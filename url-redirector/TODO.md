@@ -1,0 +1,2 @@
+- convert to typescript
+- add script to run tests suites

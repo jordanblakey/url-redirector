@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "URL Redirector",
+  "version": "1.0",
+  "description": "Redirects URLs based on user-defined rules.",
+  "permissions": [
+    "storage",
+    "webNavigation",
+    "tabs"
+  ],
+  "options_page": "options.html",
+  "background": {
+    "service_worker": "background.js"
+  }
+}

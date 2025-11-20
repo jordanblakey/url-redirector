@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Test URL Redirector Options</title>
+  <link rel="stylesheet" href="../options.css">
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>URL Redirector (Test Mode)</h1>
+      <p>Manage your redirection rules below.</p>
+    </header>
+
+    <section class="add-rule-section">
+      <div class="input-group">
+        <label for="sourceUrl">Source URL (e.g., example.com)</label>
+        <input type="text" id="sourceUrl" placeholder="Enter source URL">
+      </div>
+      <div class="input-group">
+        <label for="targetUrl">Target URL (e.g., google.com)</label>
+        <input type="text" id="targetUrl" placeholder="Enter target URL">
+      </div>
+      <button id="addRuleBtn">Add Rule</button>
+    </section>
+
+    <section class="rules-list-section">
+      <h2>Active Rules</h2>
+      <ul id="rulesList">
+        <!-- Rules will be populated here -->
+      </ul>
+    </section>
+  </div>
+  <script src="mock-chrome.js"></script>
+  <script src="../options.js"></script>
+</body>
+
+</html>
