@@ -1,2 +1,3 @@
 - convert to typescript
-- add script to run tests suites
+- run tests on precommit hook
+- [x] add script to run tests suites (Playwright)
