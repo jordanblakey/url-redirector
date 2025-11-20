@@ -9,6 +9,9 @@
     "tabs"
   ],
   "options_page": "options.html",
+  "action": {
+    "default_title": "URL Redirector"
+  },
   "background": {
     "service_worker": "dist/background.js",
     "type": "module"

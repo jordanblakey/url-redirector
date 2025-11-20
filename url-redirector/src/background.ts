@@ -40,6 +40,27 @@ chrome.webNavigation.onBeforeNavigate.addListener(
                     rule.count = (rule.count || 0) + 1;
                     chrome.storage.local.set({ rules });
 
+                    // Show badge to indicate redirection (if available)
+                    try {
+                        if (typeof chrome !== 'undefined' && chrome.action && chrome.action.setBadgeText) {
+                            chrome.action.setBadgeText({ text: '🔀' });
+                            chrome.action.setBadgeBackgroundColor({ color: 'hsla(34, 100%, 50%, 1.00)' }); // Orange to match emoji
+
+                            // Clear badge after 3 seconds
+                            setTimeout(() => {
+                                try {
+                                    if (typeof chrome !== 'undefined' && chrome.action && chrome.action.setBadgeText) {
+                                        chrome.action.setBadgeText({ text: '' });
+                                    }
+                                } catch (e) {
+                                    // Silently fail if action API not available
+                                }
+                            }, 3000);
+                        }
+                    } catch (e) {
+                        // Silently fail if action API not available
+                    }
+
                     chrome.tabs.update(details.tabId, { url: target });
                     break; // Stop after first match
                 }

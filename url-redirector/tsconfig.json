@@ -15,7 +15,8 @@
         "moduleResolution": "node",
         "resolveJsonModule": true,
         "types": [
-            "chrome"
+            "chrome",
+            "node"
         ]
     },
     "include": [
