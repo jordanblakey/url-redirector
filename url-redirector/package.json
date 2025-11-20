@@ -9,15 +9,13 @@
   "scripts": {
     "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "test:headed": "playwright test --headed",
-    "prepare": "husky"
+    "test:headed": "playwright test --headed"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "@playwright/test": "^1.56.1",
-    "husky": "^9.1.7"
+    "@playwright/test": "^1.56.1"
   }
 }

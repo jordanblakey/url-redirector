@@ -88,3 +88,22 @@ url-redirector/
 ## Testing
 
 The extension uses Playwright for automated testing. Tests run against the actual `options.html` file by injecting a mock Chrome API, ensuring we test the real production code.
+
+### Pre-commit Hook
+
+A pre-commit hook automatically runs tests before each commit. See [docs/PRE_COMMIT_HOOK.md](docs/PRE_COMMIT_HOOK.md) for setup details.
+
+### Troubleshooting
+
+If you encounter issues with Playwright UI mode (`EMFILE: too many open files`), see [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for solutions.
+
+## Contributing
+
+1. Make your changes
+2. Run tests: `npm test`
+3. Commit (tests will run automatically via pre-commit hook)
+4. Push your changes
+
+## License
+
+ISC
