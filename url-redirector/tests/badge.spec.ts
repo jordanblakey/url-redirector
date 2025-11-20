@@ -22,6 +22,6 @@ test.describe('Extension Configuration', () => {
         // Verify badge-related code exists in compiled output
         expect(backgroundContent).toContain('setBadgeText');
         expect(backgroundContent).toContain('setBadgeBackgroundColor');
-        expect(backgroundContent).toContain('🔀');
+        expect(backgroundContent).toContain('✔');
     });
 });

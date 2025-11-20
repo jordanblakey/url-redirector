@@ -43,9 +43,9 @@ chrome.webNavigation.onBeforeNavigate.addListener(
                     // Show badge to indicate redirection (if available)
                     try {
                         if (typeof chrome !== 'undefined' && chrome.action && chrome.action.setBadgeText) {
-                            chrome.action.setBadgeText({ text: '🔀' });
-                            chrome.action.setBadgeBackgroundColor({ color: 'hsla(34, 100%, 50%, 1.00)' }); // Orange to match emoji
-
+                            chrome.action.setBadgeText({ text: '✔' });
+                            chrome.action.setBadgeTextColor({ color: '#ffffff' });
+                            chrome.action.setBadgeBackgroundColor({ color: '#0059ffff' }); // Orange to match emoji
                             // Clear badge after 3 seconds
                             setTimeout(() => {
                                 try {
