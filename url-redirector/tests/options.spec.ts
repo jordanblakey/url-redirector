@@ -3,6 +3,28 @@ import fs from 'fs';
 import path from 'path';
 
 // Read the mock Chrome API script
+// Note: We need to compile the mock script to JS first or read the TS file and transpile it on the fly.
+// For simplicity in this setup, we'll read the TS file but since it's simple TS (mostly JS),
+// we might need to strip types if we inject it directly.
+// However, since we are using tsc to build, we should probably use the compiled output if available,
+// or just write the mock in JS since it's injected into the browser.
+// Actually, let's read the TS file and assume it's valid JS (which it is mostly, except for type annotations).
+// Wait, type annotations will cause syntax errors in the browser.
+// We should probably keep mock-chrome as JS or compile it.
+// Let's revert mock-chrome to JS for simplicity of injection, or compile it.
+// Since we have a build step, let's assume we want to test the built extension.
+// But the mock is for the *test environment*, not the extension itself.
+// Let's use a simple trick: we'll keep mock-chrome.ts but we'll need to transpile it before injection.
+// Or simpler: just write the mock in JS inside the test file or keep it as a JS file.
+// Given the complexity of transpiling on the fly, let's keep mock-chrome.js as a JS file for now,
+// or manually strip types.
+
+// actually, let's just use the JS version of the mock for injection.
+// I'll revert mock-chrome.ts to mock-chrome.js in the next step if needed,
+// but for now let's try to read the TS file and see if it works (it won't due to types).
+// So I will rewrite the mock-chrome.ts to be valid JS (using JSDoc for types if needed) or just keep it JS.
+// Let's stick to JS for the mock to avoid complication.
+
 const mockChromeScript = fs.readFileSync(
     path.join(process.cwd(), 'test/mock-chrome.js'),
     'utf-8'
@@ -104,7 +126,7 @@ test.describe('URL Redirector Options Page', () => {
         await page.click('#addRuleBtn');
 
         // Wait for alert dialog
-        page.on('dialog', async dialog => {
+        page.on('dialog', async (dialog) => {
             expect(dialog.message()).toContain('Please enter both source and target URLs');
             await dialog.accept();
         });

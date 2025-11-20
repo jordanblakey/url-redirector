@@ -37,7 +37,18 @@ The extension will now redirect `reddit.com` and all its subpages (like `reddit.
 
 ```bash
 npm install
+npm run build
 ```
+
+### Development
+
+To automatically rebuild TypeScript files on change:
+
+```bash
+npm run build:watch
+```
+
+Then reload the extension in `chrome://extensions` to see changes.
 
 ### Running Tests
 
@@ -66,16 +77,22 @@ The test suite includes:
 
 ```
 url-redirector/
+├── src/                   # TypeScript source files
+│   ├── options.ts
+│   ├── background.ts
+│   └── types.ts
+├── dist/                  # Compiled JavaScript (gitignored)
+│   ├── options.js
+│   └── background.js
 ├── manifest.json          # Extension configuration
 ├── options.html           # Options page UI
 ├── options.css            # Styling
-├── options.js             # Options page logic
-├── background.js          # Redirection logic
 ├── test/
 │   └── mock-chrome.js     # Mock Chrome API for testing
 ├── tests/
-│   └── options.spec.js    # Playwright test suite
-└── playwright.config.js   # Playwright configuration
+│   └── options.spec.ts    # Playwright test suite
+├── tsconfig.json          # TypeScript configuration
+└── playwright.config.ts   # Playwright configuration
 ```
 
 ## How It Works
