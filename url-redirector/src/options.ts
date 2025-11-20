@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chrome.storage.local.get(['rules'], (result) => {
             const rules = (result.rules as Rule[]) || [];
             // Simple duplicate check could be added here
-            rules.push({ source, target, id: Date.now() });
+            rules.push({ source, target, id: Date.now(), count: 0 });
 
             chrome.storage.local.set({ rules }, () => {
                 sourceInput.value = '';
@@ -82,6 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const contentDiv = document.createElement('div');
             contentDiv.className = 'rule-content';
 
+            const ruleLineDiv = document.createElement('div');
+            ruleLineDiv.className = 'rule-line';
+
             const sourceSpan = document.createElement('span');
             sourceSpan.className = 'rule-source';
             sourceSpan.textContent = rule.source;
@@ -94,9 +97,17 @@ document.addEventListener('DOMContentLoaded', () => {
             targetSpan.className = 'rule-target';
             targetSpan.textContent = rule.target;
 
-            contentDiv.appendChild(sourceSpan);
-            contentDiv.appendChild(arrowSpan);
-            contentDiv.appendChild(targetSpan);
+            ruleLineDiv.appendChild(sourceSpan);
+            ruleLineDiv.appendChild(arrowSpan);
+            ruleLineDiv.appendChild(targetSpan);
+
+            const countSpan = document.createElement('span');
+            countSpan.className = 'rule-count';
+            const count = rule.count || 0;
+            countSpan.textContent = `Used ${count} time${count !== 1 ? 's' : ''}`;
+
+            contentDiv.appendChild(ruleLineDiv);
+            contentDiv.appendChild(countSpan);
 
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-btn';

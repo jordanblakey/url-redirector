@@ -36,6 +36,10 @@ chrome.webNavigation.onBeforeNavigate.addListener(
                     // Avoid infinite redirect loops if target is same as source
                     if (currentUrl.includes(target)) return;
 
+                    // Increment count
+                    rule.count = (rule.count || 0) + 1;
+                    chrome.storage.local.set({ rules });
+
                     chrome.tabs.update(details.tabId, { url: target });
                     break; // Stop after first match
                 }

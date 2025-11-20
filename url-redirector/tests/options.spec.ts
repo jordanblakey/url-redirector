@@ -62,6 +62,7 @@ test.describe('URL Redirector Options Page', () => {
         await expect(rulesList.locator('.rule-item')).toHaveCount(1);
         await expect(rulesList.locator('.rule-source')).toContainText('reddit.com');
         await expect(rulesList.locator('.rule-target')).toContainText('google.com');
+        await expect(rulesList.locator('.rule-count')).toContainText('Used 0 times');
 
         // Verify inputs are cleared
         await expect(page.locator('#sourceUrl')).toHaveValue('');

@@ -6,6 +6,7 @@ export interface Rule {
     id: number;
     source: string;
     target: string;
+    count: number;
 }
 
 export interface StorageSchema {
