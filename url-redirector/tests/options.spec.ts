@@ -68,6 +68,18 @@ test.describe('URL Redirector Options Page', () => {
         await expect(page.locator('#targetUrl')).toHaveValue('');
     });
 
+    test('should add rule on enter key', async ({ page }) => {
+        await page.fill('#sourceUrl', 'enter-key.com');
+        await page.fill('#targetUrl', 'works.com');
+        await page.press('#targetUrl', 'Enter');
+
+        await page.waitForTimeout(100);
+
+        const rulesList = page.locator('#rulesList');
+        await expect(rulesList.locator('.rule-item')).toHaveCount(1);
+        await expect(rulesList.locator('.rule-source')).toContainText('enter-key.com');
+    });
+
     test('should persist rules after reload', async ({ page }) => {
         // Add a rule
         await page.fill('#sourceUrl', 'example.com');

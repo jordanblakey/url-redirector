@@ -21,6 +21,15 @@ document.addEventListener('DOMContentLoaded', () => {
         addRule(source, target);
     });
 
+    const handleEnter = (e: KeyboardEvent) => {
+        if (e.key === 'Enter') {
+            addBtn.click();
+        }
+    };
+
+    sourceInput.addEventListener('keypress', handleEnter);
+    targetInput.addEventListener('keypress', handleEnter);
+
     function loadRules(): void {
         chrome.storage.local.get(['rules'], (result) => {
             const rules = (result.rules as Rule[]) || [];

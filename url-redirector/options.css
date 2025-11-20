@@ -122,9 +122,11 @@ li.rule-item {
 
 .rule-content {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
   overflow: hidden;
+  flex: 1;
 }
 
 .rule-source {
@@ -134,11 +136,13 @@ li.rule-item {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 45%;
 }
 
 .rule-arrow {
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: 14px;
+  flex-shrink: 0;
 }
 
 .rule-target {
@@ -147,6 +151,7 @@ li.rule-item {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 45%;
 }
 
 button.delete-btn {
