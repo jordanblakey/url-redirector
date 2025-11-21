@@ -1,4 +1,5 @@
 import { Rule } from './types.js';
+import { matchAndGetTarget } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const sourceInput = document.getElementById('sourceUrl') as HTMLInputElement;
@@ -40,14 +41,54 @@ document.addEventListener('DOMContentLoaded', () => {
     function addRule(source: string, target: string): void {
         chrome.storage.local.get(['rules'], (result) => {
             const rules = (result.rules as Rule[]) || [];
-            // Simple duplicate check could be added here
-            rules.push({ source, target, id: Date.now(), count: 0 });
+            const newRule: Rule = { source, target, id: Date.now(), count: 0 };
+            rules.push(newRule);
 
             chrome.storage.local.set({ rules }, () => {
                 sourceInput.value = '';
                 targetInput.value = '';
                 renderRules(rules);
+
+                // Check existing tabs for redirect
+                checkAndRedirectTabs(newRule);
             });
+        });
+    }
+
+    function checkAndRedirectTabs(rule: Rule): void {
+        chrome.tabs.query({}, (tabs) => {
+            let matchCount = 0;
+            const tabsToUpdate: number[] = [];
+
+            for (const tab of tabs) {
+                if (tab.id && tab.url) {
+                    const targetUrl = matchAndGetTarget(tab.url, rule);
+                    if (targetUrl) {
+                         matchCount++;
+                         // Update tab immediately
+                         chrome.tabs.update(tab.id, { url: targetUrl });
+                    }
+                }
+            }
+
+            // Increment count in bulk if matches found
+            if (matchCount > 0) {
+                incrementRuleCount(rule.id, matchCount);
+            }
+        });
+    }
+
+    function incrementRuleCount(ruleId: number, incrementBy: number): void {
+        chrome.storage.local.get(['rules'], (result) => {
+            const rules = (result.rules as Rule[]) || [];
+            const rule = rules.find(r => r.id === ruleId);
+            if (rule) {
+                rule.count = (rule.count || 0) + incrementBy;
+                chrome.storage.local.set({ rules }, () => {
+                     // Re-render to show updated count
+                     renderRules(rules);
+                });
+            }
         });
     }
 
