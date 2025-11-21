@@ -1,0 +1,7 @@
+{
+  "name": "repo-root",
+  "private": true,
+  "scripts": {
+    "test:ci": "gh workflow run ci.yml"
+  }
+}
