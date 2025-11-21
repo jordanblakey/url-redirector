@@ -5,11 +5,14 @@ const { execSync } = require('child_process');
 
 const rootDir = path.resolve(__dirname, '..');
 const distDir = path.join(rootDir, 'dist');
-const zipPath = path.join(rootDir, 'extension.zip');
+const zipPath = path.join(rootDir, 'build', 'extension.zip');
 
 async function bundle() {
     try {
         console.log('🚀 Starting bundle process...');
+
+        // Ensure build directory exists
+        fs.ensureDirSync(path.join(rootDir, 'build'));
 
         // 1. Clean & Build
         console.log('🧹 Cleaning and building...');

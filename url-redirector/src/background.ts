@@ -2,6 +2,7 @@ import { Rule } from './types.js';
 
 chrome.webNavigation.onBeforeNavigate.addListener(
     (details: chrome.webNavigation.WebNavigationBaseCallbackDetails) => {
+
         // Only redirect main frame
         if (details.frameId !== 0) return;
 
@@ -45,7 +46,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(
                         if (typeof chrome !== 'undefined' && chrome.action && chrome.action.setBadgeText) {
                             chrome.action.setBadgeText({ text: '✔' });
                             chrome.action.setBadgeTextColor({ color: '#ffffff' });
-                            chrome.action.setBadgeBackgroundColor({ color: '#0059ffff' }); // Orange to match emoji
+                            chrome.action.setBadgeBackgroundColor({ color: '#5f33ffff' }); // Orange to match emoji
                             // Clear badge after 3 seconds
                             setTimeout(() => {
                                 try {
@@ -55,7 +56,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(
                                 } catch (e) {
                                     // Silently fail if action API not available
                                 }
-                            }, 3000);
+                            }, 10000);
                         }
                     } catch (e) {
                         // Silently fail if action API not available

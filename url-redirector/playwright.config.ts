@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-    testDir: './tests',
+    testDir: './test/e2e',
     testIgnore: '**/node_modules/**',
     fullyParallel: true,
     forbidOnly: !!process.env.CI,

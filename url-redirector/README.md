@@ -17,20 +17,6 @@ Reclaim your focus and master your digital habits with URL Redirector. This simp
 4. Click **Load unpacked**
 5. Select the **project root folder** (`url-redirector`)
 
-## Publishing
-
-To package the extension for the Chrome Web Store:
-
-```bash
-npm run bundle
-```
-
-This command will:
-1.  Clean and build the project.
-2.  Create `extension.zip` in the project root.
-
-Upload `extension.zip` to the [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/dev/dashboard).
-
 ## Usage
 
 1. Right-click the extension icon and select **Options**
@@ -127,6 +113,21 @@ A pre-commit hook automatically runs tests before each commit. See [docs/PRE_COM
 ### Troubleshooting
 
 If you encounter issues with Playwright UI mode (`EMFILE: too many open files`), see [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for solutions.
+
+
+## Publishing
+
+To package the extension for the Chrome Web Store:
+
+```bash
+npm run bundle
+```
+
+This command will:
+1.  Clean and build the project.
+2.  Create `extension.zip` in the project root.
+
+Upload `extension.zip` to the [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/dev/dashboard).
 
 ## Contributing
 

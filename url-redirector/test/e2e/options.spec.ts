@@ -26,7 +26,7 @@ import path from 'path';
 // Let's stick to JS for the mock to avoid complication.
 
 const mockChromeScript = fs.readFileSync(
-    path.join(process.cwd(), 'test/mock-chrome.js'),
+    path.join(process.cwd(), 'test/mocks/mock-chrome.js'),
     'utf-8'
 );
 
