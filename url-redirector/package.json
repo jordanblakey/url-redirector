@@ -10,7 +10,7 @@
     "build": "tsc",
     "build:watch": "tsc --watch",
     "test": "playwright test",
-    "test:install": "npm install && npx playwright install chromium",
+    "test:install": "npm install && npx playwright install --with-deps chromium",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "bundle": "node scripts/bundle.js"
