@@ -1,8 +1,8 @@
 node_modules
 .git
 *.log
-playwright-report
-test-results
+test/playwright-report
+test/test-results
 .cache
 dist
 build
