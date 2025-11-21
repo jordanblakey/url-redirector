@@ -22,17 +22,9 @@ if (!chrome.storage) {
                             }
                         });
                     } else if (typeof keys === 'string') {
-                        // Handle single string key if needed, though our code uses array
                         const value = localStorage.getItem(keys);
                         if (value) result[keys] = JSON.parse(value);
-                    } else if (typeof keys === 'object') {
-                        // Handle object with defaults if needed
-                        // For now, our code passes ['rules']
                     }
-
-                    // If 'rules' is requested but not in localStorage, return empty object or defaults
-                    // Our code handles result.rules || [] so returning empty object is fine if key missing
-
                     if (callback) callback(result);
                 }, 10);
             },
@@ -44,6 +36,22 @@ if (!chrome.storage) {
                     if (callback) callback();
                 }, 10);
             }
+        }
+    };
+}
+
+if (!chrome.tabs) {
+    chrome.tabs = {
+        query: (queryInfo, callback) => {
+             // Return empty list or mock tabs
+             setTimeout(() => {
+                 if (callback) callback([]);
+             }, 10);
+        },
+        update: (tabId, updateProperties, callback) => {
+             setTimeout(() => {
+                 if (callback) callback({});
+             }, 10);
         }
     };
 }

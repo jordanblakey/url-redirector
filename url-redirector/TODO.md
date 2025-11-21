@@ -9,9 +9,9 @@
 - [] FEAT: also expose the options page as a popup.
 
 # DOING
-- [] BUG: when new rules are added, reloads should redirect tabs currently on the source url.
 
 # DONE
+- [x] BUG: when new rules are added, reloads should redirect tabs currently on the source url.
 - [x] FEAT: generate an appropriate icon for the extension.
 - [x] FEAT: badge indicating a redirection event
 - [x] FEAT: redirection count per rule
