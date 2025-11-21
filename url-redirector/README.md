@@ -1,6 +1,6 @@
 # URL Redirector Chrome Extension
 
-A simple Chrome extension that redirects URLs based on user-defined rules.
+Reclaim your focus and master your digital habits with URL Redirector. This simple yet powerful extension acts as your personal internet traffic controller, gently nudging you away from distracting websites and towards your goals. Whether you're trying to break a social media loop or simply want to streamline your workflow, URL Redirector provides an unobtrusive way to modify your browsing patterns. Define your own rules, deflect distractions, and take back your time—one redirect at a time.
 
 ## Features
 
@@ -9,13 +9,27 @@ A simple Chrome extension that redirects URLs based on user-defined rules.
 - Persistent storage of redirect rules
 - Clean, modern UI for managing rules
 
-## Installation
+## Installation (Local Development)
 
 1. Open Google Chrome
 2. Navigate to `chrome://extensions`
 3. Enable **Developer mode** in the top right corner
 4. Click **Load unpacked**
-5. Select the `url-redirector` folder
+5. Select the **project root folder** (`url-redirector`)
+
+## Publishing
+
+To package the extension for the Chrome Web Store:
+
+```bash
+npm run bundle
+```
+
+This command will:
+1.  Clean and build the project.
+2.  Create `extension.zip` in the project root.
+
+Upload `extension.zip` to the [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/dev/dashboard).
 
 ## Usage
 
