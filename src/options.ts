@@ -1,4 +1,4 @@
-import { Rule, StorageResult } from './types.js';
+import { Rule, StorageResult } from './types';
 import { matchAndGetTarget } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
