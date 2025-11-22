@@ -1,46 +1,8 @@
 #!/usr/bin/env node
 
-const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
-const dotenv = require('dotenv');
+const { loadGcpSecrets } = require('./load-dotenv-from-gcp');
 
-async function loadGcpSecrets() {
-  const client = new SecretManagerServiceClient();
-
-  const projectId = process.env.GOOGLE_CLOUD_PROJECT || 'url-redirector-479005';
-  const secretName = process.env.GCP_SECRET_NAME || 'url-redirector-dotenv';
-  const name = `projects/${projectId}/secrets/${secretName}/versions/latest`;
-
-  try {
-    const [version] = await client.accessSecretVersion({ name });
-    const secretPayload = version.payload.data.toString();
-
-    const envConfig = dotenv.parse(secretPayload);
-    for (const k in envConfig) {
-      process.env[k] = envConfig[k];
-    }
-
-  } catch (error) {
-    // --- ADC GUARD CLAUSE ---
-    // Check for common credential errors (Missing ADC, invalid paths, or gRPC Unauthenticated)
-    if (
-      error.message.includes('Could not load the default credentials') ||
-      error.message.includes('no credentials found') ||
-      error.code === 16 // gRPC status for UNAUTHENTICATED
-    ) {
-      console.error('\n\x1b[31m%s\x1b[0m', 'ERROR: Google Cloud Credentials not found or invalid.'); // Red text
-      console.error('The script cannot access Secret Manager without authentication.');
-      console.error('\nPlease run the following command to log in:');
-      console.error('\x1b[36m%s\x1b[0m', '  gcloud auth application-default login'); // Cyan text
-      console.error('\nOr set GOOGLE_APPLICATION_CREDENTIALS to your key file path.\n');
-      process.exit(1); // Exit gracefully
-    }
-
-    // If it's a different error (e.g., Secret doesn't exist, Permission Denied), rethrow it
-    throw error;
-  }
-}
-
-// --- Helper Functions (Unchanged) ---
+// --- Helper Functions ---
 async function getAccessToken(clientId, clientSecret, refreshToken) {
   const response = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
