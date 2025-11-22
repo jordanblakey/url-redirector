@@ -9,7 +9,6 @@
 - [x] CI: understand the different coverage categories. improve branch coverage if needed.
 - [x] BUG: "Active Rules" is a bit misleading with new pause/resume feature. "Redirection Rules"? "Rules"?
 - [x] BUG: adding a rule to popup should immediately redirect tabs currently on the source url. Write test.
-- [x] BUG: adding a rule to popup should immediately redirect tabs currently on the source url. Write test.
 - [x] BUG: is there an alternative layout for URL Redirector E2E Coverage Report when running npm tests? The current layout hides the pass/fail status and you have to scroll up.
 - [x] BUG: persist badge for 10 seconds
 - [x] BUG: prevent new rules by validation criteria: must be url, must not be empty, must not be duplicate, source and dest must not be the same. Write tests.

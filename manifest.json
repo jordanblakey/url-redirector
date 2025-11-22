@@ -3,11 +3,7 @@
   "name": "URL Redirector",
   "version": "1.0",
   "description": "Redirects URLs based on user-defined rules.",
-  "permissions": [
-    "storage",
-    "webNavigation",
-    "tabs"
-  ],
+  "permissions": ["storage", "webNavigation", "tabs"],
   "options_page": "options.html",
   "icons": {
     "128": "icons/icon-128.png"
