@@ -1,16 +1,11 @@
 name: CI
 
 on:
-  push:
   pull_request:
-  workflow_dispatch:
 
 jobs:
   url-redirector:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: .
     steps:
       - uses: actions/checkout@v4
       - name: Setup Node.js
