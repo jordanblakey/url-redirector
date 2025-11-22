@@ -1,39 +1,37 @@
 # Pre-commit Hook Setup
 
-## Current Setup
+## Overview
 
-Since the git repository is at `/home/invisible/projects/learn-antigravity` (parent directory), the pre-commit hook is installed at:
+A pre-commit hook is available to automatically run tests before every commit. This ensures that broken code is never committed to the repository.
 
-```
-/home/invisible/projects/learn-antigravity/.git/hooks/pre-commit
-```
+## Setup
+
+Since the repository root contains the `.git` directory, you can install the pre-commit hook by copying the provided script to your git hooks directory.
+
+### Installation
+
+1.  Ensure you are in the root of the repository.
+2.  Make the hook executable and copy it:
+
+    ```bash
+    chmod +x .husky/pre-commit
+    cp .husky/pre-commit .git/hooks/pre-commit
+    ```
+
+    *(Note: If you are using a newer version of git or a different hook manager, adjust the path accordingly. The standard git hook path is `.git/hooks/pre-commit`)*
 
 ## How It Works
 
-The hook automatically runs tests for `url-redirector` when you commit changes to files in that directory:
+The hook:
+1.  Checks if you are committing changes.
+2.  Runs `npm test` (which executes Playwright tests).
+3.  **Pass**: If tests pass, the commit proceeds.
+4.  **Fail**: If tests fail, the commit is aborted, allowing you to fix the issues.
 
-1. Detects if any staged files are in `url-redirector/`
-2. If yes, runs `npm test` in the `url-redirector` directory
-3. Commit proceeds only if tests pass
+## Bypassing the Hook
 
-## Testing the Hook
-
-Try making a change and committing:
+If you need to commit without running tests (e.g., for documentation updates only, or WIP commits), you can use the `--no-verify` flag:
 
 ```bash
-cd /home/invisible/projects/learn-antigravity/url-redirector
-echo "# Test" >> README.md
-git add README.md
-git commit -m "Test commit"
+git commit -m "WIP: saving work" --no-verify
 ```
-
-You should see:
-```
-Running tests for url-redirector...
-Running 6 tests using 6 workers
-  6 passed (1.0s)
-```
-
-## Note on Husky
-
-Husky was installed in `url-redirector/` but won't work because the `.git` directory is at the parent level. The manual git hook approach works better for this monorepo structure.

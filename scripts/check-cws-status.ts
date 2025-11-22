@@ -1,9 +1,9 @@
-import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
-import dotenv from 'dotenv';
+#!/usr/bin/env node
 
-// 2. Define a loader function
+const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
+const dotenv = require('dotenv');
+
 async function loadGcpSecrets() {
-  // Initialize Client
   const client = new SecretManagerServiceClient();
 
   const projectId = process.env.GOOGLE_CLOUD_PROJECT || 'url-redirector-479005';
@@ -11,17 +11,9 @@ async function loadGcpSecrets() {
   const name = `projects/${projectId}/secrets/${secretName}/versions/latest`;
 
   try {
-    // Attempt to fetch the secret
     const [version] = await client.accessSecretVersion({ name });
-
-    if (!version.payload || !version.payload.data) {
-        throw new Error('Secret payload is empty');
-    }
-
-    // Decode payload to string
     const secretPayload = version.payload.data.toString();
 
-    // Parse and inject
     const envConfig = dotenv.parse(secretPayload);
     for (const k in envConfig) {
       process.env[k] = envConfig[k];
@@ -90,7 +82,6 @@ async function checkStatus(accessToken: string, publisherId: string, extensionId
     console.log('Loading secrets from Google Cloud...');
     await loadGcpSecrets();
 
-    // 5. Define constants ONLY after secrets are loaded
     const CLIENT_ID = process.env.CWS_CLIENT_ID;
     const CLIENT_SECRET = process.env.CWS_CLIENT_SECRET;
     const REFRESH_TOKEN = process.env.CWS_REFRESH_TOKEN;
