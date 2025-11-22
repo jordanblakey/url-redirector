@@ -13,6 +13,7 @@
     "check-store-status": "node scripts/check-cws-status.js",
     "setup-store-auth": "node scripts/setup-cws-auth.js",
     "test": "playwright test",
+    "test:coverage": "npm run test && npx monocart show-report test/coverage/index.html",
     "test:ui": "playwright test --ui",
     "test:install": "playwright install --with-deps chromium",
     "update-manifest": "jq --arg v $npm_package_version '.version = $v' manifest.json > tmp.json && mv tmp.json manifest.json",
@@ -34,6 +35,7 @@
     "@types/node": "^24.10.1",
     "adm-zip": "^0.5.16",
     "fs-extra": "^11.3.2",
+    "monocart-reporter": "^2.9.23",
     "typescript": "^5.9.3"
   }
 }
