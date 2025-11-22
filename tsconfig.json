@@ -12,6 +12,7 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "sourceMap": true,
+    "sourceRoot": "src",
     "types": ["chrome", "node"]
   },
   "include": ["src/**/*"],
