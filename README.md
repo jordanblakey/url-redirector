@@ -50,28 +50,16 @@ npm run build:watch
 
 Then reload the extension in `chrome://extensions` to see changes.
 
-### Running Tests
+### Testing
 
-```bash
-# Run all tests
-npm test
-
-# Run tests with UI
-npm run test:ui
-
-# Run tests in headed mode (see browser)
-npm run test:headed
-```
+See the [Testing](#testing) section below for comprehensive testing documentation and commands.
 
 ### Test Coverage
 
 The test suite includes:
-- UI rendering tests
-- Rule addition functionality
-- Persistence verification
-- Rule deletion
-- Multiple rules handling
-- Validation tests
+- **E2E Tests**: UI rendering, rule addition, persistence, deletion, validation
+- **Build Tests**: Validates build output, file integrity, and extension completeness
+- **Unit Tests**: Utility functions and helper methods
 
 ## Project Structure
 
@@ -106,13 +94,42 @@ url-redirector/
 
 The extension uses Playwright for automated testing. Tests run against the actual `options.html` file by injecting a mock Chrome API, ensuring we test the real production code.
 
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run build validation tests
+npm run test:build
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests in headed mode (see browser)
+npm run test:headed
+```
+
 ### Pre-commit Hook
 
-A pre-commit hook automatically runs tests before each commit. See [docs/PRE_COMMIT_HOOK.md](docs/PRE_COMMIT_HOOK.md) for setup details.
+A pre-commit hook automatically runs tests before each commit. See [docs/pre-commit-hook.md](docs/pre-commit-hook.md) for setup details.
 
 ### Troubleshooting
 
-If you encounter issues with Playwright UI mode (`EMFILE: too many open files`), see [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) for solutions.
+If you encounter issues with Playwright UI mode (`EMFILE: too many open files`), see [docs/troubleshooting.md](docs/troubleshooting.md) for solutions.
+
+## Documentation
+
+Comprehensive guides and technical documentation:
+
+### 📚 Development Guides
+- **[Build Tests](docs/build-tests.md)** - Complete guide to build validation tests, what's tested, and how to add new tests
+- **[Build & Bundle Refactoring](docs/build-bundle-refactoring.md)** - Analysis of the build/bundle architecture and why composition is better than duplication
+
+### 🔧 Setup & Configuration
+- **[Pre-commit Hook](docs/pre-commit-hook.md)** - Setting up automated testing before commits
+- **[Troubleshooting](docs/troubleshooting.md)** - Solutions for common development issues
+
 
 
 ## Publishing
