@@ -43,15 +43,23 @@ if (!chrome.storage) {
 if (!chrome.tabs) {
     chrome.tabs = {
         query: (queryInfo, callback) => {
-             // Return empty list or mock tabs
-             setTimeout(() => {
-                 if (callback) callback([]);
-             }, 10);
+            // Return empty list or mock tabs
+            setTimeout(() => {
+                if (callback) callback([]);
+            }, 10);
         },
         update: (tabId, updateProperties, callback) => {
-             setTimeout(() => {
-                 if (callback) callback({});
-             }, 10);
+            setTimeout(() => {
+                if (callback) callback({});
+            }, 10);
+        }
+    };
+}
+
+if (!chrome.runtime) {
+    chrome.runtime = {
+        getManifest: () => {
+            return { version: '1.0.0' };
         }
     };
 }
