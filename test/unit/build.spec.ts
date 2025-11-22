@@ -4,18 +4,24 @@ import * as path from 'path';
 import { execSync } from 'child_process';
 
 const rootDir = path.resolve(__dirname, '../..');
-const distDir = path.join(rootDir, 'dist');
-
-test.describe.configure({ mode: 'serial' });
+// Create a unique temporary directory for this test run
+const distDir = path.join(rootDir, `dist-test-${Date.now()}`);
 
 test.describe('Build Process Validation', () => {
     test.beforeAll(() => {
-        // Run the build command before tests
-        console.log('Running build command...');
-        execSync('npm run build', {
+        // Run the build command with the custom output directory
+        // console.log(`Running build command with output to ${distDir}...`);
+        execSync(`npm run build -- "${distDir}"`, {
             cwd: rootDir,
-            stdio: 'inherit'
+            stdio: 'pipe' // Suppress output for this test
         });
+    });
+
+    test.afterAll(() => {
+        // Clean up the temporary directory
+        if (fs.existsSync(distDir)) {
+            fs.rmSync(distDir, { recursive: true, force: true });
+        }
     });
 
     test('dist directory should exist', () => {
@@ -252,7 +258,7 @@ test.describe('Build Process Validation', () => {
             const filesBefore = getFileList(distDir);
 
             // Run build again
-            execSync('npm run build', {
+            execSync(`npm run build -- "${distDir}"`, {
                 cwd: rootDir,
                 stdio: 'pipe' // Suppress output for this test
             });

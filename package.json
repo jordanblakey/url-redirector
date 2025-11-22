@@ -7,20 +7,22 @@
     "test": "test"
   },
   "scripts": {
-    "build": "node scripts/build.js",
     "build:watch": "tsc --watch",
+    "build": "node scripts/build.js",
+    "bundle": "node scripts/bundle.js",
+    "check-store-status": "node scripts/check-cws-status.js",
+    "setup-store-auth": "node scripts/setup-cws-auth.js",
     "test": "playwright test",
-    "test:build": "playwright test test/unit/build.spec.ts",
-    "test:install": "npm install && npx playwright install --with-deps chromium",
     "test:ui": "playwright test --ui",
-    "test:headed": "playwright test --headed",
-    "test:ci": "gh workflow run ci.yml",
-    "bundle": "node scripts/bundle.js"
+    "test:install": "playwright install --with-deps chromium"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "dependencies": {
+    "@google-cloud/secret-manager": "^6.1.1",
+    "dotenv": "^16.4.5"
+  },
   "devDependencies": {
     "@playwright/test": "^1.56.1",
     "@types/adm-zip": "^0.5.7",

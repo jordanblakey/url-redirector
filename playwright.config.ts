@@ -1,9 +1,10 @@
 import { defineConfig } from '@playwright/test';
+import path from 'path';
 
 export default defineConfig({
-    testDir: './test',
+    testDir: '.',
     testMatch: ['**/*.spec.ts'],
-    testIgnore: '**/node_modules/**',
+    testIgnore: ['**/node_modules/**'],
     fullyParallel: true,
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 2 : 0,
@@ -12,11 +13,12 @@ export default defineConfig({
     outputDir: 'test/test-results',
     use: {
         baseURL: 'http://localhost:8000',
-        trace: 'on-first-retry',
+        trace: 'on-first-retry'
     },
     webServer: {
         command: 'python3 -m http.server 8000',
         url: 'http://localhost:8000',
         reuseExistingServer: !process.env.CI,
+        cwd: '.',
     },
 });

@@ -3,7 +3,9 @@ const path = require('path');
 const { execSync } = require('child_process');
 
 const rootDir = path.resolve(__dirname, '..');
-const distDir = path.join(rootDir, 'dist');
+const args = process.argv.slice(2);
+const customDist = args[0];
+const distDir = customDist ? path.resolve(customDist) : path.join(rootDir, 'dist');
 
 async function build() {
     try {
@@ -15,7 +17,7 @@ async function build() {
 
         // 2. Compile TypeScript
         console.log('🔨 Compiling TypeScript...');
-        execSync('tsc', { stdio: 'inherit', cwd: rootDir });
+        execSync(`tsc --outDir "${distDir}"`, { stdio: 'inherit', cwd: rootDir });
 
         // 3. Copy static assets
         console.log('📂 Copying static assets...');
