@@ -1,0 +1,36 @@
+## TODO
+
+- [] STYLE: improve visual styling and branding of the options page
+
+## DELEGATED
+
+
+## DOING
+
+- [] FEAT: also expose the options page as a popup.
+
+## DONE
+
+- [x] BUG: persist badge for 10 seconds
+- [x] BUG: prevent new rules by validation criteria: must be url, must not be empty, must not be duplicate, source and dest must not be the same. Write tests.
+- [x] BUG: when new rules are added, reloads should redirect tabs currently on the source url.
+- [x] CI: add github action to publish new version to chrome web store
+- [x] CI: add github actions to run tests on PR
+- [x] CI: add script to run tests suites (Playwright)
+- [x] CI: create a versioning strategy for the extension
+- [x] CI: run tests on precommit hook
+- [x] CLEANUP: bundles should go in a gitignored build/ top level directory.
+- [x] CLEANUP: look at all comments in the codebase to make sure they make sense, and are needed.
+- [x] CLEANUP: there are too many top level test directories. playwright-report, test-results, test.
+- [x] CLEANUP: Update readme based on recent changes
+- [x] FEAT: Add a test coverage report.
+- [x] FEAT: add script to bundle extension (crx)
+- [x] FEAT: add TS type annotations anywhere appropriate throughout the codebase. Create type definitions and interfaces if needed.
+- [x] FEAT: badge indicating a redirection event
+- [x] FEAT: create a utility script to read dotenv from Secret Manager. Refactor check-cws-status to use it.
+- [x] FEAT: explore using TS for scripts/ and anywhere .js files are still used. Validate that it works.
+- [x] FEAT: generate an appropriate icon for the extension.
+- [x] FEAT: redirection count per rule
+- [x] FEAT: submit a rule on enter keypress
+- [x] FEAT:convert to typescript
+- [x] STYLE: make the rule display one line like source -> target
