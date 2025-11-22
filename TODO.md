@@ -6,10 +6,9 @@
 
 ## DOING
 
-- [] CLEANUP: reorg to assets/ folder
-
 ## DONE
 
+- [x] CLEANUP: reorg to assets/ folder
 - [x] CI: understand the different coverage categories. improve branch coverage if needed.
 - [x] BUG: "Active Rules" is a bit misleading with new pause/resume feature. "Redirection Rules"? "Rules"?
 - [x] BUG: adding a rule to popup should immediately redirect tabs currently on the source url. Write test.

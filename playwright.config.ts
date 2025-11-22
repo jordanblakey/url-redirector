@@ -1,5 +1,4 @@
 import { defineConfig } from "@playwright/test";
-import path from "path";
 
 export default defineConfig({
   testDir: ".",
@@ -15,6 +14,7 @@ export default defineConfig({
         name: "URL Redirector E2E Coverage Report",
         outputFile: "test/coverage/index.html",
         open: true,
+        logging: "warn", // "debug", "info", "warn", "error"
         coverage: {
           lcov: true,
           reports: ["v8", "console-details"],
