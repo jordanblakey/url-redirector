@@ -1,14 +1,22 @@
 ## TODO
 
 - [] STYLE: improve visual styling and branding of the options page
-- [] CI: add github actions to test, build and publish new version to chrome web store
-- [] FEAT: also expose the options page as a popup.
-- [] FEAT: create a utility script to read dotenv from Secret Manager. Refactor check-cws-status to use it.
+- [] FEAT: add TS type annotations anywhere appropriate throughout the codebase. Create type definitions and interfaces if needed.
+- [] FEAT: Test coverage report. Add summary to main npm run test command: # and names of suites passed/failed.
+
+## DELEGATED
+- [] CLEANUP: look at all comments in the codebase to make sure they make sense, and are needed. Where possible, let the code be self explanatory. But leave comments that improve readability and maintainability.
+- [] CLEANUP: Update readme based on recent changes
+- [] FEAT: explore using TS for scripts/ and anywhere .js files are still used. Validate that it works. This may involve changing babel settings or using ts-node or a similar tool. Does this make sense to do?
+- [] BUG: actually prevent new rules being added for validation criteria: must be url, must not be empty, must not be duplicate, source and dest must not be the same. Write tests to ensure the validation works.
+
 
 ## DOING
+- [] FEAT: also expose the options page as a popup.
 
 ## DONE
 
+- [x] CI: add github action to publish new version to chrome web store
 - [x] CI: create a versioning strategy for the extension
 - [x] CI: add github actions to run tests on PR
 - [x] BUG: when new rules are added, reloads should redirect tabs currently on the source url.
