@@ -1,7 +1,7 @@
 ## TODO
 
 - [] CLEANUP: combine CSS for popup and options pages if feasible.
-- [] CI: improve branch coverage for utils.js understand the different coverage categories.
+- [] CI: understand the different coverage categories. improve branch coverage if needed.
 - [] CLEANUP: understand the purpose of sourcemaps in dist/ and remove them if not needed. What's the value?
 - [] BUG: resuming should immediately redirect tabs currently on the source url. Write test.
 - [] BUG: adding a rule to popup should immediately redirect tabs currently on the source url. Write test.
