@@ -83,6 +83,7 @@ For more details on the build validation tests, see [docs/build-tests.md](docs/b
 - **[Build System](docs/build-system.md)**: Understand how the build and bundle scripts work.
 - **[Build Tests](docs/build-tests.md)**: Details on the build validation test suite.
 - **[Pre-commit Hook](docs/pre-commit-hook.md)**: Setup for automated testing before commits.
+- **[Source Maps](docs/sourcemaps.md)**: How to use the bundled sourcemaps for production debugging.
 - **[Troubleshooting](docs/troubleshooting.md)**: Solutions for common issues.
 
 ## Contributing
