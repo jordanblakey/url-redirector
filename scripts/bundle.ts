@@ -1,7 +1,7 @@
-const fs = require('fs-extra');
-const path = require('path');
-const AdmZip = require('adm-zip');
-const { execSync } = require('child_process');
+import fs from 'fs-extra';
+import path from 'path';
+import AdmZip from 'adm-zip';
+import { execSync } from 'child_process';
 
 const rootDir = path.resolve(__dirname, '..');
 const distDir = path.join(rootDir, 'dist');
@@ -39,7 +39,7 @@ async function bundle() {
         console.log(`📂 Extension: ${distDir}`);
         console.log(`📦 Web Store ZIP: ${zipPath}`);
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('❌ Bundling failed:', error.message);
         process.exit(1);
     }
