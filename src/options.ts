@@ -28,8 +28,32 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        if (!isValidUrl(source) || !isValidUrl(target)) {
+            alert('Invalid URL. Please enter a valid URL (e.g., example.com or https://example.com).');
+            return;
+        }
+
+        if (source === target) {
+            alert('Source and target cannot be the same.');
+            return;
+        }
+
         addRule(source, target);
     });
+
+    function isValidUrl(string: string): boolean {
+        try {
+            // Check if it matches a basic domain pattern or full URL
+            const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+            if (urlPattern.test(string)) {
+                return true;
+            }
+            new URL(string);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
 
     const handleEnter = (e: KeyboardEvent) => {
         if (e.key === 'Enter') {
@@ -50,6 +74,13 @@ document.addEventListener('DOMContentLoaded', () => {
     function addRule(source: string, target: string): void {
         chrome.storage.local.get(['rules'], (result) => {
             const rules = (result.rules as Rule[]) || [];
+
+            // Check for duplicate source
+            if (rules.some(rule => rule.source === source)) {
+                alert('Duplicate source. A rule for this source URL already exists.');
+                return;
+            }
+
             const newRule: Rule = { source, target, id: Date.now(), count: 0 };
             rules.push(newRule);
 

@@ -40,6 +40,14 @@ if (!chrome.storage) {
     };
 }
 
+if (!chrome.runtime) {
+    chrome.runtime = {
+        getManifest: () => {
+            return { version: '1.0.0' };
+        }
+    };
+}
+
 if (!chrome.tabs) {
     chrome.tabs = {
         query: (queryInfo, callback) => {
