@@ -62,11 +62,6 @@ test.describe('Build Process Validation', () => {
             expect(fs.existsSync(optionsHtmlPath)).toBe(true);
         });
 
-        test('options.css should exist in dist', () => {
-            const optionsCssPath = path.join(distDir, 'options.css');
-            expect(fs.existsSync(optionsCssPath)).toBe(true);
-        });
-
         test('icons directory should exist in dist', () => {
             const iconsDir = path.join(distDir, 'icons');
             expect(fs.existsSync(iconsDir)).toBe(true);
@@ -165,11 +160,11 @@ test.describe('Build Process Validation', () => {
             });
         });
 
-        test('options.html should reference options.css', () => {
+        test('options.html should reference style.css', () => {
             const htmlPath = path.join(distDir, 'options.html');
             const content = fs.readFileSync(htmlPath, 'utf8');
 
-            expect(content).toContain('options.css');
+            expect(content).toContain('styles.css');
         });
 
         test('options.html should reference options.js', () => {
@@ -195,11 +190,11 @@ test.describe('Build Process Validation', () => {
             const requiredFiles = [
                 'manifest.json',
                 'options.html',
-                'options.css',
+                'popup.html',
+                'styles.css',
                 'background.js',
                 'options.js',
                 'utils.js',
-                'types.js',
                 'icons/icon-128.png',
                 'icons/icon-256.png'
             ];
