@@ -12,3 +12,7 @@ export interface Rule {
 export interface StorageSchema {
     rules: Rule[];
 }
+
+export interface StorageResult {
+    rules?: Rule[];
+}
