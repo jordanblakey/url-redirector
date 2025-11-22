@@ -138,7 +138,7 @@ test.describe('Build Process Validation', () => {
 
             // Check icons in manifest
             if (manifest.icons) {
-                Object.values(manifest.icons).forEach((iconPath: any) => {
+                Object.values(manifest.icons).forEach((iconPath: string) => {
                     const fullPath = path.join(distDir, iconPath);
                     expect(fs.existsSync(fullPath)).toBe(true);
                 });
@@ -146,7 +146,7 @@ test.describe('Build Process Validation', () => {
 
             // Check action icons
             if (manifest.action && manifest.action.default_icon) {
-                Object.values(manifest.action.default_icon).forEach((iconPath: any) => {
+                Object.values(manifest.action.default_icon).forEach((iconPath: string) => {
                     const fullPath = path.join(distDir, iconPath);
                     expect(fs.existsSync(fullPath)).toBe(true);
                 });

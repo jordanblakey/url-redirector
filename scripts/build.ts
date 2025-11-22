@@ -59,7 +59,7 @@ async function build() {
         console.log('🎉 Build complete!');
         console.log(`📦 Extension files are in: ${distDir}`);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
         console.error('❌ Build failed:', error);
         process.exit(1);
     }
