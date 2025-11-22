@@ -1,21 +1,22 @@
 ## TODO
 
-- [] BUG: types.js should not be in dist
+- [] BUG: is there an alternative layout for URL Redirector E2E Coverage Report when running npm tests? The current layout hides the pass/fail status and you have to scroll up.
 
 ## DELEGATED
 
 - [] CLEANUP: understand the purpose of sourcemaps in dist/ and remove them if not needed. What's the value?
-- [] CLEANUP: evaluate the use of 'any' in the codebase. Replace with appropriate types where desirable.
 - [] CI: understand the different coverage categories. improve branch coverage if needed.
-- [] BUG: "Active Rules" is a bit misleading with new pause/resume feature. "Redirection Rules"? "Rules"?
+- [] BUG: types.js should not be in dist
 
 ## DOING
 
-- [] BUG: resuming should immediately redirect tabs currently on the source url. Write test.
-- [] BUG: adding a rule to popup should immediately redirect tabs currently on the source url. Write test.
 
 ## DONE
 
+- [x] BUG: "Active Rules" is a bit misleading with new pause/resume feature. "Redirection Rules"? "Rules"?
+- [x] CLEANUP: evaluate the use of 'any' in the codebase. Replace with appropriate types where desirable.
+- [x] BUG: resuming should immediately redirect tabs currently on the source url. Write test.
+- [x] BUG: adding a rule to popup should immediately redirect tabs currently on the source url. Write test.
 - [x] CLEANUP: combine CSS for popup and options pages if feasible.
 - [x] BUG: resuming should immediately redirect tabs currently on the source url. Write test.
 - [x] BUG: adding a rule to popup should immediately redirect tabs currently on the source url. Write test.
