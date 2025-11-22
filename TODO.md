@@ -2,7 +2,11 @@
 
 ## DELEGATED
 
+- [] BUG: Monocart reporter sourcemap pathing errors
+
 ## DOING
+
+- [] CLEANUP: reorg to assets/ folder
 
 ## DONE
 

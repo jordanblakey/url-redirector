@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>URL Redirector Popup</title>
+  <link rel="stylesheet" href="../styles/base.css" />
+  <link rel="stylesheet" href="../styles/popup.css" />
+</head>
+
+<body class="popup-page">
+  <div class="container">
+    <header>
+      <h1>URL Redirector</h1>
+      <p>Manage your redirection rules below.</p>
+    </header>
+
+    <section class="add-rule-section">
+      <div class="input-group">
+        <label for="sourceUrl"><b>Source URL</b>
+          <span class="text-secondary">(e.g. example.com)</span></label>
+        <input type="text" id="sourceUrl" placeholder="Enter source URL" />
+      </div>
+      <div class="input-group">
+        <label for="targetUrl"><b>Target URL</b>
+          <span class="text-secondary">(e.g. google.com)</span></label>
+        <input type="text" id="targetUrl" placeholder="Enter target URL" />
+      </div>
+      <button id="addRuleBtn">Add Rule</button>
+    </section>
+
+    <section class="rules-list-section">
+      <h2>Redirection Rules</h2>
+      <ul id="rulesList">
+        <!-- Rules will be populated here -->
+      </ul>
+    </section>
+  </div>
+  <script src="../popup.js" type="module"></script>
+</body>
+
+</html>

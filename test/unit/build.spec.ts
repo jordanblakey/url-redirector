@@ -58,7 +58,7 @@ test.describe("Build Process Validation", () => {
     });
 
     test("options.html should exist in dist", () => {
-      const optionsHtmlPath = path.join(distDir, "options.html");
+      const optionsHtmlPath = path.join(distDir, "html", "options.html");
       expect(fs.existsSync(optionsHtmlPath)).toBe(true);
     });
 
@@ -160,7 +160,7 @@ test.describe("Build Process Validation", () => {
     });
 
     test("options.html should reference the new CSS files", () => {
-      const htmlPath = path.join(distDir, "options.html");
+      const htmlPath = path.join(distDir, "html", "options.html");
       const content = fs.readFileSync(htmlPath, "utf8");
 
       expect(content).toContain("styles/base.css");
@@ -168,7 +168,7 @@ test.describe("Build Process Validation", () => {
     });
 
     test("options.html should reference options.js", () => {
-      const htmlPath = path.join(distDir, "options.html");
+      const htmlPath = path.join(distDir, "html", "options.html");
       const content = fs.readFileSync(htmlPath, "utf8");
 
       expect(content).toContain("options.js");
@@ -189,8 +189,8 @@ test.describe("Build Process Validation", () => {
     test("dist should contain all files needed for a working extension", () => {
       const requiredFiles = [
         "manifest.json",
-        "options.html",
-        "popup.html",
+        "html/options.html",
+        "html/popup.html",
         "styles/base.css",
         "styles/options.css",
         "styles/popup.css",

@@ -15,7 +15,7 @@ const mockChromeScript = ts.transpileModule(mockChromeTs, {
 test.describe('Rule Validation', () => {
     test.beforeEach(async ({ page }) => {
         await page.addInitScript(mockChromeScript);
-        await page.goto('/dist/options.html');
+        await page.goto('/dist/html/options.html');
     });
 
     test('should prevent adding invalid URL', async ({ page }) => {

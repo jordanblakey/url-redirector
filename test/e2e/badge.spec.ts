@@ -18,7 +18,7 @@ test.describe('Badge Functionality', () => {
 
         // Navigate to a page to provide a context (we use popup.html but it could be blank)
         // We need a page that can load modules from dist/
-        await page.goto('/dist/popup.html');
+        await page.goto('/dist/html/popup.html');
     });
 
     test('should show badge on redirection', async ({ page }) => {
