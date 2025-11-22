@@ -95,7 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkAndRedirectTabs(rule: Rule): void {
         chrome.tabs.query({}, (tabs) => {
             let matchCount = 0;
-            // const tabsToUpdate: number[] = []; // Unused
 
             for (const tab of tabs) {
                 if (tab.id && tab.url) {
