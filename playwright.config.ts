@@ -28,9 +28,9 @@ export default defineConfig({
         trace: 'on-first-retry'
     },
     webServer: {
-        command: 'python3 -m http.server 8000',
+        command: 'python3 -m http.server 8000 2>/dev/null',
         url: 'http://localhost:8000',
         reuseExistingServer: !process.env.CI,
-        cwd: '.',
+        cwd: '.'
     },
 });

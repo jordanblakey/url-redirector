@@ -19,8 +19,7 @@ interface MockChrome {
     };
 }
 
-// Note: This file is transpiled to JS before being injected into the browser
-// We don't use global declarations here to avoid module syntax in the output
+// This file is transpiled to JS before being injected into the browser
 
 
 if (typeof globalThis.chrome === 'undefined') {
