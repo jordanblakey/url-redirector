@@ -1,13 +1,39 @@
 // Mock Chrome API for testing in a standard browser environment
-if (typeof chrome === 'undefined') {
-    window.chrome = {};
+
+// Define types for our mock
+interface MockStorageArea {
+    get: (keys: string | string[] | null, callback: (result: { [key: string]: any }) => void) => void;
+    set: (items: { [key: string]: any }, callback?: () => void) => void;
 }
 
-if (!chrome.storage) {
-    chrome.storage = {
+interface MockChrome {
+    storage?: {
+        local: MockStorageArea;
+    };
+    runtime?: {
+        getManifest: () => { version: string };
+    };
+    tabs?: {
+        query: (queryInfo: any, callback: (tabs: any[]) => void) => void;
+        update: (tabId: number, updateProperties: any, callback?: (tab?: any) => void) => void;
+    };
+}
+
+// Note: This file is transpiled to JS before being injected into the browser
+// We don't use global declarations here to avoid module syntax in the output
+
+
+if (typeof globalThis.chrome === 'undefined') {
+    (globalThis as any).chrome = {};
+}
+
+const chromeMock = (globalThis as any).chrome as MockChrome;
+
+if (!chromeMock.storage) {
+    chromeMock.storage = {
         local: {
-            get: (keys, callback) => {
-                const result = {};
+            get: (keys: string | string[] | null, callback: (result: { [key: string]: any }) => void) => {
+                const result: { [key: string]: any } = {};
                 // Simulate async behavior
                 setTimeout(() => {
                     if (Array.isArray(keys)) {
@@ -28,7 +54,7 @@ if (!chrome.storage) {
                     if (callback) callback(result);
                 }, 10);
             },
-            set: (items, callback) => {
+            set: (items: { [key: string]: any }, callback?: () => void) => {
                 setTimeout(() => {
                     Object.keys(items).forEach(key => {
                         localStorage.setItem(key, JSON.stringify(items[key]));
@@ -40,34 +66,26 @@ if (!chrome.storage) {
     };
 }
 
-if (!chrome.runtime) {
-    chrome.runtime = {
+if (!chromeMock.runtime) {
+    chromeMock.runtime = {
         getManifest: () => {
             return { version: '1.0.0' };
         }
     };
 }
 
-if (!chrome.tabs) {
-    chrome.tabs = {
-        query: (queryInfo, callback) => {
+if (!chromeMock.tabs) {
+    chromeMock.tabs = {
+        query: (queryInfo: any, callback: (tabs: any[]) => void) => {
             // Return empty list or mock tabs
             setTimeout(() => {
                 if (callback) callback([]);
             }, 10);
         },
-        update: (tabId, updateProperties, callback) => {
+        update: (tabId: number, updateProperties: any, callback?: (tab?: any) => void) => {
             setTimeout(() => {
                 if (callback) callback({});
             }, 10);
-        }
-    };
-}
-
-if (!chrome.runtime) {
-    chrome.runtime = {
-        getManifest: () => {
-            return { version: '1.0.0' };
         }
     };
 }

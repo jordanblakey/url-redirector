@@ -25,10 +25,16 @@ import path from 'path';
 // So I will rewrite the mock-chrome.ts to be valid JS (using JSDoc for types if needed) or just keep it JS.
 // Let's stick to JS for the mock to avoid complication.
 
-const mockChromeScript = fs.readFileSync(
-    path.join(process.cwd(), 'test/mocks/mock-chrome.js'),
+import ts from 'typescript';
+
+// Read the mock Chrome API script and transpile it to JS
+const mockChromeTs = fs.readFileSync(
+    path.join(process.cwd(), 'test/mocks/mock-chrome.ts'),
     'utf-8'
 );
+const mockChromeScript = ts.transpileModule(mockChromeTs, {
+    compilerOptions: { module: ts.ModuleKind.ESNext }
+}).outputText;
 
 test.describe('URL Redirector Options Page', () => {
     test.beforeEach(async ({ page }) => {

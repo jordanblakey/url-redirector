@@ -1,7 +1,11 @@
-const { SecretManagerServiceClient } = require('@google-cloud/secret-manager');
-const dotenv = require('dotenv');
+import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
+import dotenv from 'dotenv';
 
-async function loadGcpSecrets(projectId, secretName) {
+interface SecretManagerError extends Error {
+  code?: number;
+}
+
+export async function loadGcpSecrets(projectId?: string, secretName?: string): Promise<dotenv.DotenvConfigOutput> {
   const client = new SecretManagerServiceClient();
 
   const finalProjectId = projectId || process.env.GOOGLE_CLOUD_PROJECT || 'url-redirector-479005';
@@ -10,7 +14,11 @@ async function loadGcpSecrets(projectId, secretName) {
 
   try {
     const [version] = await client.accessSecretVersion({ name });
-    const secretPayload = version.payload.data.toString();
+    const secretPayload = version.payload?.data?.toString();
+
+    if (!secretPayload) {
+      throw new Error('Secret payload is empty');
+    }
 
     const envConfig = dotenv.parse(secretPayload);
     for (const k in envConfig) {
@@ -18,13 +26,14 @@ async function loadGcpSecrets(projectId, secretName) {
     }
     return envConfig;
 
-  } catch (error) {
+  } catch (error: unknown) {
+    const err = error as SecretManagerError;
     // --- ADC GUARD CLAUSE ---
     // Check for common credential errors (Missing ADC, invalid paths, or gRPC Unauthenticated)
     if (
-      error.message.includes('Could not load the default credentials') ||
-      error.message.includes('no credentials found') ||
-      error.code === 16 // gRPC status for UNAUTHENTICATED
+      err.message.includes('Could not load the default credentials') ||
+      err.message.includes('no credentials found') ||
+      err.code === 16 // gRPC status for UNAUTHENTICATED
     ) {
       console.error('\n\x1b[31m%s\x1b[0m', 'ERROR: Google Cloud Credentials not found or invalid.'); // Red text
       console.error('The script cannot access Secret Manager without authentication.');
@@ -38,8 +47,6 @@ async function loadGcpSecrets(projectId, secretName) {
     throw error;
   }
 }
-
-module.exports = { loadGcpSecrets };
 
 // Allow running directly
 if (require.main === module) {
