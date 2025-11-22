@@ -1,20 +1,22 @@
 ## TODO
 
-- [] CLEANUP: combine CSS for popup and options pages if feasible.
-- [] CI: understand the different coverage categories. improve branch coverage if needed.
-- [] CLEANUP: understand the purpose of sourcemaps in dist/ and remove them if not needed. What's the value?
-- [] BUG: resuming should immediately redirect tabs currently on the source url. Write test.
-- [] BUG: adding a rule to popup should immediately redirect tabs currently on the source url. Write test.
+- [] BUG: types.js should not be in dist
 
 ## DELEGATED
 
+- [] CI: understand the different coverage categories. improve branch coverage if needed.
+- [] CLEANUP: understand the purpose of sourcemaps in dist/ and remove them if not needed. What's the value?
 
 ## DOING
 
-
+- [] BUG: resuming should immediately redirect tabs currently on the source url. Write test.
+- [] BUG: adding a rule to popup should immediately redirect tabs currently on the source url. Write test.
 
 ## DONE
 
+- [x] CLEANUP: combine CSS for popup and options pages if feasible.
+- [x] BUG: resuming should immediately redirect tabs currently on the source url. Write test.
+- [x] BUG: adding a rule to popup should immediately redirect tabs currently on the source url. Write test.
 - [x] BUG: why are CSS files in the coverage report?
 - [x] FEAT: also expose the options page as a popup.
 - [x] BUG: persist badge for 10 seconds
