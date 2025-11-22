@@ -17,6 +17,20 @@ interface MockChrome {
         query: (queryInfo: any, callback: (tabs: any[]) => void) => void;
         update: (tabId: number, updateProperties: any, callback?: (tab?: any) => void) => void;
     };
+    action?: {
+        setBadgeText: (details: { text: string }) => void;
+        setBadgeBackgroundColor: (details: { color: string }) => void;
+        setBadgeTextColor: (details: { color: string }) => void;
+        // Test helper to get last call
+        getLastBadgeText?: () => string;
+    };
+    webNavigation?: {
+        onBeforeNavigate: {
+            addListener: (callback: (details: any) => void) => void;
+            // Test helper to trigger event
+            dispatch?: (details: any) => void;
+        };
+    };
 }
 
 // This file is transpiled to JS before being injected into the browser
@@ -91,6 +105,37 @@ if (!chromeMock.tabs) {
             setTimeout(() => {
                 if (callback) callback({});
             }, 10);
+        }
+    };
+}
+
+if (!chromeMock.action) {
+    let lastBadgeText = '';
+    chromeMock.action = {
+        setBadgeText: (details: { text: string }) => {
+            lastBadgeText = details.text;
+            console.log(`[MockChrome] setBadgeText: ${details.text}`);
+        },
+        setBadgeBackgroundColor: (details: { color: string }) => {
+            console.log(`[MockChrome] setBadgeBackgroundColor: ${details.color}`);
+        },
+        setBadgeTextColor: (details: { color: string }) => {
+            console.log(`[MockChrome] setBadgeTextColor: ${details.color}`);
+        },
+        getLastBadgeText: () => lastBadgeText
+    };
+}
+
+if (!chromeMock.webNavigation) {
+    const listeners: ((details: any) => void)[] = [];
+    chromeMock.webNavigation = {
+        onBeforeNavigate: {
+            addListener: (callback: (details: any) => void) => {
+                listeners.push(callback);
+            },
+            dispatch: (details: any) => {
+                listeners.forEach(l => l(details));
+            }
         }
     };
 }

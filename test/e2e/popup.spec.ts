@@ -1,11 +1,15 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../fixtures';
 import fs from 'fs';
 import path from 'path';
+import ts from 'typescript';
 
-const mockChromeScript = fs.readFileSync(
-    path.join(process.cwd(), 'test/mocks/mock-chrome.js'),
+const mockChromeTs = fs.readFileSync(
+    path.join(process.cwd(), 'test/mocks/mock-chrome.ts'),
     'utf-8'
 );
+const mockChromeScript = ts.transpileModule(mockChromeTs, {
+    compilerOptions: { module: ts.ModuleKind.ESNext }
+}).outputText;
 
 test.describe('URL Redirector Popup', () => {
     test.beforeEach(async ({ page }) => {
@@ -13,7 +17,7 @@ test.describe('URL Redirector Popup', () => {
         await page.addInitScript(mockChromeScript);
 
         // Navigate to the popup page
-        await page.goto('/popup.html');
+        await page.goto('/dist/popup.html');
     });
 
     test('should display the popup correctly', async ({ page }) => {

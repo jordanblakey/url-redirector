@@ -197,3 +197,65 @@ button.delete-btn:hover {
   background-color: var(--danger-color);
   color: white;
 }
+
+/* Paused state */
+li.rule-item.paused {
+  opacity: 0.6;
+  background-color: #f3f4f6;
+}
+
+li.rule-item.paused .rule-source,
+li.rule-item.paused .rule-target {
+  text-decoration: line-through;
+  color: var(--text-secondary);
+}
+
+/* Actions container */
+.rule-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: 12px;
+  flex-shrink: 0;
+}
+
+/* Toggle button */
+button.toggle-btn {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+button.toggle-btn:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+button.toggle-btn.paused {
+  color: var(--text-secondary);
+  border-color: var(--text-secondary);
+}
+
+button.toggle-btn.paused:hover {
+  background-color: var(--text-secondary);
+  color: white;
+}
+
+/* Update delete button to not have margin-left since it's inside actions div now */
+button.delete-btn {
+  background-color: transparent;
+  color: var(--danger-color);
+  border: 1px solid var(--danger-color);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  /* margin-left: 12px; Removed */
+}

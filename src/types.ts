@@ -7,6 +7,7 @@ export interface Rule {
     source: string;
     target: string;
     count: number;
+    active: boolean;
 }
 
 export interface StorageSchema {

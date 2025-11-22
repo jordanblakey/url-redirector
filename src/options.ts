@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const newRule: Rule = { source, target, id: Date.now(), count: 0 };
+            const newRule: Rule = { source, target, id: Date.now(), count: 0, active: true };
             rules.push(newRule);
 
             chrome.storage.local.set({ rules }, () => {
@@ -138,6 +138,19 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function toggleRule(id: number): void {
+        chrome.storage.local.get(['rules'], (result: StorageResult) => {
+            const rules = result.rules || [];
+            const rule = rules.find((r) => r.id === id);
+            if (rule) {
+                rule.active = !rule.active;
+                chrome.storage.local.set({ rules }, () => {
+                    renderRules(rules);
+                });
+            }
+        });
+    }
+
     function renderRules(rules: Rule[]): void {
         rulesList.innerHTML = '';
 
@@ -153,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         rules.forEach((rule) => {
             const li = document.createElement('li');
-            li.className = 'rule-item';
+            li.className = `rule-item ${!rule.active ? 'paused' : ''}`;
 
             const contentDiv = document.createElement('div');
             contentDiv.className = 'rule-content';
@@ -185,13 +198,24 @@ document.addEventListener('DOMContentLoaded', () => {
             contentDiv.appendChild(ruleLineDiv);
             contentDiv.appendChild(countSpan);
 
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'rule-actions';
+
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = `toggle-btn ${!rule.active ? 'paused' : ''}`;
+            toggleBtn.textContent = rule.active ? 'Pause' : 'Resume';
+            toggleBtn.onclick = () => toggleRule(rule.id);
+
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-btn';
             deleteBtn.textContent = 'Delete';
             deleteBtn.onclick = () => deleteRule(rule.id);
 
+            actionsDiv.appendChild(toggleBtn);
+            actionsDiv.appendChild(deleteBtn);
+
             li.appendChild(contentDiv);
-            li.appendChild(deleteBtn);
+            li.appendChild(actionsDiv);
 
             rulesList.appendChild(li);
         });

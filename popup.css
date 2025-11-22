@@ -17,8 +17,10 @@ body {
   /* Popup specific dimensions */
   width: 400px;
   height: 600px;
-  padding: 0; /* Padding handled by container or specific elements if needed */
-  overflow-y: auto; /* Allow scrolling if content exceeds height */
+  padding: 0;
+  /* Padding handled by container or specific elements if needed */
+  overflow-y: auto;
+  /* Allow scrolling if content exceeds height */
 }
 
 .container {
@@ -26,20 +28,25 @@ body {
   width: 100%;
   /* max-width not needed as body is fixed width */
   min-height: 100%;
-  padding: 20px; /* Reduced padding for popup */
-  border-radius: 0; /* Popups usually don't need border radius on the main container */
+  padding: 20px;
+  /* Reduced padding for popup */
+  border-radius: 0;
+  /* Popups usually don't need border radius on the main container */
   box-sizing: border-box;
-  box-shadow: none; /* Popups are already in a "window" */
+  box-shadow: none;
+  /* Popups are already in a "window" */
 }
 
 header {
-  margin-bottom: 24px; /* Reduced margin */
+  margin-bottom: 24px;
+  /* Reduced margin */
   text-align: center;
 }
 
 header h1 {
   margin: 0 0 4px 0;
-  font-size: 20px; /* Smaller font */
+  font-size: 20px;
+  /* Smaller font */
   font-weight: 700;
   color: var(--text-color);
 }
@@ -47,27 +54,32 @@ header h1 {
 header p {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 12px; /* Smaller font */
+  font-size: 12px;
+  /* Smaller font */
 }
 
 .input-group {
-  margin-bottom: 12px; /* Reduced margin */
+  margin-bottom: 12px;
+  /* Reduced margin */
 }
 
 label {
   display: block;
   margin-bottom: 4px;
-  font-size: 12px; /* Smaller font */
+  font-size: 12px;
+  /* Smaller font */
   font-weight: 500;
   color: var(--text-color);
 }
 
 input[type="text"] {
   width: 100%;
-  padding: 8px 10px; /* Reduced padding */
+  padding: 8px 10px;
+  /* Reduced padding */
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  font-size: 14px; /* Smaller font */
+  font-size: 14px;
+  /* Smaller font */
   box-sizing: border-box;
   transition: border-color 0.2s;
 }
@@ -80,12 +92,14 @@ input[type="text"]:focus {
 
 button#addRuleBtn {
   width: 100%;
-  padding: 10px; /* Reduced padding */
+  padding: 10px;
+  /* Reduced padding */
   background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 6px;
-  font-size: 14px; /* Smaller font */
+  font-size: 14px;
+  /* Smaller font */
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -96,13 +110,16 @@ button#addRuleBtn:hover {
 }
 
 .rules-list-section {
-  margin-top: 24px; /* Reduced margin */
+  margin-top: 24px;
+  /* Reduced margin */
   border-top: 1px solid var(--border-color);
-  padding-top: 16px; /* Reduced padding */
+  padding-top: 16px;
+  /* Reduced padding */
 }
 
 h2 {
-  font-size: 16px; /* Smaller font */
+  font-size: 16px;
+  /* Smaller font */
   font-weight: 600;
   margin: 0 0 12px 0;
 }
@@ -117,7 +134,8 @@ li.rule-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px; /* Reduced padding */
+  padding: 10px;
+  /* Reduced padding */
   background-color: #f9fafb;
   border: 1px solid var(--border-color);
   border-radius: 6px;
@@ -142,7 +160,8 @@ li.rule-item {
 
 .rule-source {
   font-weight: 600;
-  font-size: 12px; /* Smaller font */
+  font-size: 12px;
+  /* Smaller font */
   color: var(--text-color);
   white-space: nowrap;
   overflow: hidden;
@@ -157,7 +176,8 @@ li.rule-item {
 }
 
 .rule-target {
-  font-size: 12px; /* Smaller font */
+  font-size: 12px;
+  /* Smaller font */
   font-weight: 600;
   color: var(--text-secondary);
   white-space: nowrap;
@@ -167,7 +187,8 @@ li.rule-item {
 }
 
 .rule-count {
-  font-size: 10px; /* Smaller font */
+  font-size: 10px;
+  /* Smaller font */
   color: var(--text-secondary);
   font-style: italic;
 }
@@ -176,9 +197,11 @@ button.delete-btn {
   background-color: transparent;
   color: var(--danger-color);
   border: 1px solid var(--danger-color);
-  padding: 4px 8px; /* Reduced padding */
+  padding: 4px 8px;
+  /* Reduced padding */
   border-radius: 4px;
-  font-size: 10px; /* Smaller font */
+  font-size: 10px;
+  /* Smaller font */
   font-weight: 500;
   cursor: pointer;
   margin-left: 8px;
@@ -189,4 +212,66 @@ button.delete-btn {
 button.delete-btn:hover {
   background-color: var(--danger-color);
   color: white;
+}
+
+/* Paused state */
+li.rule-item.paused {
+  opacity: 0.6;
+  background-color: #f3f4f6;
+}
+
+li.rule-item.paused .rule-source,
+li.rule-item.paused .rule-target {
+  text-decoration: line-through;
+  color: var(--text-secondary);
+}
+
+/* Actions container */
+.rule-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: 8px;
+  flex-shrink: 0;
+}
+
+/* Toggle button */
+button.toggle-btn {
+  background-color: transparent;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+button.toggle-btn:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+button.toggle-btn.paused {
+  color: var(--text-secondary);
+  border-color: var(--text-secondary);
+}
+
+button.toggle-btn.paused:hover {
+  background-color: var(--text-secondary);
+  color: white;
+}
+
+/* Update delete button to not have margin-left since it's inside actions div now */
+button.delete-btn {
+  background-color: transparent;
+  color: var(--danger-color);
+  border: 1px solid var(--danger-color);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  /* margin-left: 8px; Removed */
 }
