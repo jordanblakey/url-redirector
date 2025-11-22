@@ -142,4 +142,106 @@ test.describe('URL Redirector Options Page', () => {
         // The checkAndRedirectTabs function should have been called
         // (verified by the fact that the rule was successfully added)
     });
+
+    test('should toggle rule active state', async ({ page }) => {
+        // Add a rule first
+        await page.fill('#sourceUrl', 'toggle.com');
+        await page.fill('#targetUrl', 'target.com');
+        await page.click('#addRuleBtn');
+        await page.waitForTimeout(100);
+
+        const ruleItem = page.locator('.rule-item').first();
+        const toggleBtn = ruleItem.locator('.toggle-btn');
+
+        // Initial state: Active (Resume is not shown, Pause is shown)
+        await expect(toggleBtn).toHaveText('Pause');
+        await expect(ruleItem).not.toHaveClass(/paused/);
+
+        // Click to Pause
+        await toggleBtn.click();
+        await page.waitForTimeout(100);
+        await expect(toggleBtn).toHaveText('Resume');
+        await expect(ruleItem).toHaveClass(/paused/);
+
+        // Click to Resume
+        await toggleBtn.click();
+        await page.waitForTimeout(100);
+        await expect(toggleBtn).toHaveText('Pause');
+        await expect(ruleItem).not.toHaveClass(/paused/);
+    });
+
+    test('should prevent infinite redirect loops', async ({ page }) => {
+        // This tests the check in matchAndGetTarget inside utils.ts
+        await page.addInitScript(() => {
+            (window as any).chrome.tabs.query = (queryInfo: any, callback: any) => {
+                 callback([
+                    { id: 1, url: 'https://target.com/foo' }
+                ]);
+            };
+        });
+
+        await page.fill('#sourceUrl', 'target.com');
+        await page.fill('#targetUrl', 'target.com/foo');
+
+        await page.click('#addRuleBtn');
+        await page.waitForTimeout(100);
+
+        const countSpan = page.locator('.rule-count');
+        await expect(countSpan).toContainText('Used 0 times');
+    });
+
+    test('should handle rule not found during deletion', async ({ page }) => {
+        await page.fill('#sourceUrl', 'delete-fail.com');
+        await page.fill('#targetUrl', 'target.com');
+        await page.click('#addRuleBtn');
+        await page.waitForTimeout(100);
+
+        // Clear storage directly
+        await page.evaluate(() => {
+            window.localStorage.removeItem('rules');
+        });
+
+        // Click Delete
+        await page.click('.delete-btn');
+        await page.waitForTimeout(100);
+        // No error should occur
+    });
+
+    test('should handle rule not found during toggle', async ({ page }) => {
+        await page.fill('#sourceUrl', 'toggle-fail.com');
+        await page.fill('#targetUrl', 'target.com');
+        await page.click('#addRuleBtn');
+        await page.waitForTimeout(100);
+
+        await page.evaluate(() => {
+             window.localStorage.removeItem('rules');
+        });
+
+        await page.click('.toggle-btn');
+        await page.waitForTimeout(100);
+        // No error should occur
+    });
+
+    test('should handle rule not found during increment count', async ({ page }) => {
+        await page.addInitScript(() => {
+             (window as any).chrome.tabs.query = (queryInfo: any, callback: any) => {
+                 setTimeout(() => {
+                     callback([ { id: 1, url: 'https://increment-fail.com' } ]);
+                 }, 50);
+             };
+        });
+
+        await page.fill('#sourceUrl', 'increment-fail.com');
+        await page.fill('#targetUrl', 'target.com');
+        await page.click('#addRuleBtn');
+
+        await page.waitForTimeout(10);
+
+        await page.evaluate(() => {
+            window.localStorage.removeItem('rules');
+        });
+
+        await page.waitForTimeout(100);
+        // No error should occur
+    });
 });
