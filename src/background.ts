@@ -15,7 +15,6 @@ chrome.webNavigation.onBeforeNavigate.addListener(
                 const target = matchAndGetTarget(currentUrl, rule);
 
                 if (target) {
-                    // Increment count
                     rule.count = (rule.count || 0) + 1;
                     chrome.storage.local.set({ rules });
 
@@ -24,8 +23,8 @@ chrome.webNavigation.onBeforeNavigate.addListener(
                         if (typeof chrome !== 'undefined' && chrome.action && chrome.action.setBadgeText) {
                             chrome.action.setBadgeText({ text: '✔' });
                             chrome.action.setBadgeTextColor({ color: '#ffffff' });
-                            chrome.action.setBadgeBackgroundColor({ color: '#5f33ffff' }); // Orange to match emoji
-                            // Clear badge after 10 seconds (as per TODO done item)
+                            chrome.action.setBadgeBackgroundColor({ color: '#5f33ffff' });
+                            // Clear badge after 10 seconds
                             setTimeout(() => {
                                 try {
                                     if (typeof chrome !== 'undefined' && chrome.action && chrome.action.setBadgeText) {

@@ -2,10 +2,8 @@ import { Rule } from './types.js';
 import { matchAndGetTarget } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Get the full manifest object
     const manifest = chrome.runtime.getManifest();
 
-    // Find the element and inject the version
     const versionElement = document.getElementById('app-version');
     if (versionElement) {
         versionElement.textContent = `v${manifest.version}`;
@@ -16,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const addBtn = document.getElementById('addRuleBtn') as HTMLButtonElement;
     const rulesList = document.getElementById('rulesList') as HTMLUListElement;
 
-    // Load rules on startup
     loadRules();
 
     addBtn.addEventListener('click', () => {
@@ -94,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (rule) {
                 rule.count = (rule.count || 0) + incrementBy;
                 chrome.storage.local.set({ rules }, () => {
-                    // Re-render to show updated count
                     renderRules(rules);
                 });
             }
