@@ -10,6 +10,7 @@ node_modules
 # Test reports and results
 test/playwright-report
 test/test-results
+test/coverage
 
 # Build artifacts and caches
 .cache
