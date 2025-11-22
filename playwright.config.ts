@@ -25,7 +25,9 @@ export default defineConfig({
     outputDir: 'test/test-results',
     use: {
         baseURL: 'http://localhost:8000',
-        trace: 'on-first-retry'
+        trace: 'retain-on-failure',
+        video: 'retain-on-failure',
+        screenshot: 'only-on-failure',
     },
     webServer: {
         command: 'python3 -m http.server 8000 2>/dev/null',
