@@ -1,10 +1,27 @@
 {
+  "schedule": [
+    "before 4am on Monday"
+  ],
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "config:base",
+    ":maintainLockFilesWeekly"
   ],
   "packageRules": [
     {
+      "description": "Group all minor and patch updates for everything into one PR",
+      "matchPackagePatterns": [
+        "*"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "all non-major dependencies",
+      "groupSlug": "all-minor-patch"
+    },
+    {
+      "description": "Keep Playwright separate and synced (Docker + NPM)",
       "matchPackageNames": [
         "@playwright/test",
         "mcr.microsoft.com/playwright"
