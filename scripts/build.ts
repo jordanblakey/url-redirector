@@ -26,7 +26,7 @@ async function build() {
             'icons',
             'options.html',
             'popup.html',
-            'styles.css'
+            'styles'
         ];
 
         for (const asset of assets) {

@@ -1,0 +1,69 @@
+/* Options Page Specifics */
+.options-page {
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+  min-height: 90vh;
+  .container {
+    max-width: 600px;
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    margin-bottom: 32px;
+    h1 {
+      font-size: 24px;
+      margin: 0 0 8px 0;
+    }
+  }
+  .input-group {
+    margin-bottom: 16px;
+    .text-secondary {
+      color: var(--text-secondary);
+    }
+  }
+  label {
+    margin-bottom: 6px;
+    font-size: 14px;
+  }
+  input[type="text"] {
+    padding: 10px 12px;
+    font-size: 16px;
+  }
+  button#addRuleBtn {
+    padding: 12px;
+    font-size: 16px;
+  }
+  .rules-list-section {
+    margin-top: 32px;
+    padding-top: 24px;
+  }
+  h2 {
+    font-size: 18px;
+    margin: 0 0 16px 0;
+  }
+  li.rule-item {
+    padding: 12px;
+  }
+  .rule-source,
+  .rule-target {
+    font-size: 14px;
+    max-width: 45%;
+  }
+  .rule-count {
+    font-size: 12px;
+  }
+  button.delete-btn,
+  button.toggle-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  .rule-actions {
+    gap: 8px;
+    margin-left: 12px;
+  }
+}
