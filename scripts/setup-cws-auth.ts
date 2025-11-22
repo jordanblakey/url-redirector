@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 console.log(`
 To check the status of your Chrome Web Store listing, you need to configure OAuth2 credentials.
 

@@ -8,10 +8,10 @@
   },
   "scripts": {
     "build:watch": "tsc --watch",
-    "build": "node scripts/build.js",
-    "bundle": "node scripts/bundle.js",
-    "check-store-status": "node scripts/check-cws-status.js",
-    "setup-store-auth": "node scripts/setup-cws-auth.js",
+    "build": "ts-node --project tsconfig.scripts.json scripts/build.ts",
+    "bundle": "ts-node --project tsconfig.scripts.json scripts/bundle.ts",
+    "check-store-status": "ts-node --project tsconfig.scripts.json scripts/check-cws-status.ts",
+    "setup-store-auth": "ts-node --project tsconfig.scripts.json scripts/setup-cws-auth.ts",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "test:install": "playwright install --with-deps chromium",
@@ -34,6 +34,7 @@
     "@types/node": "^24.10.1",
     "adm-zip": "^0.5.16",
     "fs-extra": "^11.3.2",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
 }
