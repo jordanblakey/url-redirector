@@ -17,7 +17,7 @@ test.describe('Immediate Redirect on Rule Change', () => {
         await page.addInitScript(mockChromeScript);
 
         // Navigate to popup to have a context
-        await page.goto('/dist/popup.html');
+        await page.goto('/dist/html/popup.html');
 
         // Load background script
         await page.addScriptTag({ url: '/dist/background.js', type: 'module' });

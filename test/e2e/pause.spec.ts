@@ -17,7 +17,7 @@ test.describe('URL Redirector Pause Functionality', () => {
         await page.addInitScript(mockChromeScript);
 
         // Navigate to the popup page
-        await page.goto('/dist/popup.html');
+        await page.goto('/dist/html/popup.html');
     });
 
     test('should toggle rule pause state', async ({ page }) => {

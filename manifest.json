@@ -3,17 +3,21 @@
   "name": "URL Redirector",
   "version": "1.0",
   "description": "Redirects URLs based on user-defined rules.",
-  "permissions": ["storage", "webNavigation", "tabs"],
-  "options_page": "options.html",
+  "permissions": [
+    "storage",
+    "webNavigation",
+    "tabs"
+  ],
+  "options_page": "assets/html/options.html",
   "icons": {
-    "128": "icons/icon-128.png"
+    "128": "assets/icons/icon-128.png"
   },
   "action": {
     "default_title": "URL Redirector",
-    "default_popup": "popup.html",
+    "default_popup": "assets/html/popup.html",
     "default_icon": {
-      "256": "icons/icon-256.png",
-      "128": "icons/icon-128.png"
+      "256": "assets/icons/icon-256.png",
+      "128": "assets/icons/icon-128.png"
     }
   },
   "background": {

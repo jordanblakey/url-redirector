@@ -18,7 +18,7 @@ test.describe('URL Redirector Options Page', () => {
         await page.addInitScript(mockChromeScript);
 
         // Navigate to the options page
-        await page.goto('/dist/options.html');
+        await page.goto('/dist/html/options.html');
     });
 
     test('should display the options page correctly', async ({ page }) => {
@@ -174,7 +174,7 @@ test.describe('URL Redirector Options Page', () => {
         // This tests the check in matchAndGetTarget inside utils.ts
         await page.addInitScript(() => {
             (window as any).chrome.tabs.query = (queryInfo: any, callback: any) => {
-                 callback([
+                callback([
                     { id: 1, url: 'https://target.com/foo' }
                 ]);
             };
@@ -214,7 +214,7 @@ test.describe('URL Redirector Options Page', () => {
         await page.waitForTimeout(100);
 
         await page.evaluate(() => {
-             window.localStorage.removeItem('rules');
+            window.localStorage.removeItem('rules');
         });
 
         await page.click('.toggle-btn');
@@ -224,11 +224,11 @@ test.describe('URL Redirector Options Page', () => {
 
     test('should handle rule not found during increment count', async ({ page }) => {
         await page.addInitScript(() => {
-             (window as any).chrome.tabs.query = (queryInfo: any, callback: any) => {
-                 setTimeout(() => {
-                     callback([ { id: 1, url: 'https://increment-fail.com' } ]);
-                 }, 50);
-             };
+            (window as any).chrome.tabs.query = (queryInfo: any, callback: any) => {
+                setTimeout(() => {
+                    callback([{ id: 1, url: 'https://increment-fail.com' }]);
+                }, 50);
+            };
         });
 
         await page.fill('#sourceUrl', 'increment-fail.com');

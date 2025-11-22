@@ -21,38 +21,36 @@ async function build() {
 
         // 3. Copy static assets
         console.log('📂 Copying static assets...');
-        const assets = [
-            'manifest.json',
-            'icons',
-            'options.html',
-            'popup.html',
-            'styles'
-        ];
 
-        for (const asset of assets) {
-            const srcPath = path.join(rootDir, asset);
-            const destPath = path.join(distDir, asset);
+        // Copy manifest.json with adjustments
+        const manifestSrcPath = path.join(rootDir, 'manifest.json');
+        const manifestDestPath = path.join(distDir, 'manifest.json');
 
-            if (fs.existsSync(srcPath)) {
-                if (asset === 'manifest.json') {
-                    // Read and adjust manifest for dist folder
-                    const manifestContent = fs.readFileSync(srcPath, 'utf8');
-                    const manifest = JSON.parse(manifestContent);
+        if (fs.existsSync(manifestSrcPath)) {
+            // Read and adjust manifest for dist folder
+            const manifestContent = fs.readFileSync(manifestSrcPath, 'utf8');
+            const manifest = JSON.parse(manifestContent);
 
-                    // Adjust background script path: dist/background.js -> background.js
-                    if (manifest.background && manifest.background.service_worker) {
-                        manifest.background.service_worker = manifest.background.service_worker.replace('dist/', '');
-                    }
-
-                    fs.writeFileSync(destPath, JSON.stringify(manifest, null, 2));
-                    console.log(`   ✅ Copied and adjusted ${asset}`);
-                } else {
-                    await fs.copy(srcPath, destPath);
-                    console.log(`   ✅ Copied ${asset}`);
-                }
-            } else {
-                console.warn(`   ⚠️  ${asset} not found, skipping...`);
+            // Adjust background script path: dist/background.js -> background.js
+            if (manifest.background && manifest.background.service_worker) {
+                manifest.background.service_worker = manifest.background.service_worker.replace('dist/', '');
             }
+
+            // Adjust asset paths: assets/... -> ... (since we copy assets to dist root)
+            const manifestStr = JSON.stringify(manifest, null, 2);
+            const adjustedManifest = manifestStr.replace(/assets\//g, '');
+
+            fs.writeFileSync(manifestDestPath, adjustedManifest);
+            console.log(`   ✅ Copied and adjusted manifest.json`);
+        }
+
+        // Copy assets directory contents to dist root
+        const assetsDir = path.join(rootDir, 'assets');
+        if (fs.existsSync(assetsDir)) {
+            await fs.copy(assetsDir, distDir);
+            console.log(`   ✅ Copied assets`);
+        } else {
+            console.warn(`   ⚠️  assets directory not found, skipping...`);
         }
 
         console.log('🎉 Build complete!');

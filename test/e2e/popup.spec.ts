@@ -17,7 +17,7 @@ test.describe('URL Redirector Popup', () => {
         await page.addInitScript(mockChromeScript);
 
         // Navigate to the popup page
-        await page.goto('/dist/popup.html');
+        await page.goto('/dist/html/popup.html');
     });
 
     test('should display the popup correctly', async ({ page }) => {
