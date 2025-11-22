@@ -1,17 +1,17 @@
 ## TODO
 
-- [] CLEANUP: combine CSS for popup and options pages if feasible.
-- [] CI: understand the different coverage categories. improve branch coverage if needed.
-- [] CLEANUP: understand the purpose of sourcemaps in dist/ and remove them if not needed. What's the value?
-- [] BUG: resuming should immediately redirect tabs currently on the source url. Write test.
-- [] BUG: adding a rule to popup should immediately redirect tabs currently on the source url. Write test.
 
 ## DELEGATED
-
+- [] CLEANUP: evaluate the use of 'any' in the codebase. Replace with appropriate types where desirable.
+- [] CLEANUP: combine CSS for popup and options pages if feasible.
+- [] CLEANUP: understand the purpose of sourcemaps in dist/ and remove them if not needed. What's the value?
+- [] CI: understand the different coverage categories. improve branch coverage if needed.
+- [] BUG: "Active Rules" is a bit misleading with new pause/resume feature. "Redirection Rules"? "Rules"?
 
 ## DOING
 
-
+- [x] BUG: resuming should immediately redirect tabs currently on the source url. Write test.
+- [x] BUG: adding a rule to popup should immediately redirect tabs currently on the source url. Write test.
 
 ## DONE
 

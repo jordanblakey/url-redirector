@@ -9,6 +9,10 @@ interface MockStorageArea {
 interface MockChrome {
     storage?: {
         local: MockStorageArea;
+        onChanged?: {
+            addListener: (callback: (changes: any, areaName: string) => void) => void;
+            dispatch?: (changes: any, areaName: string) => void;
+        };
     };
     runtime?: {
         getManifest: () => { version: string };
@@ -69,11 +73,34 @@ if (!chromeMock.storage) {
             },
             set: (items: { [key: string]: any }, callback?: () => void) => {
                 setTimeout(() => {
+                    const changes: { [key: string]: { oldValue: any, newValue: any } } = {};
                     Object.keys(items).forEach(key => {
-                        localStorage.setItem(key, JSON.stringify(items[key]));
+                        const oldValue = localStorage.getItem(key) ? JSON.parse(localStorage.getItem(key)!) : undefined;
+                        const newValue = items[key];
+                        localStorage.setItem(key, JSON.stringify(newValue));
+                        changes[key] = { oldValue, newValue };
                     });
+
+                    if (chromeMock.storage?.onChanged && (chromeMock.storage.onChanged as any).dispatch) {
+                        (chromeMock.storage.onChanged as any).dispatch(changes, 'local');
+                    }
+
                     if (callback) callback();
                 }, 10);
+            }
+        },
+        onChanged: {
+            addListener: (callback: (changes: any, areaName: string) => void) => {
+                if (!(chromeMock.storage as any)._listeners) {
+                    (chromeMock.storage as any)._listeners = [];
+                }
+                (chromeMock.storage as any)._listeners.push(callback);
+            },
+            // Test helper to trigger event
+            dispatch: (changes: any, areaName: string) => {
+                if ((chromeMock.storage as any)._listeners) {
+                    (chromeMock.storage as any)._listeners.forEach((l: any) => l(changes, areaName));
+                }
             }
         }
     };
