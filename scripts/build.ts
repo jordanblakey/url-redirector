@@ -1,6 +1,6 @@
-const fs = require('fs-extra');
-const path = require('path');
-const { execSync } = require('child_process');
+import fs from 'fs-extra';
+import path from 'path';
+import { execSync } from 'child_process';
 
 const rootDir = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
@@ -57,7 +57,7 @@ async function build() {
         console.log('🎉 Build complete!');
         console.log(`📦 Extension files are in: ${distDir}`);
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('❌ Build failed:', error);
         process.exit(1);
     }

@@ -1,16 +1,13 @@
 ## TODO
 
 - [] STYLE: improve visual styling and branding of the options page
-- [] FEAT: also expose the options page as a popup.
-- [] FEAT: create a utility script to read dotenv from Secret Manager. Refactor check-cws-status to use it.
-- [] FEAT: add TS type annotations anywhere appropriate throughout the codebase. Create type definitions and interfaces if needed.
-- [] FEAT: Test coverage report. Add summary to main npm run test command: # and names of suites passed/failed.
 
 ## DELEGATED
 
-- [] FEAT: explore using TS for scripts/ and anywhere .js files are still used. Validate that it works. This may involve changing babel settings or using ts-node or a similar tool. Does this make sense to do?
 
 ## DOING
+
+- [] FEAT: also expose the options page as a popup.
 
 ## DONE
 
@@ -26,8 +23,12 @@
 - [x] CLEANUP: look at all comments in the codebase to make sure they make sense, and are needed.
 - [x] CLEANUP: there are too many top level test directories. playwright-report, test-results, test.
 - [x] CLEANUP: Update readme based on recent changes
+- [x] FEAT: Add a test coverage report.
 - [x] FEAT: add script to bundle extension (crx)
+- [x] FEAT: add TS type annotations anywhere appropriate throughout the codebase. Create type definitions and interfaces if needed.
 - [x] FEAT: badge indicating a redirection event
+- [x] FEAT: create a utility script to read dotenv from Secret Manager. Refactor check-cws-status to use it.
+- [x] FEAT: explore using TS for scripts/ and anywhere .js files are still used. Validate that it works.
 - [x] FEAT: generate an appropriate icon for the extension.
 - [x] FEAT: redirection count per rule
 - [x] FEAT: submit a rule on enter keypress

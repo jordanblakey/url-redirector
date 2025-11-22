@@ -1,4 +1,4 @@
-import { Rule } from './types.js';
+import { Rule, StorageResult } from './types.js';
 import { matchAndGetTarget } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -62,15 +62,15 @@ document.addEventListener('DOMContentLoaded', () => {
     targetInput.addEventListener('keypress', handleEnter);
 
     function loadRules(): void {
-        chrome.storage.local.get(['rules'], (result) => {
-            const rules = (result.rules as Rule[]) || [];
+        chrome.storage.local.get(['rules'], (result: StorageResult) => {
+            const rules = result.rules || [];
             renderRules(rules);
         });
     }
 
     function addRule(source: string, target: string): void {
-        chrome.storage.local.get(['rules'], (result) => {
-            const rules = (result.rules as Rule[]) || [];
+        chrome.storage.local.get(['rules'], (result: StorageResult) => {
+            const rules = result.rules || [];
 
             // Check for duplicate source
             if (rules.some(rule => rule.source === source)) {
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkAndRedirectTabs(rule: Rule): void {
         chrome.tabs.query({}, (tabs) => {
             let matchCount = 0;
-            const tabsToUpdate: number[] = [];
+            // const tabsToUpdate: number[] = []; // Unused
 
             for (const tab of tabs) {
                 if (tab.id && tab.url) {
@@ -116,8 +116,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function incrementRuleCount(ruleId: number, incrementBy: number): void {
-        chrome.storage.local.get(['rules'], (result) => {
-            const rules = (result.rules as Rule[]) || [];
+        chrome.storage.local.get(['rules'], (result: StorageResult) => {
+            const rules = result.rules || [];
             const rule = rules.find(r => r.id === ruleId);
             if (rule) {
                 rule.count = (rule.count || 0) + incrementBy;
@@ -129,8 +129,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function deleteRule(id: number): void {
-        chrome.storage.local.get(['rules'], (result) => {
-            const rules = (result.rules as Rule[]) || [];
+        chrome.storage.local.get(['rules'], (result: StorageResult) => {
+            const rules = result.rules || [];
             const newRules = rules.filter((rule) => rule.id !== id);
 
             chrome.storage.local.set({ rules: newRules }, () => {

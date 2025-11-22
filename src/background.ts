@@ -1,4 +1,4 @@
-import { Rule } from './types.js';
+import { Rule, StorageResult } from './types.js';
 import { matchAndGetTarget } from './utils.js';
 
 chrome.webNavigation.onBeforeNavigate.addListener(
@@ -7,8 +7,8 @@ chrome.webNavigation.onBeforeNavigate.addListener(
         // Only redirect main frame
         if (details.frameId !== 0) return;
 
-        chrome.storage.local.get(['rules'], (result) => {
-            const rules = (result.rules as Rule[]) || [];
+        chrome.storage.local.get(['rules'], (result: StorageResult) => {
+            const rules = result.rules || [];
             const currentUrl = details.url;
 
             for (const rule of rules) {

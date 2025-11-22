@@ -2,10 +2,15 @@ import { test, expect } from '../fixtures';
 import fs from 'fs';
 import path from 'path';
 
-const mockChromeScript = fs.readFileSync(
-    path.join(process.cwd(), 'test/mocks/mock-chrome.js'),
+import ts from 'typescript';
+
+const mockChromeTs = fs.readFileSync(
+    path.join(process.cwd(), 'test/mocks/mock-chrome.ts'),
     'utf-8'
 );
+const mockChromeScript = ts.transpileModule(mockChromeTs, {
+    compilerOptions: { module: ts.ModuleKind.ESNext }
+}).outputText;
 
 test.describe('Rule Validation', () => {
     test.beforeEach(async ({ page }) => {
