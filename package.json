@@ -12,12 +12,10 @@
     "bundle": "node scripts/bundle.js",
     "check-store-status": "node scripts/check-cws-status.js",
     "setup-store-auth": "node scripts/setup-cws-auth.js",
-    "test:build": "playwright test test/unit/build.spec.ts",
-    "test:ci": "gh workflow run ci.yml",
-    "test:headed": "playwright test --headed",
-    "test:install": "npm install && npx playwright install --with-deps chromium",
+    "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "test": "playwright test"
+    "test:install": "playwright install --with-deps chromium",
+    "test:headed": "SLOW_MO=1000 playwright test --headed --workers=1"
   },
   "keywords": [],
   "author": "",

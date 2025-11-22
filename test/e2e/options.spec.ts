@@ -36,7 +36,7 @@ test.describe('URL Redirector Options Page', () => {
         await page.addInitScript(mockChromeScript);
 
         // Navigate to the options page
-        await page.goto('/options.html');
+        await page.goto('/dist/options.html');
     });
 
     test('should display the options page correctly', async ({ page }) => {
