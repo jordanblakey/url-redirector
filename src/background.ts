@@ -1,4 +1,5 @@
 import { Rule } from './types.js';
+import { matchAndGetTarget } from './utils.js';
 
 chrome.webNavigation.onBeforeNavigate.addListener(
     (details: chrome.webNavigation.WebNavigationBaseCallbackDetails) => {
@@ -11,32 +12,9 @@ chrome.webNavigation.onBeforeNavigate.addListener(
             const currentUrl = details.url;
 
             for (const rule of rules) {
-                // Normalize URLs for comparison
-                // If user enters "example.com", we match "http://example.com", "https://example.com", "https://example.com/foo"
+                const target = matchAndGetTarget(currentUrl, rule);
 
-                let source = rule.source.toLowerCase();
-                // Remove protocol
-                source = source.replace(/^https?:\/\//, '');
-                // Remove www.
-                source = source.replace(/^www\./, '');
-
-                const currentUrlLower = currentUrl.toLowerCase();
-                // Remove protocol
-                let currentUrlClean = currentUrlLower.replace(/^https?:\/\//, '');
-                // Remove www.
-                currentUrlClean = currentUrlClean.replace(/^www\./, '');
-
-                // Check if it starts with the source
-                if (currentUrlClean.startsWith(source)) {
-                    // It's a match! Redirect.
-                    let target = rule.target;
-                    if (!target.startsWith('http')) {
-                        target = 'https://' + target;
-                    }
-
-                    // Avoid infinite redirect loops if target is same as source
-                    if (currentUrl.includes(target)) return;
-
+                if (target) {
                     // Increment count
                     rule.count = (rule.count || 0) + 1;
                     chrome.storage.local.set({ rules });
@@ -47,7 +25,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(
                             chrome.action.setBadgeText({ text: '✔' });
                             chrome.action.setBadgeTextColor({ color: '#ffffff' });
                             chrome.action.setBadgeBackgroundColor({ color: '#5f33ffff' }); // Orange to match emoji
-                            // Clear badge after 3 seconds
+                            // Clear badge after 10 seconds (as per TODO done item)
                             setTimeout(() => {
                                 try {
                                     if (typeof chrome !== 'undefined' && chrome.action && chrome.action.setBadgeText) {

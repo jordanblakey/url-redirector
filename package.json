@@ -7,14 +7,17 @@
     "test": "test"
   },
   "scripts": {
-    "build": "tsc",
     "build:watch": "tsc --watch",
-    "test": "playwright test",
-    "test:ui": "playwright test --ui",
-    "test:headed": "playwright test --headed",
+    "build": "node scripts/build.js",
     "bundle": "node scripts/bundle.js",
     "check-store-status": "node scripts/check-cws-status.js",
-    "setup-store-auth": "node scripts/setup-cws-auth.js"
+    "setup-store-auth": "node scripts/setup-cws-auth.js",
+    "test:build": "playwright test test/unit/build.spec.ts",
+    "test:ci": "gh workflow run ci.yml",
+    "test:headed": "playwright test --headed",
+    "test:install": "npm install && npx playwright install --with-deps chromium",
+    "test:ui": "playwright test --ui",
+    "test": "playwright test"
   },
   "keywords": [],
   "author": "",

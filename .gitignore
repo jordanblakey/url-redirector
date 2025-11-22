@@ -1,1 +1,8 @@
 node_modules
+.git
+*.log
+test/playwright-report
+test/test-results
+.cache
+dist
+build
