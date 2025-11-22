@@ -1,8 +1,20 @@
+# Dependency directories
 node_modules
+
+# Version control metadata
 .git
+
+# Log files
 *.log
+
+# Test reports and results
 test/playwright-report
 test/test-results
+
+# Build artifacts and caches
 .cache
 dist
 build
+
+# Environment configuration
+.env

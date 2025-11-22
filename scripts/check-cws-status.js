@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+require('dotenv').config();
 const CLIENT_ID = process.env.CWS_CLIENT_ID;
 const CLIENT_SECRET = process.env.CWS_CLIENT_SECRET;
 const REFRESH_TOKEN = process.env.CWS_REFRESH_TOKEN;
@@ -48,13 +49,13 @@ async function checkStatus(accessToken) {
   });
 
   if (!response.ok) {
-     const text = await response.text();
-     throw new Error(`Failed to fetch status: ${response.status} ${text}`);
+    const text = await response.text();
+    throw new Error(`Failed to fetch status: ${response.status} ${text}`);
   }
 
   const data = await response.json();
-  console.log('Chrome Web Store Extension Status:');
-  console.log(JSON.stringify(data, null, 2));
+  console.log('Chrome Web Store Extension Status:\n');
+  console.dir(data, { depth: null, colors: true });
 }
 
 (async () => {

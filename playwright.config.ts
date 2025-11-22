@@ -13,10 +13,7 @@ export default defineConfig({
     outputDir: 'test/test-results',
     use: {
         baseURL: 'http://localhost:8000',
-        trace: 'on-first-retry',
-        launchOptions: {
-            slowMo: process.env.SLOW_MO ? parseInt(process.env.SLOW_MO) : 0,
-        },
+        trace: 'on-first-retry'
     },
     webServer: {
         command: 'python3 -m http.server 8000',
