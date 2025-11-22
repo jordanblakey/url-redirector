@@ -3,7 +3,7 @@
 const { loadGcpSecrets } = require('./load-dotenv-from-gcp');
 
 // --- Helper Functions ---
-async function getAccessToken(clientId, clientSecret, refreshToken) {
+async function getAccessToken(clientId: string, clientSecret: string, refreshToken: string) {
   const response = await fetch('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -22,7 +22,7 @@ async function getAccessToken(clientId, clientSecret, refreshToken) {
   return (await response.json()).access_token;
 }
 
-async function checkStatus(accessToken, publisherId, extensionId) {
+async function checkStatus(accessToken: any, publisherId: string, extensionId: string) {
   const fetchStatusUrl = `https://chromewebstore.googleapis.com/v2/publishers/${publisherId}/items/${extensionId}:fetchStatus`;
   const response = await fetch(fetchStatusUrl, {
     headers: { 'Authorization': `Bearer ${accessToken}` },
