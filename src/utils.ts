@@ -1,4 +1,4 @@
-import { Rule } from './types.js';
+import { Rule } from './types';
 
 /**
  * Checks if the given URL matches the rule's source.

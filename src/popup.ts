@@ -1,4 +1,4 @@
-import { Rule } from './types.js';
+import { Rule } from './types';
 
 document.addEventListener('DOMContentLoaded', () => {
     const sourceInput = document.getElementById('sourceUrl') as HTMLInputElement;
