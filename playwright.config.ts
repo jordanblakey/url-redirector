@@ -17,7 +17,7 @@ export default defineConfig({
             coverage: {
                 lcov: true,
                 reports: ['v8', 'console-details'],
-                entryFilter: (entry: any) => entry.url.includes('dist/'),
+                entryFilter: (entry: any) => entry.url.includes('dist/') && !entry.url.endsWith('.css'),
                 sourceFilter: (sourcePath: string) => sourcePath.search(/src\/.+/) !== -1,
             }
         }]

@@ -12,6 +12,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(
             const currentUrl = details.url;
 
             for (const rule of rules) {
+                if (rule.active === false) continue;
                 const target = matchAndGetTarget(currentUrl, rule);
 
                 if (target) {

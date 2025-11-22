@@ -5,7 +5,6 @@
   --card-bg: #ffffff;
   --text-color: #1f2937;
   --text-secondary: #6b7280;
-  --text-muted: #ccc;
   --border-color: #e5e7eb;
   --danger-color: #ef4444;
 }
@@ -15,39 +14,39 @@ body {
   background-color: var(--bg-color);
   color: var(--text-color);
   margin: 0;
-  padding: 40px 20px;
-  display: flex;
-  justify-content: center;
-  min-height: 90vh;
+  /* Popup specific dimensions */
+  width: 400px;
+  height: 600px;
+  padding: 0;
+  /* Padding handled by container or specific elements if needed */
+  overflow-y: auto;
+  /* Allow scrolling if content exceeds height */
 }
 
 .container {
   background-color: var(--card-bg);
   width: 100%;
-  max-width: 600px;
-  padding: 32px;
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  display: flex;
-  flex-direction: column;
+  /* max-width not needed as body is fixed width */
+  min-height: 100%;
+  padding: 20px;
+  /* Reduced padding for popup */
+  border-radius: 0;
+  /* Popups usually don't need border radius on the main container */
+  box-sizing: border-box;
+  box-shadow: none;
+  /* Popups are already in a "window" */
 }
 
 header {
-  margin-bottom: 32px;
+  margin-bottom: 24px;
+  /* Reduced margin */
   text-align: center;
-}
-
-footer {
-  margin-top: auto;
-  padding-top: 1rem;
-  text-align: center;
-  font-size: 0.8rem;
-  color: var(--text-muted);
 }
 
 header h1 {
-  margin: 0 0 8px 0;
-  font-size: 24px;
+  margin: 0 0 4px 0;
+  font-size: 20px;
+  /* Smaller font */
   font-weight: 700;
   color: var(--text-color);
 }
@@ -55,26 +54,32 @@ header h1 {
 header p {
   margin: 0;
   color: var(--text-secondary);
+  font-size: 12px;
+  /* Smaller font */
 }
 
 .input-group {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  /* Reduced margin */
 }
 
 label {
   display: block;
-  margin-bottom: 6px;
-  font-size: 14px;
+  margin-bottom: 4px;
+  font-size: 12px;
+  /* Smaller font */
   font-weight: 500;
   color: var(--text-color);
 }
 
 input[type="text"] {
   width: 100%;
-  padding: 10px 12px;
+  padding: 8px 10px;
+  /* Reduced padding */
   border: 1px solid var(--border-color);
   border-radius: 6px;
-  font-size: 16px;
+  font-size: 14px;
+  /* Smaller font */
   box-sizing: border-box;
   transition: border-color 0.2s;
 }
@@ -87,12 +92,14 @@ input[type="text"]:focus {
 
 button#addRuleBtn {
   width: 100%;
-  padding: 12px;
+  padding: 10px;
+  /* Reduced padding */
   background-color: var(--primary-color);
   color: white;
   border: none;
   border-radius: 6px;
-  font-size: 16px;
+  font-size: 14px;
+  /* Smaller font */
   font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s;
@@ -103,15 +110,18 @@ button#addRuleBtn:hover {
 }
 
 .rules-list-section {
-  margin-top: 32px;
+  margin-top: 24px;
+  /* Reduced margin */
   border-top: 1px solid var(--border-color);
-  padding-top: 24px;
+  padding-top: 16px;
+  /* Reduced padding */
 }
 
 h2 {
-  font-size: 18px;
+  font-size: 16px;
+  /* Smaller font */
   font-weight: 600;
-  margin: 0 0 16px 0;
+  margin: 0 0 12px 0;
 }
 
 ul#rulesList {
@@ -124,7 +134,8 @@ li.rule-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px;
+  padding: 10px;
+  /* Reduced padding */
   background-color: #f9fafb;
   border: 1px solid var(--border-color);
   border-radius: 6px;
@@ -134,7 +145,7 @@ li.rule-item {
 .rule-content {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
   overflow: hidden;
   flex: 1;
 }
@@ -143,38 +154,41 @@ li.rule-item {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   overflow: hidden;
 }
 
 .rule-source {
   font-weight: 600;
-  font-size: 14px;
+  font-size: 12px;
+  /* Smaller font */
   color: var(--text-color);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 45%;
+  max-width: 40%;
 }
 
 .rule-arrow {
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 12px;
   flex-shrink: 0;
 }
 
 .rule-target {
-  font-size: 14px;
+  font-size: 12px;
+  /* Smaller font */
   font-weight: 600;
   color: var(--text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 45%;
+  max-width: 40%;
 }
 
 .rule-count {
-  font-size: 12px;
+  font-size: 10px;
+  /* Smaller font */
   color: var(--text-secondary);
   font-style: italic;
 }
@@ -183,12 +197,14 @@ button.delete-btn {
   background-color: transparent;
   color: var(--danger-color);
   border: 1px solid var(--danger-color);
-  padding: 6px 12px;
+  padding: 4px 8px;
+  /* Reduced padding */
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 10px;
+  /* Smaller font */
   font-weight: 500;
   cursor: pointer;
-  margin-left: 12px;
+  margin-left: 8px;
   transition: all 0.2s;
   flex-shrink: 0;
 }
@@ -213,8 +229,8 @@ li.rule-item.paused .rule-target {
 /* Actions container */
 .rule-actions {
   display: flex;
-  gap: 8px;
-  margin-left: 12px;
+  gap: 4px;
+  margin-left: 8px;
   flex-shrink: 0;
 }
 
@@ -223,9 +239,9 @@ button.toggle-btn {
   background-color: transparent;
   color: var(--primary-color);
   border: 1px solid var(--primary-color);
-  padding: 6px 12px;
+  padding: 4px 8px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
@@ -251,11 +267,11 @@ button.delete-btn {
   background-color: transparent;
   color: var(--danger-color);
   border: 1px solid var(--danger-color);
-  padding: 6px 12px;
+  padding: 4px 8px;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
-  /* margin-left: 12px; Removed */
+  /* margin-left: 8px; Removed */
 }

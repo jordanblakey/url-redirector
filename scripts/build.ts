@@ -25,7 +25,9 @@ async function build() {
             'manifest.json',
             'icons',
             'options.html',
-            'options.css'
+            'options.css',
+            'popup.html',
+            'popup.css'
         ];
 
         for (const asset of assets) {
