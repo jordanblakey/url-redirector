@@ -76,9 +76,15 @@ if (!chromeMock.runtime) {
 if (!chromeMock.tabs) {
     chromeMock.tabs = {
         query: (queryInfo: any, callback: (tabs: any[]) => void) => {
-            // Return empty list or mock tabs
+            // Return mock tabs that can be redirected
             setTimeout(() => {
-                if (callback) callback([]);
+                if (callback) {
+                    callback([
+                        { id: 1, url: 'https://example.com/page1' },
+                        { id: 2, url: 'https://reddit.com/r/test' },
+                        { id: 3, url: 'https://google.com' }
+                    ]);
+                }
             }, 10);
         },
         update: (tabId: number, updateProperties: any, callback?: (tab?: any) => void) => {

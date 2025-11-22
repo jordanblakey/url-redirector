@@ -12,7 +12,7 @@ export default defineConfig({
     reporter: [
         ['list'],
         ['monocart-reporter', {
-            name: "URL Redirector Test Report",
+            name: "URL Redirector E2E Coverage Report",
             outputFile: 'test/coverage/index.html',
             coverage: {
                 lcov: true,
