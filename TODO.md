@@ -4,8 +4,10 @@
 
 ## DELEGATED
 
-- [] CI: understand the different coverage categories. improve branch coverage if needed.
 - [] CLEANUP: understand the purpose of sourcemaps in dist/ and remove them if not needed. What's the value?
+- [] CLEANUP: evaluate the use of 'any' in the codebase. Replace with appropriate types where desirable.
+- [] CI: understand the different coverage categories. improve branch coverage if needed.
+- [] BUG: "Active Rules" is a bit misleading with new pause/resume feature. "Redirection Rules"? "Rules"?
 
 ## DOING
 
