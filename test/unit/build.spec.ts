@@ -12,7 +12,7 @@ test.describe.configure({ mode: 'serial' });
 test.describe('Build Process Validation', () => {
     test.beforeAll(() => {
         // Run the build command with the custom output directory
-        console.log('Building extension...', distDir);
+        // console.log('Building extension...', distDir);
         execSync(`npm run build -- "${distDir}"`, {
             cwd: rootDir,
             stdio: 'pipe' // Suppress output for this test
@@ -20,8 +20,8 @@ test.describe('Build Process Validation', () => {
     });
 
     test.afterAll(() => {
-        console.log('Cleaning up temporary directory...', distDir);
         // Clean up the temporary directory
+        // console.log('Cleaning up temporary directory...', distDir);
         if (fs.existsSync(distDir)) {
             fs.rmSync(distDir, { recursive: true, force: true });
         }
@@ -60,11 +60,6 @@ test.describe('Build Process Validation', () => {
         test('options.html should exist in dist', () => {
             const optionsHtmlPath = path.join(distDir, 'options.html');
             expect(fs.existsSync(optionsHtmlPath)).toBe(true);
-        });
-
-        test('options.css should exist in dist', () => {
-            const optionsCssPath = path.join(distDir, 'options.css');
-            expect(fs.existsSync(optionsCssPath)).toBe(true);
         });
 
         test('icons directory should exist in dist', () => {
@@ -138,7 +133,7 @@ test.describe('Build Process Validation', () => {
 
             // Check icons in manifest
             if (manifest.icons) {
-                Object.values(manifest.icons).forEach((iconPath: any) => {
+                Object.values(manifest.icons).forEach((iconPath: string) => {
                     const fullPath = path.join(distDir, iconPath);
                     expect(fs.existsSync(fullPath)).toBe(true);
                 });
@@ -146,7 +141,7 @@ test.describe('Build Process Validation', () => {
 
             // Check action icons
             if (manifest.action && manifest.action.default_icon) {
-                Object.values(manifest.action.default_icon).forEach((iconPath: any) => {
+                Object.values(manifest.action.default_icon).forEach((iconPath: string) => {
                     const fullPath = path.join(distDir, iconPath);
                     expect(fs.existsSync(fullPath)).toBe(true);
                 });
@@ -165,11 +160,11 @@ test.describe('Build Process Validation', () => {
             });
         });
 
-        test('options.html should reference options.css', () => {
+        test('options.html should reference style.css', () => {
             const htmlPath = path.join(distDir, 'options.html');
             const content = fs.readFileSync(htmlPath, 'utf8');
 
-            expect(content).toContain('options.css');
+            expect(content).toContain('styles.css');
         });
 
         test('options.html should reference options.js', () => {
@@ -195,11 +190,11 @@ test.describe('Build Process Validation', () => {
             const requiredFiles = [
                 'manifest.json',
                 'options.html',
-                'options.css',
+                'popup.html',
+                'styles.css',
                 'background.js',
                 'options.js',
                 'utils.js',
-                'types.js',
                 'icons/icon-128.png',
                 'icons/icon-256.png'
             ];

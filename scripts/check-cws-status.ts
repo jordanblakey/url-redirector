@@ -22,7 +22,7 @@ async function getAccessToken(clientId: string, clientSecret: string, refreshTok
   return (await response.json()).access_token;
 }
 
-async function checkStatus(accessToken: any, publisherId: string, extensionId: string) {
+async function checkStatus(accessToken: string, publisherId: string, extensionId: string) {
   const fetchStatusUrl = `https://chromewebstore.googleapis.com/v2/publishers/${publisherId}/items/${extensionId}:fetchStatus`;
   const response = await fetch(fetchStatusUrl, {
     headers: { 'Authorization': `Bearer ${accessToken}` },
