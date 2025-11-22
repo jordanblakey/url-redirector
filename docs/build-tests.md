@@ -10,7 +10,7 @@ The build validation tests ensure that the `npm run build` command produces a co
 
 ```bash
 # Run only build validation tests
-npm run test:build
+npm test test/unit/build.spec.ts
 
 # Run all tests (including build tests)
 npm test

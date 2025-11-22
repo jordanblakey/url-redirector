@@ -13,7 +13,6 @@
     "check-store-status": "node scripts/check-cws-status.js",
     "setup-store-auth": "node scripts/setup-cws-auth.js",
     "test": "playwright test",
-    "test:build": "playwright test test/unit/build.spec.ts",
     "test:ui": "playwright test --ui",
     "test:install": "playwright install --with-deps chromium",
     "update-manifest": "jq --arg v $npm_package_version '.version = $v' manifest.json > tmp.json && mv tmp.json manifest.json",
