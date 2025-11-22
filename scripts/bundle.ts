@@ -39,8 +39,9 @@ async function bundle() {
         console.log(`📂 Extension: ${distDir}`);
         console.log(`📦 Web Store ZIP: ${zipPath}`);
 
-    } catch (error: any) {
-        console.error('❌ Bundling failed:', error.message);
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error('❌ Bundling failed:', errorMessage);
         process.exit(1);
     }
 }
