@@ -1,0 +1,38 @@
+name: Publish to Chrome Web Store
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    name: Bundle and Upload
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Installs dependencies (including adm-zip, fs-extra, etc.)
+      - name: Install Dependencies
+        run: npm ci
+
+      # Runs your exact script. 
+      # This builds the project and creates build/extension.zip
+      - name: Bundle Extension
+        run: npm run bundle
+
+      - name: Upload to Chrome Web Store
+        uses: mnao305/chrome-extension-upload@v5.0.0
+        with:
+          # UPDATED: Matches the path in your bundle script
+          file-path: 'build/extension.zip'
+          extension-id: ${{ secrets.CWS_EXTENSION_ID }}
+          client-id: ${{ secrets.CWS_CLIENT_ID }}
+          client-secret: ${{ secrets.CWS_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.CWS_REFRESH_TOKEN }}
+          publish: true

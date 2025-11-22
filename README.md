@@ -135,8 +135,6 @@ Comprehensive guides and technical documentation:
 - **[Pre-commit Hook](docs/pre-commit-hook.md)** - Setting up automated testing before commits
 - **[Troubleshooting](docs/troubleshooting.md)** - Solutions for common development issues
 
-
-
 ## Publishing
 
 To package the extension for the Chrome Web Store:
@@ -150,6 +148,40 @@ This command will:
 2.  Create `extension.zip` in the project root.
 
 Upload `extension.zip` to the [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/dev/dashboard).
+
+## Release Workflow
+
+This project uses **Continuous Deployment (CD)** to publish to the Chrome Web Store. Releases are fully automated using npm scripts and GitHub Actions.
+
+### Prerequisites
+
+To trigger a release from your local machine, ensure you have:
+1.  **GitHub CLI (`gh`)**: Installed and authenticated (`gh auth login`).
+2.  **jq**: Installed (required to sync `manifest.json` version automatically).
+    * *Linux/Ubuntu:* `sudo apt-get install jq`
+
+### How to Publish
+
+Instead of manually zipping and uploading, simply run the standard npm version command:
+
+```bash
+# Bug fixes (e.g., 1.0.0 -> 1.0.1)
+npm version patch
+
+# New features (e.g., 1.0.0 -> 1.1.0)
+npm version minor
+
+# Major changes (e.g., 1.0.0 -> 2.0.0)
+npm version major
+```
+
+### ⚠️ Recommended Release Cadence
+
+While the deployment process is automated, **do not release on every merge**. The Chrome Web Store review process involves manual checks that can take anywhere from a few hours to several days.
+
+* **Batch your updates:** Group multiple fixes or features into a single release (e.g., weekly).
+* **Avoid Queue Clashes:** If you submit a new version while the previous one is still "Pending Review," you risk resetting your position in the queue.
+* **Critical Fixes Only:** Reserve rapid-fire updates only for critical production bugs.
 
 ## Contributing
 

@@ -2,14 +2,14 @@
 
 - [] STYLE: improve visual styling and branding of the options page
 - [] CI: add github actions to test, build and publish new version to chrome web store
-- [] CI: add github actions to build and publish new version to chrome web store
-- [] FEAT: add top level README explaining Antigravity experiments
 - [] FEAT: also expose the options page as a popup.
+- [] FEAT: create a utility script to read dotenv from Secret Manager. Refactor check-cws-status to use it.
 
 ## DOING
 
 ## DONE
 
+- [x] CI: create a versioning strategy for the extension
 - [x] CI: add github actions to run tests on PR
 - [x] BUG: when new rules are added, reloads should redirect tabs currently on the source url.
 - [x] FEAT: generate an appropriate icon for the extension.

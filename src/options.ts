@@ -2,6 +2,15 @@ import { Rule } from './types.js';
 import { matchAndGetTarget } from './utils.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Get the full manifest object
+    const manifest = chrome.runtime.getManifest();
+
+    // Find the element and inject the version
+    const versionElement = document.getElementById('app-version');
+    if (versionElement) {
+        versionElement.textContent = `v${manifest.version}`;
+    }
+
     const sourceInput = document.getElementById('sourceUrl') as HTMLInputElement;
     const targetInput = document.getElementById('targetUrl') as HTMLInputElement;
     const addBtn = document.getElementById('addRuleBtn') as HTMLButtonElement;
@@ -64,9 +73,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (tab.id && tab.url) {
                     const targetUrl = matchAndGetTarget(tab.url, rule);
                     if (targetUrl) {
-                         matchCount++;
-                         // Update tab immediately
-                         chrome.tabs.update(tab.id, { url: targetUrl });
+                        matchCount++;
+                        // Update tab immediately
+                        chrome.tabs.update(tab.id, { url: targetUrl });
                     }
                 }
             }
@@ -85,8 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (rule) {
                 rule.count = (rule.count || 0) + incrementBy;
                 chrome.storage.local.set({ rules }, () => {
-                     // Re-render to show updated count
-                     renderRules(rules);
+                    // Re-render to show updated count
+                    renderRules(rules);
                 });
             }
         });

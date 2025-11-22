@@ -14,7 +14,10 @@
     "setup-store-auth": "node scripts/setup-cws-auth.js",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
-    "test:install": "playwright install --with-deps chromium"
+    "test:install": "playwright install --with-deps chromium",
+    "update-manifest": "jq --arg v $npm_package_version '.version = $v' manifest.json > tmp.json && mv tmp.json manifest.json",
+    "version": "npm run update-manifest && git add manifest.json",
+    "postversion": "git push && git push --tags && gh release create v$npm_package_version --generate-notes"
   },
   "keywords": [],
   "author": "",
