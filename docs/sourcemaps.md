@@ -1,4 +1,3 @@
-
 ## Source Maps
 
 Sourcemaps (`.map` files) are enabled in the TypeScript compiler options (`tsconfig.json`) and are **intentionally included** in the production bundle (`extension.zip`).
