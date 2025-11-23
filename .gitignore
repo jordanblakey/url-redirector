@@ -8,7 +8,7 @@ node_modules
 *.log
 
 # Demo recordings
-# demos/recordings
+demos/recordings
 
 # Test reports and results
 test/playwright-report

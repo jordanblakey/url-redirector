@@ -2,23 +2,18 @@
 
 - [] BUG: Monocart reporter sourcemap pathing errors. Failed to fix twice now. Consider alternatives.
 - [] FEATURE: Randomly select a top distracting site to populate source and wholesome site populate target placeholder text
-
+- [] CI: Push initial version through Chrome Web Store review process
 
 ## DELEGATED
 
 ## DOING
 
-- [] CI: Write instructions for Chrome Web Store reviewer to test the extension.
-- [] FEATURE: Automated demo recording utility.
-- [] FEATURE: Automated demo recording - modular demo scripts by npm command args.
-- [] FEATURE: Automated demo recording - migrate to top level folder demos/.
-- [] FEATURE: Automated demo recording - named recording.
-- [] FEATURE: Automated demo recording - visible mouse actions.
-- [] FEATURE: Automated demo recording - text overlay of the playwright actions.
-- [] FEATURE: Add a "demo" recording of the extension for the Chrome Web Store.
-
 ## DONE
 
+- [x] CI: Write instructions for Chrome Web Store reviewer to test the extension.
+- [x] FEATURE: Automated demo recording utility.
+- [x] FEATURE: Automated demo recording - named recording. migrate to top level folder demos/. visible mouse actions.
+- [x] FEATURE: Add a "demo" recording of the extension for the Chrome Web Store.
 - [x] BUG: long urls are truncated. Especially in the popup.
 - [x] UX: Buttons a bit small on Popup. Fitts' Law.
 - [x] FEATURE: Microcopy ideas for rule counts. Randomized.
@@ -81,5 +76,8 @@
 - [] FEATURE: Possibly, support drag and drop to reorder rules instead of alpha sorting. Imagine I have 50 rules and I want to move one to the top.
 - [] FEATURE: Revisit sorting if alpha is not the best. Pinned rules. Usage sorting. Pinning + selectable sorting. Sort selection memory.
 
-## Guided Tour
+### Guided Tour
 - [] FEATURE: Add a guided tour of the extension on first load.
+
+### Demo Recording
+- [] FEATURE: Automated demo recording - modular demo scripts by npm command args.
