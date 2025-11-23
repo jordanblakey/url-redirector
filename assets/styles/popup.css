@@ -4,6 +4,7 @@
   height: 600px;
   padding: 0;
   overflow-y: auto;
+
   .container {
     min-height: 100%;
     padding: 20px;
@@ -11,58 +12,73 @@
     box-shadow: none;
     box-sizing: border-box;
   }
+
   header {
     margin-bottom: 24px;
+
     h1 {
       font-size: 20px;
       margin: 0 0 4px 0;
     }
+
     p {
       font-size: 12px;
     }
   }
+
   .input-group {
     margin-bottom: 12px;
+
     .text-secondary {
       color: var(--text-secondary);
     }
   }
+
   label {
     margin-bottom: 4px;
     font-size: 12px;
   }
+
   input[type="text"] {
     padding: 8px 10px;
     font-size: 14px;
   }
+
   button#addRuleBtn {
     padding: 10px;
     font-size: 14px;
   }
+
   .rules-list-section {
     margin-top: 24px;
     padding-top: 16px;
   }
+
   h2 {
     font-size: 16px;
     margin: 0 0 12px 0;
   }
+
   li.rule-item {
     padding: 10px;
   }
+
   .rule-source,
   .rule-target {
     font-size: 12px;
     max-width: 40%;
   }
+
   .rule-count {
     font-size: 10px;
   }
+
   button.delete-btn,
   button.toggle-btn {
     padding: 4px 8px;
     font-size: 10px;
   }
+
   .rule-actions {
     gap: 4px;
     margin-left: 8px;

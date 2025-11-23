@@ -8,6 +8,7 @@ export interface Rule {
     target: string;
     count: number;
     active: boolean;
+    lastCountMessage?: string;
 }
 
 export interface StorageSchema {

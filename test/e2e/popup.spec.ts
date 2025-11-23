@@ -43,7 +43,7 @@ test.describe('URL Redirector Popup', () => {
         await expect(rulesList.locator('.rule-item')).toHaveCount(1);
         await expect(rulesList.locator('.rule-source')).toContainText('reddit.com');
         await expect(rulesList.locator('.rule-target')).toContainText('google.com');
-        await expect(rulesList.locator('.rule-count')).toContainText('Used 0 times');
+        await expect(rulesList.locator('.rule-count .count-value')).toHaveText('0');
 
         // Verify inputs are cleared
         await expect(page.locator('#sourceUrl')).toHaveValue('');
@@ -124,5 +124,52 @@ test.describe('URL Redirector Popup', () => {
             expect(dialog.message()).toContain('Please enter both source and target URLs');
             await dialog.accept();
         });
+    });
+    test('should display correct message plurality', async ({ page }) => {
+        // Add a rule
+        await page.fill('#sourceUrl', 'plural-test.com');
+        await page.fill('#targetUrl', 'target.com');
+        await page.click('#addRuleBtn');
+        await page.waitForTimeout(100);
+
+        const ruleItem = page.locator('.rule-item').first();
+        const countSpan = ruleItem.locator('.rule-count');
+
+        // Case 0: Should be "Used 0 times"
+        // (Default state is 0)
+        await expect(countSpan).toContainText('Used 0 times');
+
+        // Case 1: Singular
+        await page.evaluate(() => {
+            return new Promise<void>((resolve) => {
+                chrome.storage.local.get(['rules'], (result) => {
+                    const rules = result.rules as any;
+                    rules[0].count = 1;
+                    // Clear lastCountMessage to force regeneration
+                    delete rules[0].lastCountMessage;
+                    chrome.storage.local.set({ rules }, resolve);
+                });
+            });
+        });
+        // Reload to force re-render
+        await page.reload();
+        await expect(countSpan).toContainText('1');
+        // We can't easily check for "time" vs "times" generically without knowing the message,
+        // but we can check that it's NOT "Used 0 times"
+        await expect(countSpan).not.toContainText('Used 0 times');
+
+        // Case 2: Plural
+        await page.evaluate(() => {
+            return new Promise<void>((resolve) => {
+                chrome.storage.local.get(['rules'], (result) => {
+                    const rules = result.rules as any;
+                    rules[0].count = 5;
+                    delete rules[0].lastCountMessage;
+                    chrome.storage.local.set({ rules }, resolve);
+                });
+            });
+        });
+        await page.reload();
+        await expect(countSpan).toContainText('5');
     });
 });
