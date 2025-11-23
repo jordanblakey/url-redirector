@@ -7,6 +7,9 @@ node_modules
 # Log files
 *.log
 
+# Demo recordings
+demos/recordings
+
 # Test reports and results
 test/playwright-report
 test/test-results
@@ -19,3 +22,4 @@ build
 
 # Environment configuration
 .env
+

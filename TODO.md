@@ -2,12 +2,20 @@
 
 - [] BUG: Monocart reporter sourcemap pathing errors. Failed to fix twice now. Consider alternatives.
 - [] FEATURE: Randomly select a top distracting site to populate source and wholesome site populate target placeholder text
-- [] FEATURE: Visually show how many times a rule has been used with a shaded area in the background https://www.figma.com/design/rTrJwTPfute4FiZwULEJGg/URL-Redirector-Screens?node-id=5-9&t=EH0NU01TjYsU23fw-0. The rule with the most usage should have about 90% of the background shaded. A bar graph.
-- [] FEATURE: Expand messages.ts to include more microcopy options.
+
 
 ## DELEGATED
 
 ## DOING
+
+- [] CI: Write instructions for Chrome Web Store reviewer to test the extension.
+- [] FEATURE: Automated demo recording utility.
+- [] FEATURE: Automated demo recording - modular demo scripts by npm command args.
+- [] FEATURE: Automated demo recording - migrate to top level folder demos/.
+- [] FEATURE: Automated demo recording - named recording.
+- [] FEATURE: Automated demo recording - visible mouse actions.
+- [] FEATURE: Automated demo recording - text overlay of the playwright actions.
+- [] FEATURE: Add a "demo" recording of the extension for the Chrome Web Store.
 
 ## DONE
 
@@ -66,7 +74,12 @@
 ### Juice
 - [] FEATURE: The arrow between the source and destination url should get longer and longer as the rule is used more and more.
 - [] FEATURE: Randomly select a top distracting site to populate source and wholesome site populate target placeholder text
+- [] FEATURE: Expand messages.ts to include more microcopy options.
+- [] FEATURE: Visually show how many times a rule has been used with a shaded area in the background https://www.figma.com/design/rTrJwTPfute4FiZwULEJGg/URL-Redirector-Screens?node-id=5-9&t=EH0NU01TjYsU23fw-0. The rule with the most usage should have about 90% of the background shaded. A bar graph. Sort by usage.
 
 ### Rule Sorting
 - [] FEATURE: Possibly, support drag and drop to reorder rules instead of alpha sorting. Imagine I have 50 rules and I want to move one to the top.
 - [] FEATURE: Revisit sorting if alpha is not the best. Pinned rules. Usage sorting. Pinning + selectable sorting. Sort selection memory.
+
+## Guided Tour
+- [] FEATURE: Add a guided tour of the extension on first load.
