@@ -1,6 +1,16 @@
 import { Rule } from './types';
 import { getRandomMessage } from './messages.js';
 
+const getFaviconUrl = (url: string) => {
+    // Basic clean up to get the domain
+    try {
+        const domain = new URL(url.startsWith('http') ? url : `https://${url}`).hostname;
+        return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
+    } catch (e) {
+        return 'default-icon.png'; // Fallback
+    }
+};
+
 export function renderRules(
     rules: Rule[],
     listElement: HTMLUListElement,
@@ -46,6 +56,10 @@ export function renderRules(
         const ruleLineDiv = document.createElement('div');
         ruleLineDiv.className = 'rule-line';
 
+        const sourceFaviconSpan = document.createElement('span');
+        sourceFaviconSpan.className = 'rule-favicon';
+        sourceFaviconSpan.style.backgroundImage = `url(${getFaviconUrl(rule.source)})`;
+
         const sourceSpan = document.createElement('span');
         sourceSpan.className = 'rule-source';
         sourceSpan.textContent = rule.source;
@@ -58,8 +72,14 @@ export function renderRules(
         targetSpan.className = 'rule-target';
         targetSpan.textContent = rule.target;
 
+        const targetFaviconSpan = document.createElement('span');
+        targetFaviconSpan.className = 'rule-favicon';
+        targetFaviconSpan.style.backgroundImage = `url(${getFaviconUrl(rule.target)})`;
+
+        ruleLineDiv.appendChild(sourceFaviconSpan);
         ruleLineDiv.appendChild(sourceSpan);
         ruleLineDiv.appendChild(arrowSpan);
+        ruleLineDiv.appendChild(targetFaviconSpan);
         ruleLineDiv.appendChild(targetSpan);
 
         const countSpan = document.createElement('span');

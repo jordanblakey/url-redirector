@@ -1,6 +1,6 @@
 import { Rule } from './types';
-import { getRandomMessage } from './messages.js';
 import { renderRules } from './ui.js';
+import { getThematicPair } from './suggestions.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const sourceInput = document.getElementById('sourceUrl') as HTMLInputElement;
@@ -8,7 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const addBtn = document.getElementById('addRuleBtn') as HTMLButtonElement;
     const rulesList = document.getElementById('rulesList') as HTMLUListElement;
 
-    // Load rules on startup
     loadRules();
 
     addBtn.addEventListener('click', () => {
@@ -31,6 +30,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sourceInput.addEventListener('keypress', handleEnter);
     targetInput.addEventListener('keypress', handleEnter);
+
+    setSmartPlaceholders();
+
+    function setSmartPlaceholders(): void {
+        const { source, target } = getThematicPair();
+
+        sourceInput.placeholder = `e.g. ${source}`;
+        targetInput.placeholder = `e.g. ${target}`;
+    }
 
     function loadRules(): void {
         chrome.storage.local.get(['rules'], (result) => {
