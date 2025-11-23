@@ -1,18 +1,19 @@
 ## TODO
 
 - [] BUG: Monocart reporter sourcemap pathing errors. Failed to fix twice now. Consider alternatives.
+- [] FEATURE: Randomly select a top distracting site to populate source and wholesome site populate target placeholder text
 
 ## DELEGATED
 
 - [] FEATURE: Microcopy ideas for rule counts. Randomized.
-- [] UX: Move input examples from labels into placeholder text. Cleaner and more standard.
-- [] UX: Alpha sort rules by source url.
 - [] UX: Buttons a bit small on Popup. Fitts' Law.
 
 ## DOING
 
 ## DONE
 
+- [x] UX: Move input examples from labels into placeholder text. Cleaner and more standard.
+- [x] UX: Alpha sort rules by source url.
 - [x] CLEANUP: reorg to assets/ folder
 - [x] CI: understand the different coverage categories. improve branch coverage if needed.
 - [x] BUG: "Active Rules" is a bit misleading with new pause/resume feature. "Redirection Rules"? "Rules"?
