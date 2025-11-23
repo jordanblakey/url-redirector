@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "URL Redirector",
-  "version": "1.0",
+  "version": "1.0.0",
   "description": "Redirects URLs based on user-defined rules.",
   "permissions": [
     "storage",

@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import type { Page } from 'playwright';
 
 // Example automation function - customize this with your own actions!
 async function performAutomation(page: Page) {

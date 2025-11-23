@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { loadGcpSecrets } = require('./load-dotenv-from-gcp');
+import { loadGcpSecrets } from './load-dotenv-from-gcp';
 
 // --- Helper Functions ---
 async function getAccessToken(clientId: string, clientSecret: string, refreshToken: string) {
@@ -44,6 +44,7 @@ async function checkStatus(accessToken: string, publisherId: string, extensionId
     console.log('Loading secrets from Google Cloud...');
     await loadGcpSecrets();
 
+    // Extract required environment variables
     const CLIENT_ID = process.env.CWS_CLIENT_ID;
     const CLIENT_SECRET = process.env.CWS_CLIENT_SECRET;
     const REFRESH_TOKEN = process.env.CWS_REFRESH_TOKEN;

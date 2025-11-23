@@ -47,17 +47,3 @@ export async function loadGcpSecrets(projectId?: string, secretName?: string): P
     throw error;
   }
 }
-
-// Allow running directly
-if (require.main === module) {
-  (async () => {
-    try {
-      console.log('Loading secrets from Google Cloud...');
-      const secrets = await loadGcpSecrets();
-      console.log('Successfully loaded secrets. Keys:', Object.keys(secrets).join(', '));
-    } catch (error) {
-      console.error('Failed to load secrets:', error);
-      process.exit(1);
-    }
-  })();
-}
