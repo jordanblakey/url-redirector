@@ -71,3 +71,15 @@
     font-size: 12px;
   }
 }
+
+button.delete-btn,
+button.toggle-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.rule-actions {
+  gap: 8px;
+  margin-left: 12px;
+}
+}

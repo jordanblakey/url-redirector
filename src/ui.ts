@@ -80,18 +80,12 @@ export function renderRules(
 
         const toggleBtn = document.createElement('button');
         toggleBtn.className = `toggle-btn ${!rule.active ? 'paused' : ''}`;
-        toggleBtn.title = rule.active ? 'Pause Rule' : 'Resume Rule';
-        // Play/Pause Icon (Solid Fill)
-        toggleBtn.innerHTML = rule.active
-            ? '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>'
-            : '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
+        toggleBtn.textContent = rule.active ? 'Pause' : 'Play';
         toggleBtn.onclick = () => onToggle(rule.id);
 
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'delete-btn';
-        deleteBtn.title = 'Delete Rule';
-        // Trash Icon (Solid Fill)
-        deleteBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M3 6h18v2H3V6zm2 2h14v14H5V8zm5-4h4v2h-4V4z"></path></svg>';
+        deleteBtn.textContent = 'Delete';
         deleteBtn.onclick = () => onDelete(rule.id);
 
         actionsDiv.appendChild(toggleBtn);
