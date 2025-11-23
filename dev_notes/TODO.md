@@ -1,8 +1,13 @@
 ## TODO
 
+- [] BUG: Monocart reporter sourcemap pathing errors. Failed to fix twice now. Consider alternatives.
+
 ## DELEGATED
 
-- [] BUG: Monocart reporter sourcemap pathing errors
+- [] FEATURE: Microcopy ideas for rule counts. Randomized.
+- [] UX: Move input examples from labels into placeholder text. Cleaner and more standard.
+- [] UX: Alpha sort rules by source url.
+- [] UX: Buttons a bit small on Popup. Fitts' Law.
 
 ## DOING
 
