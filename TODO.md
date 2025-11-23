@@ -1,16 +1,23 @@
 ## TODO
 
 - [] CI: Push initial version through Chrome Web Store review process
-- [] BUG: Validation alerts dont work in popup. They do work in options. Are they implemented? Use flash messages?
-- [] BUG: TLD other than .com is blocked by validation. Update test cases for .com .org .net
-- [] Feature: Convert the "Pause" button into a Temporary Snooze (e.g., 5-10 minutes)  Logic: Instead of setting active: false, set a pausedUntil timestamp (e.g., Date.now() + 5 * 60000). Background: Update the redirect listener to check if (Date.now() < rule.pausedUntil) before redirecting. UI: Visual indicator that the rule is "Snoozed" (maybe a countdown or a different icon color) so the user knows it will come back.
+
+
 
 ## DELEGATED
 
+- [] BUG: Use flash messages instead of alerts.
+- [] BUG: Validation doesn't block creation of rules where source and target are the same.
+- [] BUG: TLD other than .com is blocked by validation. Update test cases for .com .org .net
+- [] Feature: Convert the "Pause" button into a Temporary Snooze (e.g., 5-10 minutes)  Logic: Instead of setting active: false, set a pausedUntil timestamp (e.g., Date.now() + 5 * 60000). Background: Update the redirect listener to check if (Date.now() < rule.pausedUntil) before redirecting. UI: Visual indicator that the rule is "Snoozed" (maybe a countdown or a different icon color) so the user knows it will come back.
+- [] BUG: Prevent the entry of rules where a rule with the same source url exists
+- [] FEATURE: Add a "use" button on hover to inputs that makes the placeholder the value
+
 ## DOING
 
-## DONE
 
+## DONE
+- [x] FEATURE: Expand messages.ts to include more microcopy options.
 - [x] FEATURE: Randomly select a top distracting site to populate source and wholesome site populate target placeholder text
 - [x] FEATURE: Include preset templates for common distracting sites paired with healthier alternatives. Hook into the psychology of why people use these sites and satisfy it in a different way. Bad habit? Replace with a good one.
 - [x] Feature: Implement "Thematic Matching" logic for placeholders (map specific source categories to relevant target categories, e.g., Video → Education vs. Social Scroll → Deep Reading) to replace pure randomization.
@@ -67,17 +74,12 @@
 ## Ambitious and Not Necessarily Good Ideas
 
 ### Juice
-- [] FEATURE: The arrow between the source and destination url should get longer and longer as the rule is used more and more.
-- [] FEATURE: Randomly select a top distracting site to populate source and wholesome site populate target placeholder text
-- [] FEATURE: Expand messages.ts to include more microcopy options.
+
 - [] FEATURE: Visually show how many times a rule has been used with a shaded area in the background https://www.figma.com/design/rTrJwTPfute4FiZwULEJGg/URL-Redirector-Screens?node-id=5-9&t=EH0NU01TjYsU23fw-0. The rule with the most usage should have about 90% of the background shaded. A bar graph. Sort by usage.
 
 ### Rule Sorting
 - [] FEATURE: Possibly, support drag and drop to reorder rules instead of alpha sorting. Imagine I have 50 rules and I want to move one to the top.
 - [] FEATURE: Revisit sorting if alpha is not the best. Pinned rules. Usage sorting. Pinning + selectable sorting. Sort selection memory.
-
-### Guided Tour
-- [] FEATURE: Add a guided tour of the extension on first load.
 
 ### Demo Recording
 - [] FEATURE: Automated demo recording - modular demo scripts by npm command args.
