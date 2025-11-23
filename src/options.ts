@@ -1,5 +1,6 @@
 import { Rule, StorageResult } from './types';
 import { matchAndGetTarget } from './utils.js';
+import { getRandomMessage } from './messages.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const manifest = chrome.runtime.getManifest();
@@ -120,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const rule = rules.find(r => r.id === ruleId);
             if (rule) {
                 rule.count = (rule.count || 0) + incrementBy;
+                rule.lastCountMessage = getRandomMessage(rule.count);
                 chrome.storage.local.set({ rules }, () => {
                     renderRules(rules);
                 });
@@ -193,7 +195,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const countSpan = document.createElement('span');
             countSpan.className = 'rule-count';
             const count = rule.count || 0;
-            countSpan.textContent = `Used ${count} time${count !== 1 ? 's' : ''}`;
+
+            if (rule.lastCountMessage) {
+                countSpan.textContent = rule.lastCountMessage;
+            } else {
+                countSpan.textContent = `Used ${count} time${count !== 1 ? 's' : ''}`;
+            }
 
             contentDiv.appendChild(ruleLineDiv);
             contentDiv.appendChild(countSpan);

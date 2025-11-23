@@ -1,5 +1,6 @@
 import { Rule, StorageResult } from './types';
 import { matchAndGetTarget } from './utils.js';
+import { getRandomMessage } from './messages.js';
 
 chrome.webNavigation.onBeforeNavigate.addListener(
     (details: chrome.webNavigation.WebNavigationBaseCallbackDetails) => {
@@ -17,6 +18,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(
 
                 if (target) {
                     rule.count = (rule.count || 0) + 1;
+                    rule.lastCountMessage = getRandomMessage(rule.count);
                     chrome.storage.local.set({ rules });
 
                     // Show badge to indicate redirection (if available)
@@ -66,6 +68,7 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
                                 const ruleToUpdate = currentRules.find(r => r.id === rule.id);
                                 if (ruleToUpdate) {
                                     ruleToUpdate.count = (ruleToUpdate.count || 0) + 1;
+                                    ruleToUpdate.lastCountMessage = getRandomMessage(ruleToUpdate.count);
                                     // We need to be careful not to trigger this listener again in a way that causes loop.
                                     // But since we filter for "became active", incrementing count won't change "active" state,
                                     // so it shouldn't trigger this block again.
