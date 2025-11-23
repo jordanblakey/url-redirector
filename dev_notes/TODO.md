@@ -1,19 +1,21 @@
 ## TODO
 
 - [] BUG: Monocart reporter sourcemap pathing errors. Failed to fix twice now. Consider alternatives.
+- [] BUG: long urls are truncated. Especially in the popup.
+
 - [] FEATURE: Randomly select a top distracting site to populate source and wholesome site populate target placeholder text
 - [] FEATURE: Visually show how many times a rule has been used with a shaded area in the background https://www.figma.com/design/rTrJwTPfute4FiZwULEJGg/URL-Redirector-Screens?node-id=5-9&t=EH0NU01TjYsU23fw-0. The rule with the most usage should have about 90% of the background shaded. A bar graph.
 - [] FEATURE: Expand messages.ts to include more microcopy options.
 
 ## DELEGATED
 
-- [] FEATURE: Microcopy ideas for rule counts. Randomized.
-- [] UX: Buttons a bit small on Popup. Fitts' Law.
 
 ## DOING
 
 ## DONE
 
+- [x] UX: Buttons a bit small on Popup. Fitts' Law. Compact icon buttons. buttons appear only on hover, and float above redirect urls. Possibly the row could become dark, and buttons could appear brightly on top. A pause/play icon toggle for "pause" and a trash can for "delete". buttons can be hidden until hovered (or tapped?).
+- [x] FEATURE: Microcopy ideas for rule counts. Randomized.
 - [x] UX: Move input examples from labels into placeholder text. Cleaner and more standard.
 - [x] UX: Alpha sort rules by source url.
 - [x] CLEANUP: reorg to assets/ folder

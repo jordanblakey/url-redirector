@@ -1,5 +1,6 @@
 import { Rule } from './types';
 import { getRandomMessage } from './messages.js';
+import { renderRules } from './ui.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const sourceInput = document.getElementById('sourceUrl') as HTMLInputElement;
@@ -34,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function loadRules(): void {
         chrome.storage.local.get(['rules'], (result) => {
             const rules = (result.rules as Rule[]) || [];
-            renderRules(rules);
+            renderRulesList(rules);
         });
     }
 
@@ -47,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             chrome.storage.local.set({ rules }, () => {
                 sourceInput.value = '';
                 targetInput.value = '';
-                renderRules(rules);
+                renderRulesList(rules);
             });
         });
     }
@@ -58,86 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const newRules = rules.filter((rule) => rule.id !== id);
 
             chrome.storage.local.set({ rules: newRules }, () => {
-                renderRules(newRules);
+                renderRulesList(newRules);
             });
         });
     }
 
-    function renderRules(rules: Rule[]): void {
-        rulesList.innerHTML = '';
-
-        // Sort rules alphabetically by source URL
-        rules.sort((a, b) => a.source.localeCompare(b.source));
-
-        if (rules.length === 0) {
-            const emptyState = document.createElement('li');
-            emptyState.textContent = 'No rules added yet.';
-            emptyState.style.textAlign = 'center';
-            emptyState.style.color = 'var(--text-secondary)';
-            emptyState.style.padding = '12px';
-            rulesList.appendChild(emptyState);
-            return;
-        }
-
-        rules.forEach((rule) => {
-            const li = document.createElement('li');
-            li.className = `rule-item ${!rule.active ? 'paused' : ''}`;
-
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'rule-content';
-
-            const ruleLineDiv = document.createElement('div');
-            ruleLineDiv.className = 'rule-line';
-
-            const sourceSpan = document.createElement('span');
-            sourceSpan.className = 'rule-source';
-            sourceSpan.textContent = rule.source;
-
-            const arrowSpan = document.createElement('span');
-            arrowSpan.className = 'rule-arrow';
-            arrowSpan.textContent = '➜';
-
-            const targetSpan = document.createElement('span');
-            targetSpan.className = 'rule-target';
-            targetSpan.textContent = rule.target;
-
-            ruleLineDiv.appendChild(sourceSpan);
-            ruleLineDiv.appendChild(arrowSpan);
-            ruleLineDiv.appendChild(targetSpan);
-
-            const countSpan = document.createElement('span');
-            countSpan.className = 'rule-count';
-            const count = rule.count || 0;
-            if (rule.lastCountMessage) {
-                countSpan.innerHTML = rule.lastCountMessage;
-            } else {
-                countSpan.innerHTML = getRandomMessage(count);
-            }
-
-            contentDiv.appendChild(ruleLineDiv);
-            contentDiv.appendChild(countSpan);
-
-            const actionsDiv = document.createElement('div');
-            actionsDiv.className = 'rule-actions';
-
-            const toggleBtn = document.createElement('button');
-            toggleBtn.className = `toggle-btn ${!rule.active ? 'paused' : ''}`;
-            toggleBtn.textContent = rule.active ? 'Pause' : 'Resume';
-            toggleBtn.onclick = () => toggleRule(rule.id);
-
-            const deleteBtn = document.createElement('button');
-            deleteBtn.className = 'delete-btn';
-            deleteBtn.textContent = 'Delete';
-            deleteBtn.onclick = () => deleteRule(rule.id);
-
-            actionsDiv.appendChild(toggleBtn);
-            actionsDiv.appendChild(deleteBtn);
-
-            li.appendChild(contentDiv);
-            li.appendChild(actionsDiv);
-
-            rulesList.appendChild(li);
-        });
+    function renderRulesList(rules: Rule[]): void {
+        renderRules(rules, rulesList, toggleRule, deleteRule);
     }
 
     function toggleRule(id: number): void {
@@ -147,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (rule) {
                 rule.active = !rule.active;
                 chrome.storage.local.set({ rules }, () => {
-                    renderRules(rules);
+                    renderRulesList(rules);
                 });
             }
         });
