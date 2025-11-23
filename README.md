@@ -3,7 +3,7 @@
 Reclaim your focus and master your digital habits with URL Redirector. This simple yet powerful extension acts as your personal internet traffic controller, gently nudging you away from distracting websites and towards your goals. Whether you're trying to break a social media loop or simply want to streamline your workflow, URL Redirector provides an unobtrusive way to modify your browsing patterns. Define your own rules, deflect distractions, and take back your time—one redirect at a time.
 
 ## Links
-- [Github](https://github.com/invisible/url-redirector)
+- [Github](https://github.com/jordanblakey/url-redirector)
 - [Chrome Web Store - Listing](https://chrome.google.com/webstore/detail/url-redirector/jhkoaofpbohfmolalpieheaeppdaminl)
 
 ## Features

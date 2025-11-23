@@ -4,13 +4,16 @@
 RECORDINGS_DIR="$(dirname "$0")/recordings"
 mkdir -p "$RECORDINGS_DIR"
 
+# Extract version from manifest.json
+VERSION=$(grep '"version":' "$(dirname "$0")/../manifest.json" | head -n 1 | cut -d '"' -f 4)
+
 # Timestamp for filename
 TIMESTAMP=$(date +"%Y-%m-%d_%H-%M-%S")
-FILENAME="$RECORDINGS_DIR/full-screen-demo_$TIMESTAMP.mp4"
+FILENAME="$RECORDINGS_DIR/url-redirector-${VERSION}-demo-${TIMESTAMP}.mp4"
 
-# Dimensions (matching the Playwright script's padded 1080p window)
-# 1920 + 20 padding = 1940
-# 1080 + 120 padding = 1200
+# Dimensions
+# We record the full 4K display (3840x2160) to capture the entire desktop context.
+# The Playwright browser will be positioned at the top-left of this display.
 WIDTH=3840
 HEIGHT=2160
 
@@ -20,24 +23,45 @@ echo "   Size:   ${WIDTH}x${HEIGHT}"
 echo "   Output: $FILENAME"
 
 # Start ffmpeg in the background
-# -f x11grab: Grab X11 display
-# -video_size: Size to grab
-# -framerate 30: Smooth 30fps
-# -i :0.0+0,0: Input display + offset
-# -c:v libx264: H.264 codec (much faster than VP9 for capture)
-# -preset ultrafast: Minimal CPU usage to prevent frame drops
-# -crf 18: High quality (visually lossless)
-# -pix_fmt yuv420p: Ensure compatibility with most players
-# -y: Overwrite if exists
-ffmpeg -f x11grab \
-    -video_size "${WIDTH}x${HEIGHT}" \
-    -framerate 60 \
-    -i :0.0+3840,0 \
-    -c:v libx264 -preset ultrafast -crf 18 -pix_fmt yuv420p \
-    -y "$FILENAME" > /dev/null 2>&1 &
+# Define the command and flags as an array
+ffmpeg_flags=(
+    # [Format]: Specifies we are recording the X11 Window System
+    -f x11grab 
+    # [Resolution]: The dimensions of the grab area
+    -video_size "${WIDTH}x${HEIGHT}" 
+    # [Input Framerate]: Capture at 60Hz
+    -framerate 60 
+    # [Input Source]: Display :0.0 with offset
+    -i :0.0+3840,0 
+    # [Video Codec]: H.264
+    -c:v libx264 
+    # [Speed]: Sacrifice compression for speed (capture only)
+    -preset ultrafast 
+    # [Quality]: Visually lossless
+    -crf 18 
+    # [Filters]: Pixel format and color scaling
+    -filter:v "format=yuv420p" 
+    # [Overwrite]: Yes
+    -y 
+)
+
+# Log file for ffmpeg output
+LOG_FILE="$RECORDINGS_DIR/ffmpeg_debug.log"
+echo "   Log:    $LOG_FILE"
+
+# Execute ffmpeg with the array expanded
+ffmpeg "${ffmpeg_flags[@]}" "$FILENAME" > "$LOG_FILE" 2>&1 &
 
 # Save PID of ffmpeg to kill it later
 FFMPEG_PID=$!
+
+# Check if ffmpeg died immediately
+sleep 1
+if ! kill -0 "$FFMPEG_PID" 2>/dev/null; then
+    echo "❌ ffmpeg failed to start! Check $LOG_FILE for details."
+    cat "$LOG_FILE"
+    exit 1
+fi
 
 # Wait a moment for recording to initialize
 sleep 2
@@ -45,8 +69,11 @@ sleep 2
 echo "🚀 Launching Playwright Demo..."
 
 # Run the Playwright script
-# We pass --hq to ensure it uses the 1080p resolution that matches our recording crop
-npm run headful -- --hq
+if [ "$1" == "--interactive" ]; then
+    npm run headful -- --interactive
+else
+    npm run headful
+fi
 
 # Capture the exit code of the node script
 EXIT_CODE=$?
