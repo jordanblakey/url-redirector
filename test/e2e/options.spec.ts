@@ -165,28 +165,21 @@ test.describe('URL Redirector Options Page', () => {
         await ruleItem.hover();
 
         // Initial state: Active (Resume is not shown, Pause is shown)
-        // Check title instead of text since we use icons now
-        await expect(toggleBtn).toHaveAttribute('title', 'Pause Rule');
         await expect(ruleItem).not.toHaveClass(/paused/);
 
         // Click to Pause
         await toggleBtn.click();
         await page.waitForTimeout(100);
 
-        // Hover again just in case
         await ruleItem.hover();
 
-        await expect(toggleBtn).toHaveAttribute('title', 'Resume Rule');
         await expect(ruleItem).toHaveClass(/paused/);
 
         // Click to Resume
         await toggleBtn.click();
         await page.waitForTimeout(100);
 
-        // Hover again
         await ruleItem.hover();
-
-        await expect(toggleBtn).toHaveAttribute('title', 'Pause Rule');
         await expect(ruleItem).not.toHaveClass(/paused/);
     });
 

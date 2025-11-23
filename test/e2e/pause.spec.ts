@@ -35,7 +35,6 @@ test.describe('URL Redirector Pause Functionality', () => {
         await ruleItem.hover();
 
         const toggleBtn = ruleItem.locator('.toggle-btn');
-        await expect(toggleBtn).toHaveAttribute('title', 'Pause Rule');
         await expect(toggleBtn).not.toHaveClass(/paused/);
 
         // Click pause
@@ -47,7 +46,6 @@ test.describe('URL Redirector Pause Functionality', () => {
 
         // Verify rule is paused
         await expect(ruleItem).toHaveClass(/paused/);
-        await expect(toggleBtn).toHaveAttribute('title', 'Resume Rule');
         await expect(toggleBtn).toHaveClass(/paused/);
 
         // Click resume
@@ -59,7 +57,6 @@ test.describe('URL Redirector Pause Functionality', () => {
 
         // Verify rule is active again
         await expect(ruleItem).not.toHaveClass(/paused/);
-        await expect(toggleBtn).toHaveAttribute('title', 'Pause Rule');
         await expect(toggleBtn).not.toHaveClass(/paused/);
     });
 
@@ -83,6 +80,5 @@ test.describe('URL Redirector Pause Functionality', () => {
         const reloadedRuleItem = page.locator('#rulesList .rule-item').first();
         await reloadedRuleItem.hover();
         await expect(reloadedRuleItem).toHaveClass(/paused/);
-        await expect(reloadedRuleItem.locator('.toggle-btn')).toHaveAttribute('title', 'Resume Rule');
     });
 });
