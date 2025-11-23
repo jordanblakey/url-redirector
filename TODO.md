@@ -1,8 +1,9 @@
 ## TODO
 
-- [] BUG: Monocart reporter sourcemap pathing errors. Failed to fix twice now. Consider alternatives.
-- [] FEATURE: Randomly select a top distracting site to populate source and wholesome site populate target placeholder text
 - [] CI: Push initial version through Chrome Web Store review process
+- [] BUG: Validation alerts dont work in popup. They do work in options. Are they implemented? Use flash messages?
+- [] BUG: TLD other than .com is blocked by validation. Update test cases for .com .org .net
+- [] Feature: Convert the "Pause" button into a Temporary Snooze (e.g., 5-10 minutes)  Logic: Instead of setting active: false, set a pausedUntil timestamp (e.g., Date.now() + 5 * 60000). Background: Update the redirect listener to check if (Date.now() < rule.pausedUntil) before redirecting. UI: Visual indicator that the rule is "Snoozed" (maybe a countdown or a different icon color) so the user knows it will come back.
 
 ## DELEGATED
 
@@ -10,6 +11,10 @@
 
 ## DONE
 
+- [x] FEATURE: Randomly select a top distracting site to populate source and wholesome site populate target placeholder text
+- [x] FEATURE: Include preset templates for common distracting sites paired with healthier alternatives. Hook into the psychology of why people use these sites and satisfy it in a different way. Bad habit? Replace with a good one.
+- [x] Feature: Implement "Thematic Matching" logic for placeholders (map specific source categories to relevant target categories, e.g., Video → Education vs. Social Scroll → Deep Reading) to replace pure randomization.
+- [x] CLEANUP: unify tsconfig
 - [x] CI: Write instructions for Chrome Web Store reviewer to test the extension.
 - [x] FEATURE: Automated demo recording utility.
 - [x] FEATURE: Automated demo recording - named recording. migrate to top level folder demos/. visible mouse actions.
@@ -60,11 +65,6 @@
 ---
 
 ## Ambitious and Not Necessarily Good Ideas
-
-### Rule Recommendations
-- [] FEATURE: Preset templates. Two dropdowns, one for country, one for top sites by country. https://github.com/InternetHealthReport/crux-top-lists-country. BQ dataset: `chrome-ux-report.experimental.country`
-- [] FEATURE: Include preset templates for common distracting sites paired with healthier alternatives. Hook into the psychology of why people use these sites and satisfy it in a different way. Bad habit? Replace with a good one.
-- [] FEATURE: Randomly select a top distracting site to populate source and wholesome site populate target placeholder text. These could be pairs.
 
 ### Juice
 - [] FEATURE: The arrow between the source and destination url should get longer and longer as the rule is used more and more.

@@ -2,6 +2,7 @@ import { Rule, StorageResult } from './types';
 import { matchAndGetTarget } from './utils.js';
 import { getRandomMessage } from './messages.js';
 import { renderRules } from './ui.js';
+import { getThematicPair } from './suggestions.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const manifest = chrome.runtime.getManifest();
@@ -62,6 +63,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sourceInput.addEventListener('keypress', handleEnter);
     targetInput.addEventListener('keypress', handleEnter);
+
+    setSmartPlaceholders();
+
+    function setSmartPlaceholders(): void {
+        const { source, target } = getThematicPair();
+        sourceInput.placeholder = `e.g. ${source}`;
+        targetInput.placeholder = `e.g. ${target}`;
+    }
 
     function loadRules(): void {
         chrome.storage.local.get(['rules'], (result: StorageResult) => {
