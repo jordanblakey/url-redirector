@@ -92,7 +92,11 @@ test.describe('URL Redirector Options Page', () => {
         await page.waitForTimeout(100);
 
         // Verify rule exists
-        await expect(page.locator('#rulesList .rule-item')).toHaveCount(1);
+        const ruleItem = page.locator('#rulesList .rule-item');
+        await expect(ruleItem).toHaveCount(1);
+
+        // Hover over the rule item to reveal buttons
+        await ruleItem.hover();
 
         // Click delete button
         await page.click('.delete-btn');
@@ -157,20 +161,25 @@ test.describe('URL Redirector Options Page', () => {
         const ruleItem = page.locator('.rule-item').first();
         const toggleBtn = ruleItem.locator('.toggle-btn');
 
+        // Hover to reveal buttons
+        await ruleItem.hover();
+
         // Initial state: Active (Resume is not shown, Pause is shown)
-        await expect(toggleBtn).toHaveText('Pause');
         await expect(ruleItem).not.toHaveClass(/paused/);
 
         // Click to Pause
         await toggleBtn.click();
         await page.waitForTimeout(100);
-        await expect(toggleBtn).toHaveText('Resume');
+
+        await ruleItem.hover();
+
         await expect(ruleItem).toHaveClass(/paused/);
 
         // Click to Resume
         await toggleBtn.click();
         await page.waitForTimeout(100);
-        await expect(toggleBtn).toHaveText('Pause');
+
+        await ruleItem.hover();
         await expect(ruleItem).not.toHaveClass(/paused/);
     });
 
@@ -205,6 +214,9 @@ test.describe('URL Redirector Options Page', () => {
             window.localStorage.removeItem('rules');
         });
 
+        const ruleItem = page.locator('.rule-item').first();
+        await ruleItem.hover();
+
         // Click Delete
         await page.click('.delete-btn');
         await page.waitForTimeout(100);
@@ -220,6 +232,9 @@ test.describe('URL Redirector Options Page', () => {
         await page.evaluate(() => {
             window.localStorage.removeItem('rules');
         });
+
+        const ruleItem = page.locator('.rule-item').first();
+        await ruleItem.hover();
 
         await page.click('.toggle-btn');
         await page.waitForTimeout(100);

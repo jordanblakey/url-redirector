@@ -87,7 +87,11 @@ test.describe('URL Redirector Popup', () => {
         await page.waitForTimeout(100);
 
         // Verify rule exists
-        await expect(page.locator('#rulesList .rule-item')).toHaveCount(1);
+        const ruleItem = page.locator('#rulesList .rule-item');
+        await expect(ruleItem).toHaveCount(1);
+
+        // Hover over the rule item to reveal buttons
+        await ruleItem.hover();
 
         // Click delete button
         await page.click('.delete-btn');
