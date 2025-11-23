@@ -68,11 +68,11 @@ sleep 2
 
 echo "🚀 Launching Playwright Demo..."
 
-# Run the Playwright script
+# Run the Playwright script using ts-node
 if [ "$1" == "--interactive" ]; then
-    npm run headful -- --interactive
+    ts-node demos/headful-session.ts --interactive
 else
-    npm run headful
+    ts-node demos/headful-session.ts
 fi
 
 # Capture the exit code of the node script

@@ -2,6 +2,8 @@ import fs from 'fs-extra';
 import path from 'path';
 import { execSync } from 'child_process';
 
+
+
 const rootDir = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
 const customDist = args[0];
@@ -17,7 +19,11 @@ async function build() {
 
         // 2. Compile TypeScript
         console.log('🔨 Compiling TypeScript...');
-        execSync(`tsc --outDir "${distDir}"`, { stdio: 'inherit', cwd: rootDir });
+        // Compile TypeScript with explicit ES2020 module output for the extension
+        execSync(
+            `tsc --module ES2020 --rootDir src --outDir "${distDir}" --lib ES2020,DOM --sourceMap true`,
+            { stdio: 'inherit', cwd: rootDir }
+        );
 
         // 3. Copy static assets
         console.log('📂 Copying static assets...');

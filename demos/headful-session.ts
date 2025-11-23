@@ -1,9 +1,11 @@
-import { chromium, Page, BrowserContext, Browser } from '@playwright/test';
+import { chromium } from 'playwright';
+import type { Browser, BrowserContext, Page } from '@playwright/test';
 import * as fs from 'fs';
 import installMouseHelper from './mouse-helper';
 import performAutomation from './perform-automation';
 import * as repl from 'repl';
 import * as path from 'path';
+
 
 /**
  * Opens a headful Playwright browser session with programmatic control.

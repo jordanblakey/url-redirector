@@ -1,4 +1,4 @@
-import { Page } from '@playwright/test';
+import type { Page } from 'playwright';
 
 // Injects a visual mouse cursor into the page to make Playwright's actions visible
 async function installMouseHelper(page: Page) {

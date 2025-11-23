@@ -7,24 +7,22 @@
     "test": "test"
   },
   "scripts": {
-    "build:watch": "tsc --watch",
-    "build": "ts-node --project tsconfig.scripts.json scripts/build.ts",
-    "bundle": "ts-node --project tsconfig.scripts.json scripts/bundle.ts",
-    "headful": "ts-node --project tsconfig.scripts.json demos/headful-session.ts",
-    "record:demo": "npm run bundle && ./demos/record-demo.sh",
+    "build": "ts-node scripts/build.ts",
+    "bundle": "ts-node scripts/bundle.ts",
     "test:install": "playwright install --with-deps chromium",
-    "test": "playwright test",
-    "test:ui": "playwright test --ui",
-    "test:coverage": "npm run test && npx monocart show-report test/coverage/index.html",
+    "test": "npm run build && playwright test",
+    "test:ui": "npm run build && playwright test --ui",
+    "test:coverage": "npm run build && playwright test && npx monocart show-report test/coverage/index.html",
     "update-manifest": "jq --arg v $npm_package_version '.version = $v' manifest.json > tmp.json && mv tmp.json manifest.json",
     "version": "npm run update-manifest && git add manifest.json",
     "postversion": "git push && git push --tags && gh release create v$npm_package_version --generate-notes",
-    "setup-store-auth": "ts-node --project tsconfig.scripts.json scripts/setup-cws-auth.ts",
-    "check-store-status": "ts-node --project tsconfig.scripts.json scripts/check-cws-status.ts"
+    "record:automation": "npm run bundle && ./demos/record-demo.sh",
+    "record:demo": "npm run bundle && ./demos/record-demo.sh --interactive",
+    "setup-store-auth": "ts-node scripts/setup-cws-auth.ts",
+    "check-store-status": "ts-node scripts/check-cws-status.ts"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
   "dependencies": {
     "@google-cloud/secret-manager": "^6.1.1",
     "dotenv": "^16.4.5"
