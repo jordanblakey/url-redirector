@@ -10,6 +10,8 @@
     "build:watch": "tsc --watch",
     "build": "ts-node --project tsconfig.scripts.json scripts/build.ts",
     "bundle": "ts-node --project tsconfig.scripts.json scripts/bundle.ts",
+    "headful": "ts-node --project tsconfig.scripts.json demos/headful-session.ts",
+    "record:demo": "npm run bundle && ./demos/record-demo.sh",
     "test:install": "playwright install --with-deps chromium",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
