@@ -1,61 +1,67 @@
 export const MESSAGES = [
   // Cheeky
-  "Caught you {count} times",
-  "Stopped {count} doom scroll attempts",
-  "Blocked {count} 'quick checks'",
-  "{count} close calls",
-  "Intercepted {count} times",
+  "Caught you {count} time{s}",
+  "Stopped {count} doom scroll attempt{s}",
+  "Blocked {count} 'quick check{s}'",
+  "{count} close call{s}",
+  "Intercepted {count} time{s}",
 
   // Warm/Supportive
-  "Protected you {count} times",
-  "Helped you focus {count} times",
-  "Kept you on track {count} times",
-  "Got your back: {count} times",
+  "Protected you {count} time{s}",
+  "Helped you focus {count} time{s}",
+  "Kept you on track {count} time{s}",
+  "Got your back: {count} time{s}",
 
   // Encouraging
-  "{count} distractions dodged!",
-  "{count} wins for focus",
-  "{count} redirects to productivity",
-  "{count} successful blocks",
+  "{count} distraction{s} dodged!",
+  "{count} win{s} for focus",
+  "{count} redirect{s} to productivity",
+  "{count} successful block{s}",
 
   // Playful
-  "Nope'd {count} times",
-  "{count} u-turns to focus",
-  "Bounced you {count} times",
-  "{count} 'not today' moments",
+  "Nope'd {count} time{s}",
+  "{count} u-turn{s} to focus",
+  "Bounced you {count} time{s}",
+  "{count} 'not today' moment{s}",
 
   // Direct but varied
-  "Used {count} times",
-  "Triggered {count} times",
-  "Active: {count} uses",
+  "Used {count} time{s}",
+  "Triggered {count} time{s}",
+  "Active: {count} use{s}",
 
   // Chaos / Left-field
-  "{count} redirects executed",
-  "You've been saved {count} times",
-  "{count} interventions",
+  "{count} redirect{s} executed",
+  "You've been saved {count} time{s}",
+  "{count} intervention{s}",
   "Deflected: {count}",
-  "{count} rescues",
-  "Diverted {count} times",
-  "{count} focus assists",
+  "{count} rescue{s}",
+  "Diverted {count} time{s}",
+  "{count} focus assist{s}",
   "Interrupted {count} rabbit holes",
-  "{count} course corrections",
-  "Bouncer mode: {count} blocks",
-  "{count} times you tried",
-  "Guarded {count} sessions",
-  "{count} soft landings",
-  "Rerouted {count} journeys",
-  "{count} second chances",
+  "{count} course correction{s}",
+  "Bouncer mode: {count} block{s}",
+  "{count} time{s} you tried",
+  "Guarded {count} session{s}",
+  "{count} soft landing{s}",
+  "Rerouted {count} journey{s}",
+  "{count} second chance{s}",
 
   // Really random/weird
   "Thank you, come again: {count}",
-  "Nothing to see here: {count} times",
-  "Road closed: {count} detours",
-  "{count} polite declines",
-  "Uno reversed {count} times",
+  "Nothing to see here: {count} time{s}",
+  "Road closed: {count} detour{s}",
+  "{count} polite decline{s}",
+  "Uno reversed {count} time{s}",
   "{count} ctrl+z on impulse"
 ];
 
 export function getRandomMessage(count: number): string {
+  if (count === 0) {
+    return `Used <span class="count-value">0</span> times`;
+  }
   const template = MESSAGES[Math.floor(Math.random() * MESSAGES.length)];
-  return template.replace("{count}", count.toString());
+  const countHtml = `<span class="count-value">${count}</span>`;
+  return template
+    .replace("{count}", countHtml)
+    .replace("{s}", count != 1 ? "s" : "");
 }

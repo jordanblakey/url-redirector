@@ -200,9 +200,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const count = rule.count || 0;
 
             if (rule.lastCountMessage) {
-                countSpan.textContent = rule.lastCountMessage;
+                countSpan.innerHTML = rule.lastCountMessage;
             } else {
-                countSpan.textContent = `Used ${count} time${count !== 1 ? 's' : ''}`;
+                countSpan.innerHTML = getRandomMessage(count);
             }
 
             contentDiv.appendChild(ruleLineDiv);

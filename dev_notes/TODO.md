@@ -2,6 +2,8 @@
 
 - [] BUG: Monocart reporter sourcemap pathing errors. Failed to fix twice now. Consider alternatives.
 - [] FEATURE: Randomly select a top distracting site to populate source and wholesome site populate target placeholder text
+- [] FEATURE: Visually show how many times a rule has been used with a shaded area in the background https://www.figma.com/design/rTrJwTPfute4FiZwULEJGg/URL-Redirector-Screens?node-id=5-9&t=EH0NU01TjYsU23fw-0. The rule with the most usage should have about 90% of the background shaded. A bar graph.
+- [] FEATURE: Expand messages.ts to include more microcopy options.
 
 ## DELEGATED
 

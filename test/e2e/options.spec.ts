@@ -191,7 +191,7 @@ test.describe('URL Redirector Options Page', () => {
         await page.waitForTimeout(100);
 
         const countSpan = page.locator('.rule-count');
-        await expect(countSpan).toContainText('Used 0 times');
+        await expect(countSpan.locator('.count-value')).toHaveText('0');
     });
 
     test('should handle rule not found during deletion', async ({ page }) => {
@@ -278,5 +278,47 @@ test.describe('URL Redirector Options Page', () => {
         expect(first).toBe('apple.com');
         expect(second).toBe('beta.com');
         expect(third).toBe('zebra.com');
+    });
+    test('should display correct message plurality', async ({ page }) => {
+        // Add a rule
+        await page.fill('#sourceUrl', 'plural-test-options.com');
+        await page.fill('#targetUrl', 'target.com');
+        await page.click('#addRuleBtn');
+        await page.waitForTimeout(100);
+
+        const ruleItem = page.locator('.rule-item').first();
+        const countSpan = ruleItem.locator('.rule-count');
+
+        // Case 0: Should be "Used 0 times"
+        await expect(countSpan).toContainText('Used 0 times');
+
+        // Case 1: Singular
+        await page.evaluate(() => {
+            return new Promise<void>((resolve) => {
+                chrome.storage.local.get(['rules'], (result) => {
+                    const rules = result.rules as any;
+                    rules[0].count = 1;
+                    delete rules[0].lastCountMessage;
+                    chrome.storage.local.set({ rules }, resolve);
+                });
+            });
+        });
+        await page.reload();
+        await expect(countSpan).toContainText('1');
+        await expect(countSpan).not.toContainText('Used 0 times');
+
+        // Case 2: Plural
+        await page.evaluate(() => {
+            return new Promise<void>((resolve) => {
+                chrome.storage.local.get(['rules'], (result) => {
+                    const rules = result.rules as any;
+                    rules[0].count = 5;
+                    delete rules[0].lastCountMessage;
+                    chrome.storage.local.set({ rules }, resolve);
+                });
+            });
+        });
+        await page.reload();
+        await expect(countSpan).toContainText('5');
     });
 });

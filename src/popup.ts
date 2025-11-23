@@ -1,4 +1,5 @@
 import { Rule } from './types';
+import { getRandomMessage } from './messages.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const sourceInput = document.getElementById('sourceUrl') as HTMLInputElement;
@@ -65,6 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderRules(rules: Rule[]): void {
         rulesList.innerHTML = '';
 
+        // Sort rules alphabetically by source URL
+        rules.sort((a, b) => a.source.localeCompare(b.source));
+
         if (rules.length === 0) {
             const emptyState = document.createElement('li');
             emptyState.textContent = 'No rules added yet.';
@@ -104,7 +108,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const countSpan = document.createElement('span');
             countSpan.className = 'rule-count';
             const count = rule.count || 0;
-            countSpan.textContent = `Used ${count} time${count !== 1 ? 's' : ''}`;
+            if (rule.lastCountMessage) {
+                countSpan.innerHTML = rule.lastCountMessage;
+            } else {
+                countSpan.innerHTML = getRandomMessage(count);
+            }
 
             contentDiv.appendChild(ruleLineDiv);
             contentDiv.appendChild(countSpan);
