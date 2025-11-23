@@ -156,6 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderRules(rules: Rule[]): void {
         rulesList.innerHTML = '';
 
+        // Sort rules alphabetically by source URL
+        rules.sort((a, b) => a.source.localeCompare(b.source));
+
         if (rules.length === 0) {
             const emptyState = document.createElement('li');
             emptyState.textContent = 'No rules added yet.';

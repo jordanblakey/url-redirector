@@ -248,4 +248,35 @@ test.describe('URL Redirector Options Page', () => {
         await page.waitForTimeout(100);
         // No error should occur
     });
+
+    test('should sort rules alphabetically by source URL', async ({ page }) => {
+        // Add rules in non-alphabetical order
+        await page.fill('#sourceUrl', 'zebra.com');
+        await page.fill('#targetUrl', 'target.com');
+        await page.click('#addRuleBtn');
+        await page.waitForTimeout(100);
+
+        await page.fill('#sourceUrl', 'apple.com');
+        await page.fill('#targetUrl', 'target.com');
+        await page.click('#addRuleBtn');
+        await page.waitForTimeout(100);
+
+        await page.fill('#sourceUrl', 'beta.com');
+        await page.fill('#targetUrl', 'target.com');
+        await page.click('#addRuleBtn');
+        await page.waitForTimeout(100);
+
+        // Get all source elements
+        const sourceElements = page.locator('.rule-source');
+        await expect(sourceElements).toHaveCount(3);
+
+        // Check if they are sorted
+        const first = await sourceElements.nth(0).textContent();
+        const second = await sourceElements.nth(1).textContent();
+        const third = await sourceElements.nth(2).textContent();
+
+        expect(first).toBe('apple.com');
+        expect(second).toBe('beta.com');
+        expect(third).toBe('zebra.com');
+    });
 });
