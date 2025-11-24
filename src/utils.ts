@@ -33,3 +33,14 @@ export function matchAndGetTarget(url: string, rule: Rule): string | null {
     }
     return null;
 }
+
+/**
+ * Checks if a rule is active and not snoozed.
+ * @param rule The rule to check.
+ * @returns True if the rule should apply, false otherwise.
+ */
+export function shouldRuleApply(rule: Rule): boolean {
+    if (rule.active === false) return false;
+    if (rule.pausedUntil && Date.now() < rule.pausedUntil) return false;
+    return true;
+}

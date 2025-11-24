@@ -1,5 +1,5 @@
 import { Rule } from './types';
-import { renderRules } from './ui.js';
+import { renderRules, updateSnoozeButtons } from './ui.js';
 import { getThematicPair } from './suggestions.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -9,6 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const rulesList = document.getElementById('rulesList') as HTMLUListElement;
 
     loadRules();
+
+    // Refresh UI every second to update snooze countdowns
+    setInterval(() => {
+        updateSnoozeButtons(rulesList);
+    }, 1000);
 
     addBtn.addEventListener('click', () => {
         const source = sourceInput.value.trim();
@@ -73,15 +78,28 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderRulesList(rules: Rule[]): void {
-        renderRules(rules, rulesList, toggleRule, deleteRule);
+        renderRules(rules, rulesList, snoozeRule, deleteRule);
     }
 
-    function toggleRule(id: number): void {
+    function snoozeRule(id: number): void {
         chrome.storage.local.get(['rules'], (result) => {
             const rules = (result.rules as Rule[]) || [];
             const rule = rules.find((r) => r.id === id);
             if (rule) {
-                rule.active = !rule.active;
+                const now = Date.now();
+                if (rule.pausedUntil && rule.pausedUntil > now) {
+                    // Already snoozed, so resume
+                    rule.pausedUntil = undefined;
+                    rule.active = true; // Ensure it's active
+                } else if (!rule.active) {
+                    // It was permanently disabled, enable it
+                    rule.active = true;
+                    rule.pausedUntil = undefined;
+                } else {
+                    // Active and not snoozed, so snooze it for 5 minutes
+                    rule.pausedUntil = now + 5 * 60 * 1000;
+                }
+
                 chrome.storage.local.set({ rules }, () => {
                     renderRulesList(rules);
                 });
