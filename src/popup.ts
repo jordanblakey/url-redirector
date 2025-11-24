@@ -1,6 +1,7 @@
 import { Rule } from './types';
-import { renderRules, showFlashMessage, updatePauseButtons, toggleRuleState } from './ui.js';
-import { getThematicPair } from './suggestions.js';
+import { renderRules, showFlashMessage, updatePauseButtons, setupSmartPlaceholders } from './ui.js';
+import { isValidUrl } from './utils.js';
+import { getRules, addRule, deleteRule, toggleRule } from './storage.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const sourceInput = document.getElementById('sourceUrl') as HTMLInputElement;
@@ -15,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePauseButtons(rulesList);
     }, 1000);
 
-    addBtn.addEventListener('click', () => {
+    addBtn.addEventListener('click', async () => {
         const source = sourceInput.value.trim();
         const target = targetInput.value.trim();
 
@@ -34,22 +35,20 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        addRule(source, target);
-    });
-
-    function isValidUrl(string: string): boolean {
         try {
-            // Check if it matches a basic domain pattern or full URL
-            const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
-            if (urlPattern.test(string)) {
-                return true;
+            await addRule(source, target);
+            sourceInput.value = '';
+            targetInput.value = '';
+            await loadRules();
+            showFlashMessage('Rule added successfully!', 'success');
+        } catch (error) {
+            if (error instanceof Error && error.message === 'Duplicate source') {
+                showFlashMessage('Duplicate source. A rule for this source URL already exists.', 'error');
+            } else {
+                showFlashMessage('Error adding rule.', 'error');
             }
-            new URL(string);
-            return true;
-        } catch (_) {
-            return false;
         }
-    }
+    });
 
     const handleEnter = (e: KeyboardEvent) => {
         if (e.key === 'Enter') {
@@ -60,69 +59,25 @@ document.addEventListener('DOMContentLoaded', () => {
     sourceInput.addEventListener('keypress', handleEnter);
     targetInput.addEventListener('keypress', handleEnter);
 
-    setSmartPlaceholders();
+    setupSmartPlaceholders(sourceInput, targetInput);
 
-    function setSmartPlaceholders(): void {
-        const { source, target } = getThematicPair();
-
-        sourceInput.placeholder = `e.g. ${source}`;
-        targetInput.placeholder = `e.g. ${target}`;
+    async function loadRules(): Promise<void> {
+        const rules = await getRules();
+        renderRulesList(rules);
     }
 
-    function loadRules(): void {
-        chrome.storage.local.get(['rules'], (result) => {
-            const rules = (result.rules as Rule[]) || [];
-            renderRulesList(rules);
-        });
-    }
-
-    function addRule(source: string, target: string): void {
-        chrome.storage.local.get(['rules'], (result) => {
-            const rules = (result.rules as Rule[]) || [];
-
-            if (rules.some(rule => rule.source === source)) {
-                showFlashMessage('Duplicate source. A rule for this source URL already exists.', 'error');
-                return;
-            }
-
-            rules.push({ source, target, id: Date.now(), count: 0, active: true });
-
-            chrome.storage.local.set({ rules }, () => {
-                sourceInput.value = '';
-                targetInput.value = '';
-                renderRulesList(rules);
-                showFlashMessage('Rule added successfully!', 'success');
-            });
-        });
-    }
-
-    function deleteRule(id: number): void {
-        chrome.storage.local.get(['rules'], (result) => {
-            const rules = (result.rules as Rule[]) || [];
-            const newRules = rules.filter((rule) => rule.id !== id);
-
-            chrome.storage.local.set({ rules: newRules }, () => {
-                renderRulesList(newRules);
-                showFlashMessage('Rule deleted.', 'info');
-            });
-        });
+    async function handleDeleteRule(id: number): Promise<void> {
+        await deleteRule(id);
+        await loadRules();
+        showFlashMessage('Rule deleted.', 'info');
     }
 
     function renderRulesList(rules: Rule[]): void {
-        renderRules(rules, rulesList, togglePauseRule, deleteRule);
+        renderRules(rules, rulesList, handleToggleRule, handleDeleteRule);
     }
 
-    function togglePauseRule(id: number): void {
-        chrome.storage.local.get(['rules'], (result) => {
-            const rules = (result.rules as Rule[]) || [];
-            const rule = rules.find((r) => r.id === id);
-            if (rule) {
-                toggleRuleState(rule);
-
-                chrome.storage.local.set({ rules }, () => {
-                    renderRulesList(rules);
-                });
-            }
-        });
+    async function handleToggleRule(id: number): Promise<void> {
+        await toggleRule(id);
+        await loadRules();
     }
 });

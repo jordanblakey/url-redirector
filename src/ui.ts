@@ -1,5 +1,9 @@
 import { Rule } from './types';
 import { getRandomMessage } from './messages.js';
+import { getThematicPair } from './suggestions.js';
+import { toggleRuleState } from './rules.js';
+
+export { toggleRuleState };
 
 const getFaviconUrl = (url: string) => {
     // Basic clean up to get the domain
@@ -10,6 +14,12 @@ const getFaviconUrl = (url: string) => {
         return 'default-icon.png'; // Fallback
     }
 };
+
+export function setupSmartPlaceholders(sourceInput: HTMLInputElement, targetInput: HTMLInputElement): void {
+    const { source, target } = getThematicPair();
+    sourceInput.placeholder = `e.g. ${source}`;
+    targetInput.placeholder = `e.g. ${target}`;
+}
 
 export function showFlashMessage(message: string, type: 'success' | 'error' | 'info' = 'info', duration = 3000): void {
     let flashContainer = document.getElementById('flash-container');
@@ -68,9 +78,6 @@ export function renderRules(
         // Toggle on row click
         li.onclick = (e) => {
             // Prevent triggering if clicking directly on buttons
-            // (Buttons have their own handlers, but event bubbles. 
-            // If we handle it here, we might double toggle or interfere.
-            // Best to check target)
             const target = e.target as HTMLElement;
             if (target.closest('button')) {
                 return;
@@ -178,9 +185,6 @@ export function updatePauseButtons(listElement: HTMLElement): void {
                     button.textContent = `Paused (${remaining}s)`;
                 }
             } else {
-                // Expired, should probably reload or just show basic text,
-                // but for cleaner state we might want to trigger reload if it just expired.
-                // For now just update text.
                 button.textContent = 'Pause';
                 button.classList.remove('paused');
                 delete button.dataset.pausedUntil;
@@ -193,20 +197,4 @@ export function updatePauseButtons(listElement: HTMLElement): void {
             }
         }
     });
-}
-
-export function toggleRuleState(rule: Rule): void {
-    const now = Date.now();
-    if (rule.pausedUntil && rule.pausedUntil > now) {
-        // Already paused, so resume
-        rule.pausedUntil = undefined;
-        rule.active = true;
-    } else if (!rule.active) {
-        // It was permanently disabled, enable it
-        rule.active = true;
-        rule.pausedUntil = undefined;
-    } else {
-        // Active and not paused, so pause it for 5 minutes (currently 5 seconds for testing?)
-        rule.pausedUntil = now + 5 * 60 * 1000;
-    }
 }

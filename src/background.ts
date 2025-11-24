@@ -1,5 +1,6 @@
 import { Rule, StorageResult } from './types';
 import { matchAndGetTarget, shouldRuleApply } from './utils.js';
+import { getRules, saveRules } from './storage.js';
 import { getRandomMessage } from './messages.js';
 
 chrome.webNavigation.onBeforeNavigate.addListener(
@@ -8,8 +9,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(
         // Only redirect main frame
         if (details.frameId !== 0) return;
 
-        chrome.storage.local.get(['rules'], (result: StorageResult) => {
-            const rules = result.rules || [];
+        getRules().then((rules) => {
             const currentUrl = details.url;
 
             for (const rule of rules) {
@@ -20,7 +20,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(
                 if (target) {
                     rule.count = (rule.count || 0) + 1;
                     rule.lastCountMessage = getRandomMessage(rule.count);
-                    chrome.storage.local.set({ rules });
+                    saveRules(rules); // We don't await this to avoid blocking redirect
 
                     // Show badge to indicate redirection (if available)
                     showBadge();
@@ -54,26 +54,14 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
                     for (const rule of activeRules) {
                         const target = matchAndGetTarget(tab.url, rule);
                         if (target) {
-                            // Update count
-                            // Note: This might cause a race condition if multiple tabs match, 
-                            // but for now we'll just increment. 
-                            // Ideally we should re-fetch rules, increment, and save, but we are inside the change listener.
-                            // To avoid infinite loops or complexity, we might skip incrementing count here 
-                            // OR we accept that we might need to do another get/set.
-                            // For simplicity and to avoid loop (set triggers onChanged), let's just redirect.
-                            // If we want to count, we should do it carefully.
-                            // Let's try to increment count.
-
-                            chrome.storage.local.get(['rules'], (result) => {
-                                const currentRules = (result.rules as Rule[]) || [];
+                            // Update count for the rule
+                            // We re-fetch rules to ensure we have the latest state and don't overwrite concurrent updates
+                            getRules().then((currentRules) => {
                                 const ruleToUpdate = currentRules.find(r => r.id === rule.id);
                                 if (ruleToUpdate) {
                                     ruleToUpdate.count = (ruleToUpdate.count || 0) + 1;
                                     ruleToUpdate.lastCountMessage = getRandomMessage(ruleToUpdate.count);
-                                    // We need to be careful not to trigger this listener again in a way that causes loop.
-                                    // But since we filter for "became active", incrementing count won't change "active" state,
-                                    // so it shouldn't trigger this block again.
-                                    chrome.storage.local.set({ rules: currentRules });
+                                    saveRules(currentRules);
                                 }
                             });
 

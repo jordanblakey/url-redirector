@@ -1,8 +1,7 @@
-import { Rule, StorageResult } from './types';
-import { matchAndGetTarget } from './utils.js';
-import { getRandomMessage } from './messages.js';
-import { renderRules, updatePauseButtons, toggleRuleState, showFlashMessage } from './ui.js';
-import { getThematicPair } from './suggestions.js';
+import { Rule } from './types';
+import { renderRules, showFlashMessage, updatePauseButtons, setupSmartPlaceholders } from './ui.js';
+import { isValidUrl } from './utils.js';
+import { getRules, addRule, deleteRule, toggleRule } from './storage.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const manifest = chrome.runtime.getManifest();
@@ -24,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePauseButtons(rulesList);
     }, 1000);
 
-    addBtn.addEventListener('click', () => {
+    addBtn.addEventListener('click', async () => {
         const source = sourceInput.value.trim();
         const target = targetInput.value.trim();
 
@@ -43,22 +42,20 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        addRule(source, target);
-    });
-
-    function isValidUrl(string: string): boolean {
         try {
-            // Check if it matches a basic domain pattern or full URL
-            const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
-            if (urlPattern.test(string)) {
-                return true;
+            await addRule(source, target);
+            sourceInput.value = '';
+            targetInput.value = '';
+            await loadRules();
+            showFlashMessage('Rule added successfully!', 'success');
+        } catch (error) {
+            if (error instanceof Error && error.message === 'Duplicate source') {
+                showFlashMessage('Duplicate source. A rule for this source URL already exists.', 'error');
+            } else {
+                showFlashMessage('Error adding rule.', 'error');
             }
-            new URL(string);
-            return true;
-        } catch (_) {
-            return false;
         }
-    }
+    });
 
     const handleEnter = (e: KeyboardEvent) => {
         if (e.key === 'Enter') {
@@ -69,114 +66,25 @@ document.addEventListener('DOMContentLoaded', () => {
     sourceInput.addEventListener('keypress', handleEnter);
     targetInput.addEventListener('keypress', handleEnter);
 
-    setSmartPlaceholders();
+    setupSmartPlaceholders(sourceInput, targetInput);
 
-    function setSmartPlaceholders(): void {
-        const { source, target } = getThematicPair();
-        sourceInput.placeholder = `e.g. ${source}`;
-        targetInput.placeholder = `e.g. ${target}`;
+    async function loadRules(): Promise<void> {
+        const rules = await getRules();
+        renderRulesList(rules);
     }
 
-    function loadRules(): void {
-        chrome.storage.local.get(['rules'], (result: StorageResult) => {
-            const rules = result.rules || [];
-            renderRulesList(rules);
-        });
+    async function handleDeleteRule(id: number): Promise<void> {
+        await deleteRule(id);
+        await loadRules();
+        showFlashMessage('Rule deleted.', 'info');
     }
 
-    function addRule(source: string, target: string): void {
-        chrome.storage.local.get(['rules'], (result: StorageResult) => {
-            const rules = result.rules || [];
-
-            // Check for duplicate source
-            if (rules.some(rule => rule.source === source)) {
-                showFlashMessage('Duplicate source. A rule for this source URL already exists.', 'error');
-                return;
-            }
-
-            const newRule: Rule = { source, target, id: Date.now(), count: 0, active: true };
-            rules.push(newRule);
-
-            chrome.storage.local.set({ rules }, () => {
-                sourceInput.value = '';
-                targetInput.value = '';
-                renderRulesList(rules);
-                showFlashMessage('Rule added successfully!', 'success');
-
-                // Check existing tabs for redirect
-                checkAndRedirectTabs(newRule);
-            });
-        });
-    }
-
-    function checkAndRedirectTabs(rule: Rule): void {
-        chrome.tabs.query({}, (tabs) => {
-            let matchCount = 0;
-
-            for (const tab of tabs) {
-                if (tab.id && tab.url) {
-                    const targetUrl = matchAndGetTarget(tab.url, rule);
-                    if (targetUrl) {
-                        matchCount++;
-                        // Update tab immediately
-                        chrome.tabs.update(tab.id, { url: targetUrl });
-                    }
-                }
-            }
-
-            // Increment count in bulk if matches found
-            if (matchCount > 0) {
-                incrementRuleCount(rule.id, matchCount);
-            }
-        });
-    }
-
-    function incrementRuleCount(ruleId: number, incrementBy: number): void {
-        chrome.storage.local.get(['rules'], (result: StorageResult) => {
-            const rules = result.rules || [];
-            const rule = rules.find(r => r.id === ruleId);
-            if (rule) {
-                rule.count = (rule.count || 0) + incrementBy;
-                rule.lastCountMessage = getRandomMessage(rule.count);
-                chrome.storage.local.set({ rules }, () => {
-                    renderRulesList(rules);
-                });
-            }
-        });
-    }
-
-    function deleteRule(id: number): void {
-        chrome.storage.local.get(['rules'], (result: StorageResult) => {
-            const rules = result.rules || [];
-            const newRules = rules.filter((rule) => rule.id !== id);
-
-            chrome.storage.local.set({ rules: newRules }, () => {
-                renderRulesList(newRules);
-                showFlashMessage('Rule deleted.', 'info');
-            });
-        });
-    }
-
-    function toggleRule(id: number): void {
-        chrome.storage.local.get(['rules'], (result: StorageResult) => {
-            const rules = result.rules || [];
-            const rule = rules.find((r) => r.id === id);
-            if (rule) {
-                toggleRuleState(rule);
-
-                chrome.storage.local.set({ rules }, () => {
-                    renderRulesList(rules);
-
-                    // If we just resumed (active=true, no pausedUntil), we should check for redirects
-                    if (rule.active && !rule.pausedUntil) {
-                        checkAndRedirectTabs(rule);
-                    }
-                });
-            }
-        });
+    async function handleToggleRule(id: number): Promise<void> {
+        await toggleRule(id);
+        await loadRules();
     }
 
     function renderRulesList(rules: Rule[]): void {
-        renderRules(rules, rulesList, toggleRule, deleteRule);
+        renderRules(rules, rulesList, handleToggleRule, handleDeleteRule);
     }
 });

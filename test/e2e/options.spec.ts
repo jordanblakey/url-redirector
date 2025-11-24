@@ -44,11 +44,11 @@ test.describe('URL Redirector Options Page', () => {
         await expect(rulesList.locator('.rule-item')).toHaveCount(1);
         await expect(rulesList.locator('.rule-source')).toContainText('reddit.com');
         await expect(rulesList.locator('.rule-target')).toContainText('google.com');
-        // Check that the count text contains "1" somewhere (since message is random)
-        // OR simply that it is visible and has content
+        // Check that the count text contains "Used 0 times" (since newly added rule has 0 count)
+        // The message for 0 count is deterministic in getRandomMessage ("Used 0 times")
         await expect(rulesList.locator('.rule-count')).toBeVisible();
         const countText = await rulesList.locator('.rule-count').textContent();
-        expect(countText).toContain('1');
+        expect(countText).toContain('Used 0 times');
 
         // Verify inputs are cleared
         await expect(page.locator('#sourceUrl')).toHaveValue('');

@@ -44,3 +44,22 @@ export function shouldRuleApply(rule: Rule): boolean {
     if (rule.pausedUntil && Date.now() < rule.pausedUntil) return false;
     return true;
 }
+
+/**
+ * Validates if the given string is a valid URL or domain.
+ * @param string The string to validate.
+ * @returns True if valid, false otherwise.
+ */
+export function isValidUrl(string: string): boolean {
+    try {
+        // Check if it matches a basic domain pattern or full URL
+        const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+        if (urlPattern.test(string)) {
+            return true;
+        }
+        new URL(string);
+        return true;
+    } catch (_) {
+        return false;
+    }
+}
