@@ -35,7 +35,6 @@ function generateRecordingFilename(): string {
     return `headful-session_${year}-${month}-${day}_${hours}-${minutes}-${seconds}`;
 }
 
-
 // Interactive mode - keeps browser open for manual interaction
 async function interactiveMode(page: Page, context: BrowserContext, browser: Browser) {
     console.log('='.repeat(70));
@@ -46,7 +45,7 @@ async function interactiveMode(page: Page, context: BrowserContext, browser: Bro
     console.log('  - You can modify this script to add more automated actions');
     console.log('  - Close the browser window to exit, or press Ctrl+C here');
     console.log('  - Your session is being recorded!');
-    console.log('\n� REPL Enabled: Type Playwright commands here!');
+    console.log('\n⌨️ REPL Enabled: Type Playwright commands here!');
     console.log('   e.g., await page.goto("https://google.com")');
     console.log('   Variables available: page, context, browser');
     console.log('='.repeat(70));
@@ -99,6 +98,9 @@ async function main() {
     });
 
     console.log('✅ Browser launched successfully!\n');
+
+    // Show tip about pinning the extension
+    console.log('💡 Tip: Click the puzzle icon (🧩) in the toolbar to pin the extension');
 
     // Create a new page (PersistentContext comes with one page by default, but we can create a new one or use pages()[0])
     const page = context.pages().length > 0 ? context.pages()[0] : await context.newPage();
