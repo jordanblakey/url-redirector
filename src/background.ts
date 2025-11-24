@@ -42,8 +42,12 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
         // Find rules that are new or have become active
         const activeRules = newRules.filter(newRule => {
             const oldRule = oldRules.find(r => r.id === newRule.id);
-            // Rule is new and active OR rule existed but was inactive and is now active
-            return (newRule.active && !oldRule) || (newRule.active && oldRule && !oldRule.active);
+
+            const isNowActive = shouldRuleApply(newRule);
+            const wasActive = oldRule ? shouldRuleApply(oldRule) : false;
+
+            // Rule is now active AND (it wasn't before OR it didn't exist)
+            return isNowActive && !wasActive;
         });
 
         if (activeRules.length > 0) {
