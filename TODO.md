@@ -3,11 +3,12 @@
 
 ## DELEGATED
 [] CLEANUP: Refactor duplicated logic in the src folder. Clean old comments, dead code. Particularly in ui.ts. popup.ts. background.ts and options.ts
-[] FEATURE: on redirect, the badge should show the redirect count of the rule used.
+[] CI: improve unit and e2e test coverage for ui.ts.
 [] FEATURE: Shuffle Mode after a source url is provided, if target input is empty, change the button text to "Add Shuffle Rule". Change it back to "Add Rule" when Target URL is provided. In the rule display, it should say :shuffle: shuffle. When the target URL is visited, a random URL is selected from list of recommended URLS.
 ## DOING
 
 ## DONE
+[x] FEATURE: on redirect, the badge should show the redirect count of the rule used.
 [x] CLEANUP: Remove any css that isn't referenced anywhere. Remove redundant rules. Add section comments grouping related rules. Nest where possible.
 [x] CI: Increase test coverage, particularity in conditional logic. Add unit tests to shadow e2e tests. If e2e tests get slow, can run them only on PRs.
 [x] FEATURE: Add a "use" button on hover to inputs that makes the placeholder the value.
