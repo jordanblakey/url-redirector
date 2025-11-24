@@ -155,6 +155,46 @@ test.describe('URL Redirector Popup', () => {
         await expect(rulesList.locator('.rule-item')).toHaveCount(1);
         expect(dialogMessage).toMatch(/Duplicate source|already exists/i);
     });
+
+    test('should prevent adding invalid URL', async ({ page }) => {
+        await page.fill('#sourceUrl', 'not-a-url');
+        await page.fill('#targetUrl', 'google.com');
+
+        await page.click('#addRuleBtn');
+        await page.waitForTimeout(100);
+
+        const rulesList = page.locator('#rulesList');
+        // It should fail to add, so count should be 0
+        await expect(rulesList.locator('.rule-item')).toHaveCount(0);
+
+        // Check for flash message
+        const flashMessage = page.locator('.flash-message.error');
+        await expect(flashMessage).toBeVisible();
+        await expect(flashMessage).toContainText(/Invalid URL|enter a valid URL/i);
+
+        // Capture screenshot of the error message
+        await page.screenshot({ path: 'test/screenshots/popup-invalid-url-error.png', fullPage: true });
+    });
+
+    test('should prevent source and target being the same', async ({ page }) => {
+        await page.fill('#sourceUrl', 'same.com');
+        await page.fill('#targetUrl', 'same.com');
+
+        await page.click('#addRuleBtn');
+        await page.waitForTimeout(100);
+
+        const rulesList = page.locator('#rulesList');
+        await expect(rulesList.locator('.rule-item')).toHaveCount(0);
+
+        // Check for flash message
+        const flashMessage = page.locator('.flash-message.error');
+        await expect(flashMessage).toBeVisible();
+        await expect(flashMessage).toContainText(/same/i);
+
+        // Capture screenshot of the error message
+        await page.screenshot({ path: 'test/screenshots/popup-same-source-target-error.png', fullPage: true });
+    });
+
     test('should display correct message plurality', async ({ page }) => {
         // Add a rule
         await page.fill('#sourceUrl', 'plural-test.com');
