@@ -1,5 +1,5 @@
 import { Rule } from './types';
-import { renderRules, showFlashMessage, updatePauseButtons, toggleRuleState } from './ui.js';
+import { renderRules, showFlashMessage, updatePauseButtons, toggleRuleState, setupPlaceholderButtons } from './ui.js';
 import { getThematicPair } from './suggestions.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -59,6 +59,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sourceInput.addEventListener('keypress', handleEnter);
     targetInput.addEventListener('keypress', handleEnter);
+
+    // Initialize placeholder copy buttons
+    setupPlaceholderButtons();
 
     setSmartPlaceholders();
 
