@@ -1,5 +1,5 @@
 import { Rule } from './types';
-import { renderRules } from './ui.js';
+import { renderRules, updatePauseButtons, toggleRuleState } from './ui.js';
 import { getThematicPair } from './suggestions.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -9,6 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const rulesList = document.getElementById('rulesList') as HTMLUListElement;
 
     loadRules();
+
+    // Refresh UI every second to update pause countdowns
+    setInterval(() => {
+        updatePauseButtons(rulesList);
+    }, 1000);
 
     addBtn.addEventListener('click', () => {
         const source = sourceInput.value.trim();
@@ -73,15 +78,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderRulesList(rules: Rule[]): void {
-        renderRules(rules, rulesList, toggleRule, deleteRule);
+        renderRules(rules, rulesList, togglePauseRule, deleteRule);
     }
 
-    function toggleRule(id: number): void {
+    function togglePauseRule(id: number): void {
         chrome.storage.local.get(['rules'], (result) => {
             const rules = (result.rules as Rule[]) || [];
             const rule = rules.find((r) => r.id === id);
             if (rule) {
-                rule.active = !rule.active;
+                toggleRuleState(rule);
+
                 chrome.storage.local.set({ rules }, () => {
                     renderRulesList(rules);
                 });

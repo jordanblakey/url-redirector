@@ -1,5 +1,5 @@
 import { Rule, StorageResult } from './types';
-import { matchAndGetTarget } from './utils.js';
+import { matchAndGetTarget, shouldRuleApply } from './utils.js';
 import { getRandomMessage } from './messages.js';
 
 chrome.webNavigation.onBeforeNavigate.addListener(
@@ -13,7 +13,8 @@ chrome.webNavigation.onBeforeNavigate.addListener(
             const currentUrl = details.url;
 
             for (const rule of rules) {
-                if (rule.active === false) continue;
+                if (!shouldRuleApply(rule)) continue;
+
                 const target = matchAndGetTarget(currentUrl, rule);
 
                 if (target) {
