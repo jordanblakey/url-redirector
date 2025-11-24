@@ -11,6 +11,33 @@ const getFaviconUrl = (url: string) => {
     }
 };
 
+export function showFlashMessage(message: string, type: 'success' | 'error' | 'info' = 'info', duration = 3000): void {
+    let flashContainer = document.getElementById('flash-container');
+    if (!flashContainer) {
+        flashContainer = document.createElement('div');
+        flashContainer.id = 'flash-container';
+        document.body.appendChild(flashContainer);
+    }
+
+    const flashMessage = document.createElement('div');
+    flashMessage.className = `flash-message ${type}`;
+    flashMessage.textContent = message;
+
+    flashContainer.appendChild(flashMessage);
+
+    // Trigger reflow to enable transition
+    requestAnimationFrame(() => {
+        flashMessage.classList.add('visible');
+    });
+
+    setTimeout(() => {
+        flashMessage.classList.remove('visible');
+        flashMessage.addEventListener('transitionend', () => {
+            flashMessage.remove();
+        });
+    }, duration);
+}
+
 export function renderRules(
     rules: Rule[],
     listElement: HTMLUListElement,

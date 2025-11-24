@@ -1,5 +1,5 @@
 import { Rule } from './types';
-import { renderRules } from './ui.js';
+import { renderRules, showFlashMessage } from './ui.js';
 import { getThematicPair } from './suggestions.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const target = targetInput.value.trim();
 
         if (!source || !target) {
-            alert('Please enter both source and target URLs.');
+            showFlashMessage('Please enter both source and target URLs.', 'error');
             return;
         }
 
@@ -57,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 sourceInput.value = '';
                 targetInput.value = '';
                 renderRulesList(rules);
+                showFlashMessage('Rule added successfully!', 'success');
             });
         });
     }
@@ -68,6 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             chrome.storage.local.set({ rules: newRules }, () => {
                 renderRulesList(newRules);
+                showFlashMessage('Rule deleted.', 'info');
             });
         });
     }
@@ -84,6 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 rule.active = !rule.active;
                 chrome.storage.local.set({ rules }, () => {
                     renderRulesList(rules);
+                    showFlashMessage(`Rule ${rule.active ? 'resumed' : 'paused'}.`, 'info');
                 });
             }
         });
