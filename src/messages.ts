@@ -28,7 +28,7 @@ export const MESSAGES = [
   "Rewired {count} neural pathway{s}",
   "Prefrontal cortex engaged {count} time{s}",
   "Short-circuited {count} impulse{s}",
-  "{count} victory{ies} over lizard brain",
+  "{count} victor{ies} over lizard brain",
   "Synapse saved {count} time{s}",
   "Craving crushed: {count} time{s}",
 
@@ -93,7 +93,7 @@ export const MESSAGES = [
   "Redirecting power to productivity ({count})",
   "Reality restored {count} time{s}",
   "Simulation glitch patched ({count})",
-  "Timeline preserved: {count} paradox{s}",
+  "Timeline preserved: {count} paradox{es}",
   "Neural link severed {count} time{s}",
   "Upload canceled: {count} attempt{s}",
 
@@ -116,5 +116,7 @@ export function getRandomMessage(count: number): string {
   const countHtml = `<span class="count-value">${count}</span>`;
   return template
     .replace("{count}", countHtml)
-    .replace("{s}", count != 1 ? "s" : "");
+    .replace("{s}", count != 1 ? "s" : "")
+    .replace("{es}", count != 1 ? "es" : "")
+    .replace("{ies}", count != 1 ? "ies" : "y")
 }
