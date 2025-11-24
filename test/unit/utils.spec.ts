@@ -96,12 +96,10 @@ test.describe('URL Validation Logic', () => {
     test('should validate URLs with paths and params', () => {
         expect(isValidUrl('example.com/foo/bar')).toBe(true);
         expect(isValidUrl('example.com?q=123')).toBe(true);
+        expect(isValidUrl('example.com#section')).toBe(true);
     });
 
     test('should validate localhost', () => {
-        // Standard URL constructor accepts localhost
-        // But our regex might be strict. Let's see behavior.
-        // new URL('http://localhost') works.
         expect(isValidUrl('http://localhost:3000')).toBe(true);
     });
 
@@ -110,7 +108,6 @@ test.describe('URL Validation Logic', () => {
     });
 
     test('should invalidate random text that is not a domain', () => {
-        // "hello world" is not a valid URL or domain
         expect(isValidUrl('hello world')).toBe(false);
     });
 
