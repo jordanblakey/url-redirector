@@ -210,3 +210,31 @@ export function toggleRuleState(rule: Rule): void {
         rule.pausedUntil = now + 5 * 60 * 1000;
     }
 }
+export function setupPlaceholderButtons(): void {
+    const usePlaceholderBtns = document.querySelectorAll('.use-placeholder-btn');
+    usePlaceholderBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const targetBtn = e.currentTarget as HTMLButtonElement;
+            const inputId = targetBtn.getAttribute('data-input-id');
+            if (!inputId) return;
+            const input = document.getElementById(inputId) as HTMLInputElement;
+            if (!input) return;
+            let placeholder = input.placeholder;
+            if (placeholder.toLowerCase().startsWith('e.g. ')) {
+                placeholder = placeholder.substring(5);
+            }
+            if (placeholder && placeholder.trim() !== '') {
+                input.value = placeholder;
+                input.focus();
+                navigator.clipboard.writeText(placeholder).catch(err => {
+                    console.error('Failed to copy to clipboard: ', err);
+                });
+                const originalColor = targetBtn.style.color;
+                targetBtn.style.color = 'var(--success-color, #10b981)';
+                setTimeout(() => {
+                    targetBtn.style.color = originalColor;
+                }, 1000);
+            }
+        });
+    });
+}

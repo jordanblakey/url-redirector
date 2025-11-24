@@ -166,6 +166,60 @@ li.rule-item {
   flex-shrink: 0;
 }
 
+.input-wrapper {
+  position: relative;
+  /* Ensure the input inside fills the wrapper */
+  display: flex;
+  align-items: center;
+}
+
+/* Adjust input padding so text doesn't overlap the button */
+.input-wrapper input[type="text"] {
+  padding-right: 40px;
+  width: 100%;
+}
+
+.use-placeholder-btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  padding: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s, background-color 0.2s, color 0.2s;
+  border-radius: 4px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.use-placeholder-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: var(--primary-color);
+}
+
+/* Show button on hover of wrapper OR focus of button */
+.input-wrapper:hover .use-placeholder-btn,
+.use-placeholder-btn:focus {
+  opacity: 1;
+}
+
+button.delete-btn,
+button.toggle-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.rule-actions {
+  gap: 8px;
+  margin-left: 12px;
+}
+
 button.delete-btn,
 button.toggle-btn {
   background-color: transparent;

@@ -1,7 +1,7 @@
 import { Rule, StorageResult } from './types';
 import { matchAndGetTarget } from './utils.js';
 import { getRandomMessage } from './messages.js';
-import { renderRules, updatePauseButtons, toggleRuleState, showFlashMessage } from './ui.js';
+import { renderRules, updatePauseButtons, toggleRuleState, showFlashMessage, setupPlaceholderButtons } from './ui.js';
 import { getThematicPair } from './suggestions.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -69,41 +69,8 @@ document.addEventListener('DOMContentLoaded', () => {
     sourceInput.addEventListener('keypress', handleEnter);
     targetInput.addEventListener('keypress', handleEnter);
 
-    // Add event listeners for "Use Placeholder" buttons
-    const usePlaceholderBtns = document.querySelectorAll('.use-placeholder-btn');
-    usePlaceholderBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const targetBtn = e.currentTarget as HTMLButtonElement;
-            const inputId = targetBtn.getAttribute('data-input-id');
-            if (inputId) {
-                const input = document.getElementById(inputId) as HTMLInputElement;
-                let placeholder = input.placeholder;
-                // Strip "e.g. " if present (case insensitive just in case, though we set it lower)
-                if (placeholder.toLowerCase().startsWith('e.g. ')) {
-                    placeholder = placeholder.substring(5);
-                }
-
-                if (placeholder && placeholder.trim() !== '') {
-                    input.value = placeholder;
-                    input.focus(); // Focus the input after filling
-
-                    // Copy to clipboard
-                    navigator.clipboard.writeText(placeholder).catch(err => {
-                        console.error('Failed to copy to clipboard: ', err);
-                    });
-
-                    // Visual feedback
-                    const originalColor = targetBtn.style.color;
-                    // Use a success color, assuming it's available or fallback to green
-                    targetBtn.style.color = 'var(--success-color, #10b981)';
-
-                    setTimeout(() => {
-                        targetBtn.style.color = originalColor;
-                    }, 1000);
-                }
-            }
-        });
-    });
+    // Initialize placeholder copy buttons
+    setupPlaceholderButtons();
 
     setSmartPlaceholders();
 
