@@ -166,7 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 chrome.storage.local.set({ rules }, () => {
                     renderRulesList(rules);
-                    showFlashMessage(`Rule ${rule.active ? 'resumed' : 'paused'}.`, 'info');
 
                     // If we just resumed (active=true, no pausedUntil), we should check for redirects
                     if (rule.active && !rule.pausedUntil) {

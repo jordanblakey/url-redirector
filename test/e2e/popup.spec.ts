@@ -153,7 +153,11 @@ test.describe('URL Redirector Popup', () => {
         // Expect only 1 rule
         const rulesList = page.locator('#rulesList');
         await expect(rulesList.locator('.rule-item')).toHaveCount(1);
-        expect(dialogMessage).toMatch(/Duplicate source|already exists/i);
+
+        const flashMessage = page.locator('.flash-message.error');
+        await expect(flashMessage).toBeVisible();
+        await expect(flashMessage).toContainText(/Duplicate source|already exists/i);
+
     });
 
     test('should prevent adding invalid URL', async ({ page }) => {

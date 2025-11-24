@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const rules = (result.rules as Rule[]) || [];
 
             if (rules.some(rule => rule.source === source)) {
-                alert('Duplicate source. A rule for this source URL already exists.');
+                showFlashMessage('Duplicate source. A rule for this source URL already exists.', 'error');
                 return;
             }
 
@@ -121,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 chrome.storage.local.set({ rules }, () => {
                     renderRulesList(rules);
-                    showFlashMessage(`Rule ${rule.active ? 'resumed' : 'paused'}.`, 'info');
                 });
             }
         });

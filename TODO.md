@@ -4,15 +4,12 @@
 
 ## DELEGATED
 
-- [] CI: Augment existing tests with screenshots where it makes sense.
 - [] FEATURE: Add a "use" button on hover to inputs that makes the placeholder the value.
 
 ## DOING
 
-- [x] BUG: Prevent the entry of rules where a rule with the same source url exists
-
-
 ## DONE
+- [x] BUG: Prevent the entry of rules where a rule with the same source url exists
 - [x] BUG: Use flash messages instead of alerts.
 - [x] Feature: Convert the "Pause" button into a Temporary Snooze (e.g., 5-10 minutes)UI: Visual indicator that the rule is "Snoozed" (maybe a countdown or a different icon color) so the user knows it will come back.
 - [x] FEATURE: Expand messages.ts to include more microcopy options.
