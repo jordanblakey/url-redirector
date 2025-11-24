@@ -15,6 +15,7 @@ demos/screenshots/*
 test/playwright-report
 test/test-results
 test/coverage
+test/screenshots
 
 # Build artifacts and caches
 .cache

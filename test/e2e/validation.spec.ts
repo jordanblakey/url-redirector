@@ -22,20 +22,20 @@ test.describe('Rule Validation', () => {
         await page.fill('#sourceUrl', 'not-a-url');
         await page.fill('#targetUrl', 'google.com');
 
-        let dialogMessage = '';
-        page.once('dialog', async (dialog) => {
-            dialogMessage = dialog.message();
-            await dialog.accept();
-        });
-
         await page.click('#addRuleBtn');
         await page.waitForTimeout(100);
 
         const rulesList = page.locator('#rulesList');
         // It should fail to add, so count should be 0
         await expect(rulesList.locator('.rule-item')).toHaveCount(0);
-        // And show an error message
-        expect(dialogMessage).toMatch(/Invalid URL|enter a valid URL/i);
+
+        // Check for flash message
+        const flashMessage = page.locator('.flash-message.error');
+        await expect(flashMessage).toBeVisible();
+        await expect(flashMessage).toContainText(/Invalid URL|enter a valid URL/i);
+
+        // Capture screenshot of the error message
+        await page.screenshot({ path: 'test/screenshots/options-invalid-url-error.png', fullPage: true });
     });
 
     test('should prevent adding duplicate source', async ({ page }) => {
@@ -49,36 +49,38 @@ test.describe('Rule Validation', () => {
         await page.fill('#sourceUrl', 'example.com');
         await page.fill('#targetUrl', 'target2.com');
 
-        let dialogMessage = '';
-        page.once('dialog', async (dialog) => {
-            dialogMessage = dialog.message();
-            await dialog.accept();
-        });
-
         await page.click('#addRuleBtn');
         await page.waitForTimeout(100);
 
         // Expect only 1 rule
         const rulesList = page.locator('#rulesList');
         await expect(rulesList.locator('.rule-item')).toHaveCount(1);
-        expect(dialogMessage).toMatch(/Duplicate source|already exists/i);
+
+        // Check for flash message
+        const flashMessage = page.locator('.flash-message.error');
+        await expect(flashMessage).toBeVisible();
+        await expect(flashMessage).toContainText(/Duplicate source|already exists/i);
+
+        // Capture screenshot of the error message
+        await page.screenshot({ path: 'test/screenshots/options-duplicate-source-error.png', fullPage: true });
     });
 
     test('should prevent source and target being the same', async ({ page }) => {
         await page.fill('#sourceUrl', 'same.com');
         await page.fill('#targetUrl', 'same.com');
 
-        let dialogMessage = '';
-        page.once('dialog', async (dialog) => {
-            dialogMessage = dialog.message();
-            await dialog.accept();
-        });
-
         await page.click('#addRuleBtn');
         await page.waitForTimeout(100);
 
         const rulesList = page.locator('#rulesList');
         await expect(rulesList.locator('.rule-item')).toHaveCount(0);
-        expect(dialogMessage).toMatch(/same/i);
+
+        // Check for flash message
+        const flashMessage = page.locator('.flash-message.error');
+        await expect(flashMessage).toBeVisible();
+        await expect(flashMessage).toContainText(/same/i);
+
+        // Capture screenshot of the error message
+        await page.screenshot({ path: 'test/screenshots/options-same-source-target-error.png', fullPage: true });
     });
 });

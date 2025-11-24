@@ -1,7 +1,7 @@
 import { Rule, StorageResult } from './types';
 import { matchAndGetTarget } from './utils.js';
 import { getRandomMessage } from './messages.js';
-import { renderRules, updatePauseButtons, toggleRuleState } from './ui.js';
+import { renderRules, updatePauseButtons, toggleRuleState, showFlashMessage } from './ui.js';
 import { getThematicPair } from './suggestions.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -29,17 +29,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const target = targetInput.value.trim();
 
         if (!source || !target) {
-            alert('Please enter both source and target URLs.');
+            showFlashMessage('Please enter both source and target URLs.', 'error');
             return;
         }
 
         if (!isValidUrl(source) || !isValidUrl(target)) {
-            alert('Invalid URL. Please enter a valid URL (e.g., example.com or https://example.com).');
+            showFlashMessage('Invalid URL. Please enter a valid URL (e.g., example.com or https://example.com).', 'error');
             return;
         }
 
         if (source === target) {
-            alert('Source and target cannot be the same.');
+            showFlashMessage('Source and target cannot be the same.', 'error');
             return;
         }
 
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Check for duplicate source
             if (rules.some(rule => rule.source === source)) {
-                alert('Duplicate source. A rule for this source URL already exists.');
+                showFlashMessage('Duplicate source. A rule for this source URL already exists.', 'error');
                 return;
             }
 
@@ -101,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 sourceInput.value = '';
                 targetInput.value = '';
                 renderRulesList(rules);
+                showFlashMessage('Rule added successfully!', 'success');
 
                 // Check existing tabs for redirect
                 checkAndRedirectTabs(newRule);
@@ -151,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             chrome.storage.local.set({ rules: newRules }, () => {
                 renderRulesList(newRules);
+                showFlashMessage('Rule deleted.', 'info');
             });
         });
     }
@@ -164,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 chrome.storage.local.set({ rules }, () => {
                     renderRulesList(rules);
+                    showFlashMessage(`Rule ${rule.active ? 'resumed' : 'paused'}.`, 'info');
 
                     // If we just resumed (active=true, no pausedUntil), we should check for redirects
                     if (rule.active && !rule.pausedUntil) {

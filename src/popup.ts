@@ -1,5 +1,5 @@
 import { Rule } from './types';
-import { renderRules, updatePauseButtons, toggleRuleState } from './ui.js';
+import { renderRules, showFlashMessage, updatePauseButtons, toggleRuleState } from './ui.js';
 import { getThematicPair } from './suggestions.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -20,12 +20,36 @@ document.addEventListener('DOMContentLoaded', () => {
         const target = targetInput.value.trim();
 
         if (!source || !target) {
-            alert('Please enter both source and target URLs.');
+            showFlashMessage('Please enter both source and target URLs.', 'error');
+            return;
+        }
+
+        if (!isValidUrl(source) || !isValidUrl(target)) {
+            showFlashMessage('Invalid URL. Please enter a valid URL (e.g., example.com or https://example.com).', 'error');
+            return;
+        }
+
+        if (source === target) {
+            showFlashMessage('Source and target cannot be the same.', 'error');
             return;
         }
 
         addRule(source, target);
     });
+
+    function isValidUrl(string: string): boolean {
+        try {
+            // Check if it matches a basic domain pattern or full URL
+            const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
+            if (urlPattern.test(string)) {
+                return true;
+            }
+            new URL(string);
+            return true;
+        } catch (_) {
+            return false;
+        }
+    }
 
     const handleEnter = (e: KeyboardEvent) => {
         if (e.key === 'Enter') {
@@ -67,6 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 sourceInput.value = '';
                 targetInput.value = '';
                 renderRulesList(rules);
+                showFlashMessage('Rule added successfully!', 'success');
             });
         });
     }
@@ -78,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             chrome.storage.local.set({ rules: newRules }, () => {
                 renderRulesList(newRules);
+                showFlashMessage('Rule deleted.', 'info');
             });
         });
     }
@@ -95,6 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 chrome.storage.local.set({ rules }, () => {
                     renderRulesList(rules);
+                    showFlashMessage(`Rule ${rule.active ? 'resumed' : 'paused'}.`, 'info');
                 });
             }
         });
