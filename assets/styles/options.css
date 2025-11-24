@@ -1,4 +1,6 @@
-/* Options Page Specifics */
+/* =========================================
+   Options Page Specifics
+   ========================================= */
 .options-page {
   padding: 40px 20px;
   display: flex;
@@ -26,10 +28,6 @@
 
   .input-group {
     margin-bottom: 16px;
-
-    .text-secondary {
-      color: var(--text-secondary);
-    }
   }
 
   label {
@@ -70,16 +68,15 @@
   .rule-count {
     font-size: 12px;
   }
-}
 
-button.delete-btn,
-button.toggle-btn {
-  padding: 6px 12px;
-  font-size: 12px;
-}
+  button.delete-btn,
+  button.toggle-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
 
-.rule-actions {
-  gap: 8px;
-  margin-left: 12px;
-}
+  .rule-actions {
+    gap: 8px;
+    margin-left: 12px;
+  }
 }
