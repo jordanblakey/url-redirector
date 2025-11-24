@@ -23,7 +23,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(
                     chrome.storage.local.set({ rules });
 
                     // Show badge to indicate redirection (if available)
-                    showBadge();
+                    showBadge(rule.count);
 
                     chrome.tabs.update(details.tabId, { url: target });
                     break; // Stop after first match
@@ -77,7 +77,7 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
                                 }
                             });
 
-                            showBadge();
+                            showBadge((rule.count || 0) + 1);
                             chrome.tabs.update(tab.id, { url: target });
                             break; // Match first rule
                         }
@@ -88,10 +88,10 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
     }
 });
 
-function showBadge() {
+function showBadge(count?: number) {
     try {
         if (typeof chrome !== 'undefined' && chrome.action && chrome.action.setBadgeText) {
-            chrome.action.setBadgeText({ text: '✔' });
+            chrome.action.setBadgeText({ text: count ? count.toString() : '✔' });
             chrome.action.setBadgeTextColor({ color: '#ffffff' });
             chrome.action.setBadgeBackgroundColor({ color: '#5f33ffff' });
             // Clear badge after 10 seconds

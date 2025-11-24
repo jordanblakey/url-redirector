@@ -59,7 +59,45 @@ test.describe('Badge Functionality', () => {
                 // @ts-ignore
                 return chrome.action.getLastBadgeText();
             });
-        }).toBe('✔');
+        }).toBe('1');
+    });
+
+    test('should show correct count on badge', async ({ page }) => {
+        // 1. Load the background script logic
+        await page.addScriptTag({ url: '/dist/background.js', type: 'module' });
+
+        // Wait for script to initialize
+        await page.waitForTimeout(500);
+
+        // 2. Set up a redirection rule with existing count
+        await page.evaluate(() => {
+            const rules = [{
+                source: 'facebook.com',
+                target: 'google.com',
+                active: true,
+                count: 42
+            }];
+            // @ts-ignore
+            chrome.storage.local.set({ rules });
+        });
+
+        // 3. Trigger the onBeforeNavigate event
+        await page.evaluate(() => {
+            // @ts-ignore
+            chrome.webNavigation.onBeforeNavigate.dispatch({
+                frameId: 0,
+                tabId: 1,
+                url: 'https://facebook.com/feed'
+            });
+        });
+
+        // 4. Verify the badge text shows incremented count (42 + 1 = 43)
+        await expect.poll(async () => {
+            return await page.evaluate(() => {
+                // @ts-ignore
+                return chrome.action.getLastBadgeText();
+            });
+        }).toBe('43');
     });
 
     test('should not show badge if rule is inactive', async ({ page }) => {
