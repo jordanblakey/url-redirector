@@ -55,7 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
     function addRule(source: string, target: string): void {
         chrome.storage.local.get(['rules'], (result) => {
             const rules = (result.rules as Rule[]) || [];
-            // Simple duplicate check could be added here
+
+            if (rules.some(rule => rule.source === source)) {
+                alert('Duplicate source. A rule for this source URL already exists.');
+                return;
+            }
+
             rules.push({ source, target, id: Date.now(), count: 0, active: true });
 
             chrome.storage.local.set({ rules }, () => {

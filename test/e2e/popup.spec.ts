@@ -129,6 +129,32 @@ test.describe('URL Redirector Popup', () => {
             await dialog.accept();
         });
     });
+
+    test('should prevent adding duplicate source', async ({ page }) => {
+        // Add first rule
+        await page.fill('#sourceUrl', 'duplicate-test.com');
+        await page.fill('#targetUrl', 'target1.com');
+        await page.click('#addRuleBtn');
+        await page.waitForTimeout(100);
+
+        // Try to add duplicate source
+        await page.fill('#sourceUrl', 'duplicate-test.com');
+        await page.fill('#targetUrl', 'target2.com');
+
+        let dialogMessage = '';
+        page.once('dialog', async (dialog) => {
+            dialogMessage = dialog.message();
+            await dialog.accept();
+        });
+
+        await page.click('#addRuleBtn');
+        await page.waitForTimeout(100);
+
+        // Expect only 1 rule
+        const rulesList = page.locator('#rulesList');
+        await expect(rulesList.locator('.rule-item')).toHaveCount(1);
+        expect(dialogMessage).toMatch(/Duplicate source|already exists/i);
+    });
     test('should display correct message plurality', async ({ page }) => {
         // Add a rule
         await page.fill('#sourceUrl', 'plural-test.com');
