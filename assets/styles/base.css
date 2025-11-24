@@ -11,6 +11,9 @@
   --success-color: #10b981;
 }
 
+/* =========================================
+   Global Styles
+   ========================================= */
 body {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Helvetica, Arial, sans-serif;
@@ -19,7 +22,9 @@ body {
   margin: 0;
 }
 
-/* Shared Styles */
+/* =========================================
+   Layout Components
+   ========================================= */
 .container {
   background-color: var(--card-bg);
   width: 100%;
@@ -47,6 +52,9 @@ footer {
   color: var(--text-muted);
 }
 
+/* =========================================
+   Form Elements
+   ========================================= */
 label {
   display: block;
   font-weight: 500;
@@ -82,6 +90,9 @@ button#addRuleBtn {
   }
 }
 
+/* =========================================
+   Rules List
+   ========================================= */
 .rules-list-section {
   border-top: 1px solid var(--border-color);
 }
@@ -159,6 +170,13 @@ li.rule-item {
 .rule-count {
   color: var(--text-secondary);
   font-style: italic;
+}
+
+.rule-favicon {
+  width: 12px;
+  height: 12px;
+  background-size: contain;
+  flex-shrink: 0;
 }
 
 .rule-actions {
@@ -261,14 +279,9 @@ button.toggle-btn {
   }
 }
 
-.rule-favicon {
-  width: 12px;
-  height: 12px;
-  flex-shrink: 0;
-  background-size: contain;
-}
-
-/* Flash Message Styles */
+/* =========================================
+   Flash Messages
+   ========================================= */
 #flash-container {
   position: fixed;
   top: 20px;
@@ -293,21 +306,21 @@ button.toggle-btn {
   transform: translateY(-10px);
   transition: opacity 0.3s ease, transform 0.3s ease;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
 
-.flash-message.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+  &.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
 
-.flash-message.success {
-  background-color: var(--success-color);
-}
+  &.success {
+    background-color: var(--success-color);
+  }
 
-.flash-message.error {
-  background-color: var(--danger-color);
-}
+  &.error {
+    background-color: var(--danger-color);
+  }
 
-.flash-message.info {
-  background-color: var(--primary-color);
+  &.info {
+    background-color: var(--primary-color);
+  }
 }
