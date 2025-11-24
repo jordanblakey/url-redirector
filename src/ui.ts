@@ -104,13 +104,13 @@ export function renderRules(
         toggleBtn.dataset.id = String(rule.id);
 
         if (isPaused) {
-             const remaining = Math.ceil(((rule.pausedUntil || 0) - Date.now()) / 1000);
-             if (remaining > 60) {
-                 toggleBtn.textContent = `Paused (${Math.ceil(remaining / 60)}m)`;
-             } else {
-                 toggleBtn.textContent = `Paused (${remaining}s)`;
-             }
-             toggleBtn.dataset.pausedUntil = String(rule.pausedUntil);
+            const remaining = Math.ceil(((rule.pausedUntil || 0) - Date.now()) / 1000);
+            if (remaining > 60) {
+                toggleBtn.textContent = `Paused (${Math.ceil(remaining / 60)}m)`;
+            } else {
+                toggleBtn.textContent = `Paused (${remaining}s)`;
+            }
+            toggleBtn.dataset.pausedUntil = String(rule.pausedUntil);
         } else {
             toggleBtn.textContent = rule.active ? 'Pause' : 'Play';
             delete toggleBtn.dataset.pausedUntil;
@@ -151,19 +151,35 @@ export function updatePauseButtons(listElement: HTMLElement): void {
                     button.textContent = `Paused (${remaining}s)`;
                 }
             } else {
-                 // Expired, should probably reload or just show basic text,
-                 // but for cleaner state we might want to trigger reload if it just expired.
-                 // For now just update text.
-                 button.textContent = 'Pause';
-                 button.classList.remove('paused');
-                 delete button.dataset.pausedUntil;
+                // Expired, should probably reload or just show basic text,
+                // but for cleaner state we might want to trigger reload if it just expired.
+                // For now just update text.
+                button.textContent = 'Pause';
+                button.classList.remove('paused');
+                delete button.dataset.pausedUntil;
 
-                 // Also update parent row style
-                 const row = button.closest('.rule-item');
-                 if (row) {
-                     row.classList.remove('paused');
-                 }
+                // Also update parent row style
+                const row = button.closest('.rule-item');
+                if (row) {
+                    row.classList.remove('paused');
+                }
             }
         }
     });
+}
+
+export function toggleRuleState(rule: Rule): void {
+    const now = Date.now();
+    if (rule.pausedUntil && rule.pausedUntil > now) {
+        // Already paused, so resume
+        rule.pausedUntil = undefined;
+        rule.active = true;
+    } else if (!rule.active) {
+        // It was permanently disabled, enable it
+        rule.active = true;
+        rule.pausedUntil = undefined;
+    } else {
+        // Active and not paused, so pause it for 5 minutes (currently 5 seconds for testing?)
+        rule.pausedUntil = now + 5 * 60 * 1000;
+    }
 }

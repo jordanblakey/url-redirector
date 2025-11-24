@@ -1,7 +1,7 @@
 import { Rule, StorageResult } from './types';
 import { matchAndGetTarget } from './utils.js';
 import { getRandomMessage } from './messages.js';
-import { renderRules } from './ui.js';
+import { renderRules, updatePauseButtons, toggleRuleState } from './ui.js';
 import { getThematicPair } from './suggestions.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -18,6 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const rulesList = document.getElementById('rulesList') as HTMLUListElement;
 
     loadRules();
+
+    // Refresh UI every second to update pause countdowns
+    setInterval(() => {
+        updatePauseButtons(rulesList);
+    }, 1000);
 
     addBtn.addEventListener('click', () => {
         const source = sourceInput.value.trim();
@@ -155,9 +160,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const rules = result.rules || [];
             const rule = rules.find((r) => r.id === id);
             if (rule) {
-                rule.active = !rule.active;
+                toggleRuleState(rule);
+
                 chrome.storage.local.set({ rules }, () => {
                     renderRulesList(rules);
+
+                    // If we just resumed (active=true, no pausedUntil), we should check for redirects
+                    if (rule.active && !rule.pausedUntil) {
+                        checkAndRedirectTabs(rule);
+                    }
                 });
             }
         });

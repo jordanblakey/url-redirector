@@ -1,5 +1,5 @@
 import { Rule } from './types';
-import { renderRules, updatePauseButtons } from './ui.js';
+import { renderRules, updatePauseButtons, toggleRuleState } from './ui.js';
 import { getThematicPair } from './suggestions.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -86,19 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const rules = (result.rules as Rule[]) || [];
             const rule = rules.find((r) => r.id === id);
             if (rule) {
-                const now = Date.now();
-                if (rule.pausedUntil && rule.pausedUntil > now) {
-                    // Already paused, so resume
-                    rule.pausedUntil = undefined;
-                    rule.active = true; // Ensure it's active
-                } else if (!rule.active) {
-                    // It was permanently disabled, enable it
-                    rule.active = true;
-                    rule.pausedUntil = undefined;
-                } else {
-                    // Active and not paused, so pause it for 5 minutes
-                    rule.pausedUntil = now + 5 * 60 * 1000;
-                }
+                toggleRuleState(rule);
 
                 chrome.storage.local.set({ rules }, () => {
                     renderRulesList(rules);

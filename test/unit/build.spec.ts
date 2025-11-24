@@ -12,7 +12,7 @@ test.describe.configure({ mode: "serial" });
 test.describe("Build Process Validation", () => {
   test.beforeAll(() => {
     // Run the build command with the custom output directory
-    // console.log('Building extension...', distDir);
+
     execSync(`npm run build -- "${distDir}"`, {
       cwd: rootDir,
       stdio: "pipe", // Suppress output for this test
@@ -21,7 +21,7 @@ test.describe("Build Process Validation", () => {
 
   test.afterAll(() => {
     // Clean up the temporary directory
-    // console.log('Cleaning up temporary directory...', distDir);
+
     if (fs.existsSync(distDir)) {
       fs.rmSync(distDir, { recursive: true, force: true });
     }
