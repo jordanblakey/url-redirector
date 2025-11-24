@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { matchAndGetTarget } from '../../src/utils.js';
+import { matchAndGetTarget, shouldRuleApply, isValidUrl } from '../../src/utils.js';
 
 
 test.describe('URL Matching Logic', () => {
@@ -55,5 +55,63 @@ test.describe('URL Matching Logic', () => {
         // logic removes www. from source
         expect(matchAndGetTarget('https://example.com', rule)).toBe('https://google.com');
         expect(matchAndGetTarget('https://www.example.com', rule)).toBe('https://google.com');
+    });
+});
+
+test.describe('Rule Application Logic', () => {
+    test('should apply active rule', () => {
+        const rule = { id: 1, source: 'src', target: 'tgt', active: true };
+        expect(shouldRuleApply(rule)).toBe(true);
+    });
+
+    test('should not apply inactive rule', () => {
+        const rule = { id: 1, source: 'src', target: 'tgt', active: false };
+        expect(shouldRuleApply(rule)).toBe(false);
+    });
+
+    test('should not apply paused rule (future)', () => {
+        const futureTime = Date.now() + 100000;
+        const rule = { id: 1, source: 'src', target: 'tgt', active: true, pausedUntil: futureTime };
+        expect(shouldRuleApply(rule)).toBe(false);
+    });
+
+    test('should apply paused rule (past)', () => {
+        const pastTime = Date.now() - 100000;
+        const rule = { id: 1, source: 'src', target: 'tgt', active: true, pausedUntil: pastTime };
+        expect(shouldRuleApply(rule)).toBe(true);
+    });
+});
+
+test.describe('URL Validation Logic', () => {
+    test('should validate standard URLs', () => {
+        expect(isValidUrl('https://example.com')).toBe(true);
+        expect(isValidUrl('http://example.com')).toBe(true);
+    });
+
+    test('should validate domains without protocol', () => {
+        expect(isValidUrl('example.com')).toBe(true);
+        expect(isValidUrl('sub.example.com')).toBe(true);
+    });
+
+    test('should validate URLs with paths and params', () => {
+        expect(isValidUrl('example.com/foo/bar')).toBe(true);
+        expect(isValidUrl('example.com?q=123')).toBe(true);
+        expect(isValidUrl('example.com#section')).toBe(true);
+    });
+
+    test('should validate localhost', () => {
+        expect(isValidUrl('http://localhost:3000')).toBe(true);
+    });
+
+    test('should invalidate empty strings', () => {
+        expect(isValidUrl('')).toBe(false);
+    });
+
+    test('should invalidate random text that is not a domain', () => {
+        expect(isValidUrl('hello world')).toBe(false);
+    });
+
+    test('should invalidate strings with spaces in domain part', () => {
+        expect(isValidUrl('exa mple.com')).toBe(false);
     });
 });
