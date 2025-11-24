@@ -2,21 +2,19 @@
 
 - [] CI: Push initial version through Chrome Web Store review process
 
-
-
 ## DELEGATED
 
 - [] BUG: Use flash messages instead of alerts.
-- [] BUG: Validation doesn't block creation of rules where source and target are the same.
-- [] BUG: TLD other than .com is blocked by validation. Update test cases for .com .org .net
-- [] Feature: Convert the "Pause" button into a Temporary Snooze (e.g., 5-10 minutes)  Logic: Instead of setting active: false, set a pausedUntil timestamp (e.g., Date.now() + 5 * 60000). Background: Update the redirect listener to check if (Date.now() < rule.pausedUntil) before redirecting. UI: Visual indicator that the rule is "Snoozed" (maybe a countdown or a different icon color) so the user knows it will come back.
-- [] BUG: Prevent the entry of rules where a rule with the same source url exists
-- [] FEATURE: Add a "use" button on hover to inputs that makes the placeholder the value
+- [] FEATURE: Add a "use" button on hover to inputs that makes the placeholder the value.
 
 ## DOING
 
+- [] BUG: Prevent the entry of rules where a rule with the same source url exists
+- [] BUG: Validation doesn't block creation of rules where source and target are the same.
+
 
 ## DONE
+- [x] Feature: Convert the "Pause" button into a Temporary Snooze (e.g., 5-10 minutes)UI: Visual indicator that the rule is "Snoozed" (maybe a countdown or a different icon color) so the user knows it will come back.
 - [x] FEATURE: Expand messages.ts to include more microcopy options.
 - [x] FEATURE: Randomly select a top distracting site to populate source and wholesome site populate target placeholder text
 - [x] FEATURE: Include preset templates for common distracting sites paired with healthier alternatives. Hook into the psychology of why people use these sites and satisfy it in a different way. Bad habit? Replace with a good one.
