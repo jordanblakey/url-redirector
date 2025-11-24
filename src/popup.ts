@@ -1,5 +1,5 @@
 import { Rule } from './types';
-import { renderRules, updateSnoozeButtons } from './ui.js';
+import { renderRules, updatePauseButtons } from './ui.js';
 import { getThematicPair } from './suggestions.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -10,9 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     loadRules();
 
-    // Refresh UI every second to update snooze countdowns
+    // Refresh UI every second to update pause countdowns
     setInterval(() => {
-        updateSnoozeButtons(rulesList);
+        updatePauseButtons(rulesList);
     }, 1000);
 
     addBtn.addEventListener('click', () => {
@@ -78,17 +78,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderRulesList(rules: Rule[]): void {
-        renderRules(rules, rulesList, snoozeRule, deleteRule);
+        renderRules(rules, rulesList, togglePauseRule, deleteRule);
     }
 
-    function snoozeRule(id: number): void {
+    function togglePauseRule(id: number): void {
         chrome.storage.local.get(['rules'], (result) => {
             const rules = (result.rules as Rule[]) || [];
             const rule = rules.find((r) => r.id === id);
             if (rule) {
                 const now = Date.now();
                 if (rule.pausedUntil && rule.pausedUntil > now) {
-                    // Already snoozed, so resume
+                    // Already paused, so resume
                     rule.pausedUntil = undefined;
                     rule.active = true; // Ensure it's active
                 } else if (!rule.active) {
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     rule.active = true;
                     rule.pausedUntil = undefined;
                 } else {
-                    // Active and not snoozed, so snooze it for 5 minutes
+                    // Active and not paused, so pause it for 5 minutes
                     rule.pausedUntil = now + 5 * 60 * 1000;
                 }
 

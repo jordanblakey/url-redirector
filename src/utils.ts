@@ -35,7 +35,7 @@ export function matchAndGetTarget(url: string, rule: Rule): string | null {
 }
 
 /**
- * Checks if a rule is active and not snoozed.
+ * Checks if a rule is active and not paused.
  * @param rule The rule to check.
  * @returns True if the rule should apply, false otherwise.
  */

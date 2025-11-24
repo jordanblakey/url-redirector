@@ -14,7 +14,7 @@ const getFaviconUrl = (url: string) => {
 export function renderRules(
     rules: Rule[],
     listElement: HTMLUListElement,
-    onSnooze: (id: number) => void,
+    onPause: (id: number) => void,
     onDelete: (id: number) => void
 ): void {
     listElement.innerHTML = '';
@@ -33,9 +33,9 @@ export function renderRules(
     }
 
     rules.forEach((rule) => {
-        const isSnoozed = rule.pausedUntil && rule.pausedUntil > Date.now();
+        const isPaused = rule.pausedUntil && rule.pausedUntil > Date.now();
         const li = document.createElement('li');
-        li.className = `rule-item ${!rule.active || isSnoozed ? 'paused' : ''}`;
+        li.className = `rule-item ${!rule.active || isPaused ? 'paused' : ''}`;
         li.style.cursor = 'pointer'; // Indicate clickability
 
         // Toggle on row click
@@ -48,7 +48,7 @@ export function renderRules(
             if (target.closest('button')) {
                 return;
             }
-            onSnooze(rule.id);
+            onPause(rule.id);
         };
 
         const contentDiv = document.createElement('div');
@@ -100,23 +100,23 @@ export function renderRules(
         actionsDiv.className = 'rule-actions';
 
         const toggleBtn = document.createElement('button');
-        toggleBtn.className = `toggle-btn ${!rule.active || isSnoozed ? 'paused' : ''}`;
+        toggleBtn.className = `toggle-btn ${!rule.active || isPaused ? 'paused' : ''}`;
         toggleBtn.dataset.id = String(rule.id);
 
-        if (isSnoozed) {
+        if (isPaused) {
              const remaining = Math.ceil(((rule.pausedUntil || 0) - Date.now()) / 1000);
              if (remaining > 60) {
-                 toggleBtn.textContent = `Snoozed (${Math.ceil(remaining / 60)}m)`;
+                 toggleBtn.textContent = `Paused (${Math.ceil(remaining / 60)}m)`;
              } else {
-                 toggleBtn.textContent = `Snoozed (${remaining}s)`;
+                 toggleBtn.textContent = `Paused (${remaining}s)`;
              }
-             toggleBtn.dataset.snoozedUntil = String(rule.pausedUntil);
+             toggleBtn.dataset.pausedUntil = String(rule.pausedUntil);
         } else {
-            toggleBtn.textContent = rule.active ? 'Snooze 5m' : 'Play';
-            delete toggleBtn.dataset.snoozedUntil;
+            toggleBtn.textContent = rule.active ? 'Pause' : 'Play';
+            delete toggleBtn.dataset.pausedUntil;
         }
 
-        toggleBtn.onclick = () => onSnooze(rule.id);
+        toggleBtn.onclick = () => onPause(rule.id);
 
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'delete-btn';
@@ -133,30 +133,30 @@ export function renderRules(
     });
 }
 
-export function updateSnoozeButtons(listElement: HTMLElement): void {
+export function updatePauseButtons(listElement: HTMLElement): void {
     const buttons = listElement.querySelectorAll('.toggle-btn');
     const now = Date.now();
 
     buttons.forEach((btn) => {
         const button = btn as HTMLButtonElement;
-        const snoozedUntilStr = button.dataset.snoozedUntil;
+        const pausedUntilStr = button.dataset.pausedUntil;
 
-        if (snoozedUntilStr) {
-            const snoozedUntil = parseInt(snoozedUntilStr, 10);
-            if (snoozedUntil > now) {
-                const remaining = Math.ceil((snoozedUntil - now) / 1000);
+        if (pausedUntilStr) {
+            const pausedUntil = parseInt(pausedUntilStr, 10);
+            if (pausedUntil > now) {
+                const remaining = Math.ceil((pausedUntil - now) / 1000);
                 if (remaining > 60) {
-                    button.textContent = `Snoozed (${Math.ceil(remaining / 60)}m)`;
+                    button.textContent = `Paused (${Math.ceil(remaining / 60)}m)`;
                 } else {
-                    button.textContent = `Snoozed (${remaining}s)`;
+                    button.textContent = `Paused (${remaining}s)`;
                 }
             } else {
                  // Expired, should probably reload or just show basic text,
                  // but for cleaner state we might want to trigger reload if it just expired.
                  // For now just update text.
-                 button.textContent = 'Snooze 5m';
+                 button.textContent = 'Pause';
                  button.classList.remove('paused');
-                 delete button.dataset.snoozedUntil;
+                 delete button.dataset.pausedUntil;
 
                  // Also update parent row style
                  const row = button.closest('.rule-item');

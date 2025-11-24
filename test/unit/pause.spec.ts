@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 import { Rule } from '../../src/types';
 import { shouldRuleApply } from '../../src/utils';
 
-test.describe('Snooze Functionality', () => {
+test.describe('Pause Functionality', () => {
     test('should apply rule if not paused and active', () => {
         const rule: Rule = {
             id: 1,
