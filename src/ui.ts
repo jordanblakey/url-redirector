@@ -41,7 +41,7 @@ export function showFlashMessage(message: string, type: 'success' | 'error' | 'i
 export function renderRules(
     rules: Rule[],
     listElement: HTMLUListElement,
-    onToggle: (id: number) => void,
+    onPause: (id: number) => void,
     onDelete: (id: number) => void
 ): void {
     listElement.innerHTML = '';
@@ -60,8 +60,9 @@ export function renderRules(
     }
 
     rules.forEach((rule) => {
+        const isPaused = rule.pausedUntil && rule.pausedUntil > Date.now();
         const li = document.createElement('li');
-        li.className = `rule-item ${!rule.active ? 'paused' : ''}`;
+        li.className = `rule-item ${!rule.active || isPaused ? 'paused' : ''}`;
         li.style.cursor = 'pointer'; // Indicate clickability
 
         // Toggle on row click
@@ -74,7 +75,7 @@ export function renderRules(
             if (target.closest('button')) {
                 return;
             }
-            onToggle(rule.id);
+            onPause(rule.id);
         };
 
         const contentDiv = document.createElement('div');
@@ -126,9 +127,23 @@ export function renderRules(
         actionsDiv.className = 'rule-actions';
 
         const toggleBtn = document.createElement('button');
-        toggleBtn.className = `toggle-btn ${!rule.active ? 'paused' : ''}`;
-        toggleBtn.textContent = rule.active ? 'Pause' : 'Play';
-        toggleBtn.onclick = () => onToggle(rule.id);
+        toggleBtn.className = `toggle-btn ${!rule.active || isPaused ? 'paused' : ''}`;
+        toggleBtn.dataset.id = String(rule.id);
+
+        if (isPaused) {
+            const remaining = Math.ceil(((rule.pausedUntil || 0) - Date.now()) / 1000);
+            if (remaining > 60) {
+                toggleBtn.textContent = `Paused (${Math.ceil(remaining / 60)}m)`;
+            } else {
+                toggleBtn.textContent = `Paused (${remaining}s)`;
+            }
+            toggleBtn.dataset.pausedUntil = String(rule.pausedUntil);
+        } else {
+            toggleBtn.textContent = rule.active ? 'Pause' : 'Play';
+            delete toggleBtn.dataset.pausedUntil;
+        }
+
+        toggleBtn.onclick = () => onPause(rule.id);
 
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'delete-btn';
@@ -143,4 +158,55 @@ export function renderRules(
 
         listElement.appendChild(li);
     });
+}
+
+export function updatePauseButtons(listElement: HTMLElement): void {
+    const buttons = listElement.querySelectorAll('.toggle-btn');
+    const now = Date.now();
+
+    buttons.forEach((btn) => {
+        const button = btn as HTMLButtonElement;
+        const pausedUntilStr = button.dataset.pausedUntil;
+
+        if (pausedUntilStr) {
+            const pausedUntil = parseInt(pausedUntilStr, 10);
+            if (pausedUntil > now) {
+                const remaining = Math.ceil((pausedUntil - now) / 1000);
+                if (remaining > 60) {
+                    button.textContent = `Paused (${Math.ceil(remaining / 60)}m)`;
+                } else {
+                    button.textContent = `Paused (${remaining}s)`;
+                }
+            } else {
+                // Expired, should probably reload or just show basic text,
+                // but for cleaner state we might want to trigger reload if it just expired.
+                // For now just update text.
+                button.textContent = 'Pause';
+                button.classList.remove('paused');
+                delete button.dataset.pausedUntil;
+
+                // Also update parent row style
+                const row = button.closest('.rule-item');
+                if (row) {
+                    row.classList.remove('paused');
+                }
+            }
+        }
+    });
+}
+
+export function toggleRuleState(rule: Rule): void {
+    const now = Date.now();
+    if (rule.pausedUntil && rule.pausedUntil > now) {
+        // Already paused, so resume
+        rule.pausedUntil = undefined;
+        rule.active = true;
+    } else if (!rule.active) {
+        // It was permanently disabled, enable it
+        rule.active = true;
+        rule.pausedUntil = undefined;
+    } else {
+        // Active and not paused, so pause it for 5 minutes (currently 5 seconds for testing?)
+        rule.pausedUntil = now + 5 * 60 * 1000;
+    }
 }

@@ -22,20 +22,17 @@ test.describe('Rule Validation', () => {
         await page.fill('#sourceUrl', 'not-a-url');
         await page.fill('#targetUrl', 'google.com');
 
-        let dialogMessage = '';
-        page.once('dialog', async (dialog) => {
-            dialogMessage = dialog.message();
-            await dialog.accept();
-        });
-
         await page.click('#addRuleBtn');
         await page.waitForTimeout(100);
 
         const rulesList = page.locator('#rulesList');
         // It should fail to add, so count should be 0
         await expect(rulesList.locator('.rule-item')).toHaveCount(0);
-        // And show an error message
-        expect(dialogMessage).toMatch(/Invalid URL|enter a valid URL/i);
+
+        // Check for flash message
+        const flashMessage = page.locator('.flash-message.error');
+        await expect(flashMessage).toBeVisible();
+        await expect(flashMessage).toContainText(/Invalid URL|enter a valid URL/i);
     });
 
     test('should prevent adding duplicate source', async ({ page }) => {
