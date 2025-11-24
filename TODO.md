@@ -1,10 +1,7 @@
 ## TODO
-
 - [] CI: Push initial version through Chrome Web Store review process
 
 ## DELEGATED
-
-
 - [] CLEANUP: Remove any css that isn't referenced anywhere. Remove redundant rules. Add section comments grouping related rules. Nest where possible.
 - [] CI: Increase test coverage, particularity in conditional logic. Add unit tests to shadow e2e tests. If e2e tests get slow, can run them only on PRs.
 
@@ -19,7 +16,6 @@
 - [x] BUG: persist badge for 10 seconds
 - [x] BUG: prevent new rules by validation criteria: must be url, must not be empty, must not be duplicate, source and dest must not be the same. Write tests.
 - [x] BUG: Prevent the entry of rules where a rule with the same source url exists
-- [x] BUG: resuming should immediately redirect tabs currently on the source url. Write test.
 - [x] BUG: resuming should immediately redirect tabs currently on the source url. Write test.
 - [x] BUG: types.js should not be in dist
 - [x] BUG: Use flash messages instead of alerts.
