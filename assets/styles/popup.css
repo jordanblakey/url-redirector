@@ -1,4 +1,6 @@
-/* Popup Page Specifics */
+/* =========================================
+   Popup Page Specifics
+   ========================================= */
 .popup-page {
   width: 400px;
   height: 600px;
@@ -28,10 +30,6 @@
 
   .input-group {
     margin-bottom: 12px;
-
-    .text-secondary {
-      color: var(--text-secondary);
-    }
   }
 
   label {
