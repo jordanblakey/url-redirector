@@ -336,4 +336,13 @@ test.describe('URL Redirector Options Page', () => {
         await page.reload();
         await expect(countSpan).toContainText('5');
     });
+
+    test('should have tabindex="-1" on placeholder buttons to skip tab order', async ({ page }) => {
+        const placeholderBtns = page.locator('.use-placeholder-btn');
+        await expect(placeholderBtns).toHaveCount(2);
+
+        for (let i = 0; i < await placeholderBtns.count(); i++) {
+            await expect(placeholderBtns.nth(i)).toHaveAttribute('tabindex', '-1');
+        }
+    });
 });
