@@ -1,0 +1,56 @@
+import { Rule, StorageResult } from './types';
+
+export const storage = {
+    getRules: (): Promise<Rule[]> => {
+        return new Promise((resolve) => {
+            chrome.storage.local.get(['rules'], (result: StorageResult) => {
+                resolve(result.rules || []);
+            });
+        });
+    },
+
+    saveRules: (rules: Rule[]): Promise<void> => {
+        return new Promise((resolve) => {
+            chrome.storage.local.set({ rules }, () => {
+                resolve();
+            });
+        });
+    },
+
+    addRule: async (rule: Rule): Promise<void> => {
+        const rules = await storage.getRules();
+        if (rules.some(r => r.source === rule.source)) {
+            throw new Error('Duplicate source');
+        }
+        rules.push(rule);
+        await storage.saveRules(rules);
+    },
+
+    updateRule: async (updatedRule: Rule): Promise<void> => {
+        const rules = await storage.getRules();
+        const index = rules.findIndex(r => r.id === updatedRule.id);
+        if (index !== -1) {
+            rules[index] = updatedRule;
+            await storage.saveRules(rules);
+        }
+    },
+
+    deleteRule: async (id: number): Promise<Rule[]> => {
+        const rules = await storage.getRules();
+        const newRules = rules.filter(r => r.id !== id);
+        await storage.saveRules(newRules);
+        return newRules;
+    },
+
+    incrementCount: async (id: number, incrementBy: number = 1, message?: string): Promise<void> => {
+        const rules = await storage.getRules();
+        const rule = rules.find(r => r.id === id);
+        if (rule) {
+            rule.count = (rule.count || 0) + incrementBy;
+            if (message) {
+                rule.lastCountMessage = message;
+            }
+            await storage.saveRules(rules);
+        }
+    }
+};
