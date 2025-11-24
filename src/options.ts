@@ -1,7 +1,7 @@
 import { Rule, StorageResult } from './types';
-import { matchAndGetTarget } from './utils.js';
+import { matchAndGetTarget, isValidUrl } from './utils.js';
 import { getRandomMessage } from './messages.js';
-import { renderRules, updatePauseButtons, toggleRuleState, showFlashMessage } from './ui.js';
+import { renderRules, updatePauseButtons, toggleRuleState, showFlashMessage, setupPlaceholderButtons } from './ui.js';
 import { getThematicPair } from './suggestions.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -46,20 +46,6 @@ document.addEventListener('DOMContentLoaded', () => {
         addRule(source, target);
     });
 
-    function isValidUrl(string: string): boolean {
-        try {
-            // Check if it matches a basic domain pattern or full URL
-            const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
-            if (urlPattern.test(string)) {
-                return true;
-            }
-            new URL(string);
-            return true;
-        } catch (_) {
-            return false;
-        }
-    }
-
     const handleEnter = (e: KeyboardEvent) => {
         if (e.key === 'Enter') {
             addBtn.click();
@@ -68,6 +54,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sourceInput.addEventListener('keypress', handleEnter);
     targetInput.addEventListener('keypress', handleEnter);
+
+    // Initialize placeholder copy buttons
+    setupPlaceholderButtons();
 
     setSmartPlaceholders();
 
