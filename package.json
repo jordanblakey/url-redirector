@@ -19,7 +19,9 @@
     "record:automation": "npm run build && ./demos/record-demo.sh",
     "record:demo": "npm run build && ./demos/record-demo.sh --interactive",
     "setup-store-auth": "ts-node scripts/setup-cws-auth.ts",
-    "check-store-status": "ts-node scripts/check-cws-status.ts"
+    "check-store-status": "ts-node scripts/check-cws-status.ts",
+    "jules:list": "npx jules remote list --session | less",
+    "jules:delegate": "cat TODO-JULES.md | xargs -I {} npx jules new \"{}\""
   },
   "keywords": [],
   "author": "",
@@ -28,6 +30,7 @@
     "dotenv": "^17.0.0"
   },
   "devDependencies": {
+    "@google/jules": "^0.1.40",
     "@playwright/test": "^1.56.1",
     "@types/adm-zip": "^0.5.7",
     "@types/chrome": "^0.1.31",

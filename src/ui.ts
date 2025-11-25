@@ -1,25 +1,30 @@
-import { Rule } from './types';
-import { getRandomMessage } from './messages.js';
+import { Rule } from "./types";
+import { getRandomMessage } from "./messages.js";
 
-const getFaviconUrl = (url: string) => {
+export const getFaviconUrl = (url: string) => {
     // Basic clean up to get the domain
     try {
-        const domain = new URL(url.startsWith('http') ? url : `https://${url}`).hostname;
+        const domain = new URL(url.startsWith("http") ? url : `https://${url}`)
+            .hostname;
         return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
     } catch (e) {
-        return 'default-icon.png'; // Fallback
+        return "default-icon.png"; // Fallback
     }
 };
 
-export function showFlashMessage(message: string, type: 'success' | 'error' | 'info' = 'info', duration = 3000): void {
-    let flashContainer = document.getElementById('flash-container');
+export function showFlashMessage(
+    message: string,
+    type: "success" | "error" | "info" = "info",
+    duration = 3000
+): void {
+    let flashContainer = document.getElementById("flash-container");
     if (!flashContainer) {
-        flashContainer = document.createElement('div');
-        flashContainer.id = 'flash-container';
+        flashContainer = document.createElement("div");
+        flashContainer.id = "flash-container";
         document.body.appendChild(flashContainer);
     }
 
-    const flashMessage = document.createElement('div');
+    const flashMessage = document.createElement("div");
     flashMessage.className = `flash-message ${type}`;
     flashMessage.textContent = message;
 
@@ -27,12 +32,12 @@ export function showFlashMessage(message: string, type: 'success' | 'error' | 'i
 
     // Trigger reflow to enable transition
     requestAnimationFrame(() => {
-        flashMessage.classList.add('visible');
+        flashMessage.classList.add("visible");
     });
 
     setTimeout(() => {
-        flashMessage.classList.remove('visible');
-        flashMessage.addEventListener('transitionend', () => {
+        flashMessage.classList.remove("visible");
+        flashMessage.addEventListener("transitionend", () => {
             flashMessage.remove();
         });
     }, duration);
@@ -44,54 +49,56 @@ export function renderRules(
     onPause: (id: number) => void,
     onDelete: (id: number) => void
 ): void {
-    listElement.innerHTML = '';
+    listElement.innerHTML = "";
 
     // Sort rules alphabetically by source URL
     rules.sort((a, b) => a.source.localeCompare(b.source));
 
     if (rules.length === 0) {
-        const emptyState = document.createElement('li');
-        emptyState.textContent = 'No rules added yet.';
-        emptyState.style.textAlign = 'center';
-        emptyState.style.color = 'var(--text-secondary)';
-        emptyState.style.padding = '12px';
+        const emptyState = document.createElement("li");
+        emptyState.textContent = "No rules added yet.";
+        emptyState.style.textAlign = "center";
+        emptyState.style.color = "var(--text-secondary)";
+        emptyState.style.padding = "12px";
         listElement.appendChild(emptyState);
         return;
     }
 
     rules.forEach((rule) => {
         const isPaused = rule.pausedUntil && rule.pausedUntil > Date.now();
-        const li = document.createElement('li');
-        li.className = `rule-item ${!rule.active || isPaused ? 'paused' : ''}`;
-        li.style.cursor = 'pointer'; // Indicate clickability
+        const li = document.createElement("li");
+        li.className = `rule-item ${!rule.active || isPaused ? "paused" : ""}`;
+        li.style.cursor = "pointer"; // Indicate clickability
 
         // Toggle on row click
         li.onclick = (e) => {
             // Prevent triggering if clicking directly on buttons
             const target = e.target as HTMLElement;
-            if (target.closest('button')) {
+            if (target.closest("button")) {
                 return;
             }
             onPause(rule.id);
         };
 
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'rule-content';
+        const contentDiv = document.createElement("div");
+        contentDiv.className = "rule-content";
 
-        const ruleLineDiv = document.createElement('div');
-        ruleLineDiv.className = 'rule-line';
+        const ruleLineDiv = document.createElement("div");
+        ruleLineDiv.className = "rule-line";
 
-        const sourceFaviconSpan = document.createElement('span');
-        sourceFaviconSpan.className = 'rule-favicon';
-        sourceFaviconSpan.style.backgroundImage = `url(${getFaviconUrl(rule.source)})`;
+        const sourceFaviconSpan = document.createElement("span");
+        sourceFaviconSpan.className = "rule-favicon";
+        sourceFaviconSpan.style.backgroundImage = `url(${getFaviconUrl(
+            rule.source
+        )})`;
 
-        const sourceSpan = document.createElement('span');
-        sourceSpan.className = 'rule-source';
+        const sourceSpan = document.createElement("span");
+        sourceSpan.className = "rule-source";
         sourceSpan.textContent = rule.source;
 
-        const arrowSpan = document.createElement('span');
-        arrowSpan.className = 'rule-arrow';
-        arrowSpan.textContent = '➜';
+        const arrowSpan = document.createElement("span");
+        arrowSpan.className = "rule-arrow";
+        arrowSpan.textContent = "➜";
 
         const targetSpan = document.createElement('span');
         targetSpan.className = 'rule-target';
@@ -111,8 +118,8 @@ export function renderRules(
         }
         ruleLineDiv.appendChild(targetSpan);
 
-        const countSpan = document.createElement('span');
-        countSpan.className = 'rule-count';
+        const countSpan = document.createElement("span");
+        countSpan.className = "rule-count";
         const count = rule.count || 0;
 
         if (rule.lastCountMessage) {
@@ -124,15 +131,18 @@ export function renderRules(
         contentDiv.appendChild(ruleLineDiv);
         contentDiv.appendChild(countSpan);
 
-        const actionsDiv = document.createElement('div');
-        actionsDiv.className = 'rule-actions';
+        const actionsDiv = document.createElement("div");
+        actionsDiv.className = "rule-actions";
 
-        const toggleBtn = document.createElement('button');
-        toggleBtn.className = `toggle-btn ${!rule.active || isPaused ? 'paused' : ''}`;
+        const toggleBtn = document.createElement("button");
+        toggleBtn.className = `toggle-btn ${!rule.active || isPaused ? "paused" : ""
+            }`;
         toggleBtn.dataset.id = String(rule.id);
 
         if (isPaused) {
-            const remaining = Math.ceil(((rule.pausedUntil || 0) - Date.now()) / 1000);
+            const remaining = Math.ceil(
+                ((rule.pausedUntil || 0) - Date.now()) / 1000
+            );
             if (remaining > 60) {
                 toggleBtn.textContent = `Paused (${Math.ceil(remaining / 60)}m)`;
             } else {
@@ -140,15 +150,15 @@ export function renderRules(
             }
             toggleBtn.dataset.pausedUntil = String(rule.pausedUntil);
         } else {
-            toggleBtn.textContent = rule.active ? 'Pause' : 'Play';
+            toggleBtn.textContent = rule.active ? "Pause" : "Play";
             delete toggleBtn.dataset.pausedUntil;
         }
 
         toggleBtn.onclick = () => onPause(rule.id);
 
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'delete-btn';
-        deleteBtn.textContent = 'Delete';
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "delete-btn";
+        deleteBtn.textContent = "Delete";
         deleteBtn.onclick = () => onDelete(rule.id);
 
         actionsDiv.appendChild(toggleBtn);
@@ -162,7 +172,7 @@ export function renderRules(
 }
 
 export function updatePauseButtons(listElement: HTMLElement): void {
-    const buttons = listElement.querySelectorAll('.toggle-btn');
+    const buttons = listElement.querySelectorAll(".toggle-btn");
     const now = Date.now();
 
     buttons.forEach((btn) => {
@@ -179,13 +189,13 @@ export function updatePauseButtons(listElement: HTMLElement): void {
                     button.textContent = `Paused (${remaining}s)`;
                 }
             } else {
-                button.textContent = 'Pause';
-                button.classList.remove('paused');
+                button.textContent = "Pause";
+                button.classList.remove("paused");
                 delete button.dataset.pausedUntil;
 
-                const row = button.closest('.rule-item');
+                const row = button.closest(".rule-item");
                 if (row) {
-                    row.classList.remove('paused');
+                    row.classList.remove("paused");
                 }
             }
         }
