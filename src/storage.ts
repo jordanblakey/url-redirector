@@ -1,5 +1,12 @@
 import { Rule, StorageResult } from './types';
 
+// This promise queue is a lightweight mechanism to prevent race conditions.
+// The chrome.storage API is asynchronous but not atomic. A classic "read-modify-write"
+// operation on the same key, if executed concurrently, can cause updates to be lost.
+// By chaining promises, we ensure that each `incrementCount` operation completes
+// fully before the next one begins.
+let updateQueue = Promise.resolve();
+
 export const storage = {
     getRules: (): Promise<Rule[]> => {
         return new Promise((resolve) => {
@@ -42,15 +49,34 @@ export const storage = {
         return newRules;
     },
 
-    incrementCount: async (id: number, incrementBy: number = 1, message?: string): Promise<void> => {
-        const rules = await storage.getRules();
-        const rule = rules.find(r => r.id === id);
-        if (rule) {
-            rule.count = (rule.count || 0) + incrementBy;
-            if (message) {
-                rule.lastCountMessage = message;
-            }
-            await storage.saveRules(rules);
-        }
+    incrementCount: (id: number, incrementBy: number = 1, message?: string): Promise<void> => {
+        // The `work` function encapsulates the non-atomic read-modify-write operation.
+        const work = () => {
+            return new Promise<void>((resolve) => {
+                chrome.storage.local.get(['rules'], (result: StorageResult) => {
+                    const rules = result.rules || [];
+                    const rule = rules.find(r => r.id === id);
+                    if (rule) {
+                        rule.count = (rule.count || 0) + incrementBy;
+                        if (message) {
+                            rule.lastCountMessage = message;
+                        }
+                        chrome.storage.local.set({ rules }, () => {
+                            resolve();
+                        });
+                    } else {
+                        resolve();
+                    }
+                });
+            });
+        };
+
+        // We chain the next `work` unit onto the existing queue.
+        // This ensures that even if `incrementCount` is called multiple times
+        // in quick succession, each `work` unit will wait for the previous one
+        // to finish before starting.
+        const newQueue = updateQueue.then(work);
+        updateQueue = newQueue;
+        return newQueue;
     }
 };
