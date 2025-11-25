@@ -1,0 +1,52 @@
+.container {
+    max-width: 400px;
+    text-align: center;
+    padding: 2rem;
+    border-radius: 8px;
+    background-color: var(--background-color-light);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+    margin-bottom: 1.5rem;
+}
+
+.logo {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 0.5rem;
+}
+
+h1 {
+    font-size: 1.5rem;
+    color: var(--text-color-dark);
+}
+
+.message {
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    color: var(--text-color-med);
+}
+
+.message strong {
+    color: var(--primary-color);
+    word-break: break-all;
+}
+
+.actions .button {
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.override-confirm-container {
+    margin-top: 1.5rem;
+}
+
+.override-confirm-container .button[disabled] {
+    background-color: var(--button-disabled-color);
+    cursor: not-allowed;
+}
+
+.hidden {
+    display: none;
+}

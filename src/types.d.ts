@@ -9,6 +9,7 @@ export interface Rule {
     count: number;
     active: boolean;
     pausedUntil?: number;
+    overrideUntil?: number;
     lastCountMessage?: string;
 }
 

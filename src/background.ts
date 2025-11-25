@@ -24,7 +24,9 @@ chrome.webNavigation.onBeforeNavigate.addListener(
                 // Show badge to indicate redirection (if available)
                 showBadge();
 
-                chrome.tabs.update(details.tabId, { url: target });
+                const redirectUrl = chrome.runtime.getURL('html/redirect.html');
+                const url = `${redirectUrl}?source=${encodeURIComponent(currentUrl)}&target=${encodeURIComponent(target)}&ruleId=${rule.id}`;
+                chrome.tabs.update(details.tabId, { url });
                 break; // Stop after first match
             }
         }

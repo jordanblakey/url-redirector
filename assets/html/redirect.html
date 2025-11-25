@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+    <link rel="stylesheet" href="../styles/base.css">
+    <link rel="stylesheet" href="../styles/redirect.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="../icons/icon-128.png" alt="URL Redirector" class="logo">
+            <h1>Redirecting you</h1>
+        </div>
+        <div class="message">
+            <p>You were redirected from <strong id="source">...</strong></p>
+            <p>to <strong id="target">...</strong></p>
+        </div>
+        <div class="actions">
+            <button id="proceedBtn" class="button">Proceed to Target</button>
+            <button id="overrideBtn" class="button button-secondary">Override (for 5 mins)</button>
+        </div>
+        <div id="override-confirm-container" class="override-confirm-container hidden">
+            <button id="confirmOverrideBtn" class="button" data-testid="confirm-override-button" disabled>Confirm Override (5)</button>
+        </div>
+    </div>
+    <script type="module" src="../redirect.js"></script>
+</body>
+</html>

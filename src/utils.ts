@@ -42,6 +42,7 @@ export function matchAndGetTarget(url: string, rule: Rule): string | null {
 export function shouldRuleApply(rule: Rule): boolean {
     if (rule.active === false) return false;
     if (rule.pausedUntil && Date.now() < rule.pausedUntil) return false;
+    if (rule.overrideUntil && Date.now() < rule.overrideUntil) return false;
     return true;
 }
 
