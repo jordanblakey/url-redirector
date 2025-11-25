@@ -33,6 +33,21 @@ Complete guide to the build validation test suite.
 
 ---
 
+## 🧪 Testing
+
+### [Mocking Strategy](mocking-strategy.md)
+Explanation of the custom Chrome API mocking strategy.
+
+**Topics covered:**
+- Why a custom mock is used
+- Integrating `sinon` for assertions
+
+**When to read:**
+- Before writing or modifying tests
+- To understand how E2E tests work in a browser environment
+
+---
+
 ## 🔧 Setup & Configuration
 
 ### [Pre-commit Hook](pre-commit-hook.md)
