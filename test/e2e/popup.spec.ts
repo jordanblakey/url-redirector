@@ -183,7 +183,9 @@ test.describe("URL Redirector Popup", () => {
     // Check for flash message
     const flashMessage = page.locator(".flash-message.error");
     await expect(flashMessage).toBeVisible();
-    await expect(flashMessage).toContainText(/Invalid URL|enter a valid URL/i);
+    await expect(flashMessage).toContainText(
+      /Invalid Source URL|enter a valid URL/i
+    );
 
     // Capture screenshot of the error message
     await page.screenshot({
