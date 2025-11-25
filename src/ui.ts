@@ -1,16 +1,6 @@
 import { Rule } from "./types";
 import { getRandomMessage } from "./messages.js";
-
-export const getFaviconUrl = (url: string) => {
-  // Basic clean up to get the domain
-  try {
-    const domain = new URL(url.startsWith("http") ? url : `https://${url}`)
-      .hostname;
-    return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-  } catch (e) {
-    return "default-icon.png"; // Fallback
-  }
-};
+import { getFaviconUrl } from "./favicon-cache.js";
 
 export function showFlashMessage(
   message: string,
@@ -88,9 +78,9 @@ export function renderRules(
 
     const sourceFaviconSpan = document.createElement("span");
     sourceFaviconSpan.className = "rule-favicon";
-    sourceFaviconSpan.style.backgroundImage = `url(${getFaviconUrl(
-      rule.source
-    )})`;
+    getFaviconUrl(rule.source).then(url => {
+        sourceFaviconSpan.style.backgroundImage = `url(${url})`;
+    });
 
     const sourceSpan = document.createElement("span");
     sourceSpan.className = "rule-source";
@@ -106,9 +96,9 @@ export function renderRules(
 
     const targetFaviconSpan = document.createElement("span");
     targetFaviconSpan.className = "rule-favicon";
-    targetFaviconSpan.style.backgroundImage = `url(${getFaviconUrl(
-      rule.target
-    )})`;
+    getFaviconUrl(rule.target).then(url => {
+        targetFaviconSpan.style.backgroundImage = `url(${url})`;
+    });
 
     ruleLineDiv.appendChild(sourceFaviconSpan);
     ruleLineDiv.appendChild(sourceSpan);

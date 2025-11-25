@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { toggleRuleState, getFaviconUrl } from "../../src/ui.js";
+import { toggleRuleState } from "../../src/ui.js";
 import { Rule } from "../../src/types";
 
 test.describe("UI Logic - toggleRuleState", () => {
@@ -53,46 +53,5 @@ test.describe("UI Logic - toggleRuleState", () => {
 
     expect(rule.active).toBe(true);
     expect(rule.pausedUntil).toBeUndefined();
-  });
-});
-
-test.describe("UI Logic - getFaviconUrl", () => {
-  test("should generate correct Google S2 URL for standard domain", () => {
-    const url = "https://example.com";
-    const iconUrl = getFaviconUrl(url);
-    expect(iconUrl).toBe(
-      "https://www.google.com/s2/favicons?domain=example.com&sz=32"
-    );
-  });
-
-  test("should handle URL without protocol", () => {
-    const url = "example.com";
-    const iconUrl = getFaviconUrl(url);
-    expect(iconUrl).toBe(
-      "https://www.google.com/s2/favicons?domain=example.com&sz=32"
-    );
-  });
-
-  test("should handle URL with path", () => {
-    const url = "https://example.com/foo/bar";
-    const iconUrl = getFaviconUrl(url);
-    expect(iconUrl).toBe(
-      "https://www.google.com/s2/favicons?domain=example.com&sz=32"
-    );
-  });
-
-  test("should return fallback for invalid URL", () => {
-    const url = "not-a-url";
-    // The URL constructor might accept 'not-a-url' as relative path if base is provided,
-    // but here it throws or treats it weirdly. In Node, new URL('not-a-url') throws TypeError.
-    // However, existing code does: new URL(url.startsWith('http') ? url : `https://${url}`)
-    // `https://not-a-url` is technically a valid URL structure (hostname 'not-a-url').
-
-    // Let's try something that definitely fails URL parsing or returns empty domain?
-    // Actually the code uses `try...catch`.
-    // `new URL('https://')` throws.
-
-    const iconUrl = getFaviconUrl("");
-    expect(iconUrl).toBe("default-icon.png");
   });
 });
