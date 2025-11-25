@@ -2,10 +2,6 @@ import { Rule } from './types';
 import { getRandomMessage } from './messages.js';
 
 const getFaviconUrl = (url: string) => {
-    if (url === ':shuffle:') {
-        // Simple shuffle icon SVG as data URI
-        return 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiM1ZjMzZmYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cG9seWxpbmUgcG9pbnRzPSIxNiAzIDIxIDMgMjEgOCI+PC9wb2x5bGluZT48bGluZSB4MT0iNCIgeTE9IjIwIiB4Mj0iMjEiIHkyPSIzIj48L2xpbmU+PHBvbHlsaW5lIHBvaW50cz0iMjEgMTYgMjEgMjEgMTYgMjEiPjwvcG9seWxpbmU+PGxpbmUgeDE9IjE1IiB5MT0iMTUiIHgyPSIyMSIgeTI9IjIxIj48L2xpbmU+PGxpbmUgeDE9IjQiIHkxPSI0IiB4Mj0iOSIgeTI9IjkiPjwvbGluZT48L3N2Zz4=';
-    }
     // Basic clean up to get the domain
     try {
         const domain = new URL(url.startsWith('http') ? url : `https://${url}`).hostname;
@@ -103,17 +99,16 @@ export function renderRules(
         const isShuffle = rule.target === ':shuffle:';
         targetSpan.textContent = isShuffle ? '🔀 shuffle' : rule.target;
 
-        const targetFaviconSpan = document.createElement('span');
-        targetFaviconSpan.className = 'rule-favicon';
-        targetFaviconSpan.style.backgroundImage = `url(${getFaviconUrl(rule.target)})`;
-        if (isShuffle) {
-             targetFaviconSpan.style.filter = 'invert(27%) sepia(51%) saturate(2878%) hue-rotate(246deg) brightness(96%) contrast(97%)';
-        }
-
         ruleLineDiv.appendChild(sourceFaviconSpan);
         ruleLineDiv.appendChild(sourceSpan);
         ruleLineDiv.appendChild(arrowSpan);
-        ruleLineDiv.appendChild(targetFaviconSpan);
+
+        if (!isShuffle) {
+            const targetFaviconSpan = document.createElement('span');
+            targetFaviconSpan.className = 'rule-favicon';
+            targetFaviconSpan.style.backgroundImage = `url(${getFaviconUrl(rule.target)})`;
+            ruleLineDiv.appendChild(targetFaviconSpan);
+        }
         ruleLineDiv.appendChild(targetSpan);
 
         const countSpan = document.createElement('span');
