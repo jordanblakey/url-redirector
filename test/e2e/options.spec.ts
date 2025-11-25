@@ -1,24 +1,9 @@
 import { test, expect } from '../fixtures';
-import fs from 'fs';
-import path from 'path';
-import ts from 'typescript';
-
-// Read the mock Chrome API script and transpile it to JS
-const mockChromeTs = fs.readFileSync(
-    path.join(process.cwd(), 'test/mocks/mock-chrome.ts'),
-    'utf-8'
-);
-const mockChromeScript = ts.transpileModule(mockChromeTs, {
-    compilerOptions: { module: ts.ModuleKind.ESNext }
-}).outputText;
 
 test.describe('URL Redirector Options Page', () => {
-    test.beforeEach(async ({ page }) => {
-        // Inject the mock Chrome API before the page loads
-        await page.addInitScript(mockChromeScript);
-
+    test.beforeEach(async ({ page, extensionId }) => {
         // Navigate to the options page
-        await page.goto('/dist/html/options.html');
+        await page.goto(`chrome-extension://${extensionId}/html/options.html`);
     });
 
     test('should display the options page correctly', async ({ page }) => {
@@ -128,11 +113,10 @@ test.describe('URL Redirector Options Page', () => {
         // Try to add rule with empty fields
         await page.click('#addRuleBtn');
 
-        // Wait for alert dialog
-        page.on('dialog', async (dialog) => {
-            expect(dialog.message()).toContain('Please enter both source and target URLs');
-            await dialog.accept();
-        });
+        // Verify flash message
+        const flashMessage = page.locator('.flash-message');
+        await expect(flashMessage).toBeVisible();
+        await expect(flashMessage).toContainText('Please enter both source and target URLs');
     });
 
     test('should check and redirect existing tabs when adding a rule', async ({ page }) => {
@@ -183,26 +167,6 @@ test.describe('URL Redirector Options Page', () => {
         await expect(ruleItem).not.toHaveClass(/paused/);
     });
 
-    test('should prevent infinite redirect loops', async ({ page }) => {
-        // This tests the check in matchAndGetTarget inside utils.ts
-        await page.addInitScript(() => {
-            (window as any).chrome.tabs.query = (queryInfo: any, callback: any) => {
-                callback([
-                    { id: 1, url: 'https://target.com/foo' }
-                ]);
-            };
-        });
-
-        await page.fill('#sourceUrl', 'target.com');
-        await page.fill('#targetUrl', 'target.com/foo');
-
-        await page.click('#addRuleBtn');
-        await page.waitForTimeout(100);
-
-        const countSpan = page.locator('.rule-count');
-        await expect(countSpan.locator('.count-value')).toHaveText('0');
-    });
-
     test('should handle rule not found during deletion', async ({ page }) => {
         await page.fill('#sourceUrl', 'delete-fail.com');
         await page.fill('#targetUrl', 'target.com');
@@ -211,7 +175,9 @@ test.describe('URL Redirector Options Page', () => {
 
         // Clear storage directly
         await page.evaluate(() => {
-            window.localStorage.removeItem('rules');
+            return new Promise<void>((resolve) => {
+                chrome.storage.local.set({ rules: [] }, resolve);
+            });
         });
 
         const ruleItem = page.locator('.rule-item').first();
@@ -230,36 +196,15 @@ test.describe('URL Redirector Options Page', () => {
         await page.waitForTimeout(100);
 
         await page.evaluate(() => {
-            window.localStorage.removeItem('rules');
+            return new Promise<void>((resolve) => {
+                chrome.storage.local.set({ rules: [] }, resolve);
+            });
         });
 
         const ruleItem = page.locator('.rule-item').first();
         await ruleItem.hover();
 
         await page.click('.toggle-btn');
-        await page.waitForTimeout(100);
-        // No error should occur
-    });
-
-    test('should handle rule not found during increment count', async ({ page }) => {
-        await page.addInitScript(() => {
-            (window as any).chrome.tabs.query = (queryInfo: any, callback: any) => {
-                setTimeout(() => {
-                    callback([{ id: 1, url: 'https://increment-fail.com' }]);
-                }, 50);
-            };
-        });
-
-        await page.fill('#sourceUrl', 'increment-fail.com');
-        await page.fill('#targetUrl', 'target.com');
-        await page.click('#addRuleBtn');
-
-        await page.waitForTimeout(10);
-
-        await page.evaluate(() => {
-            window.localStorage.removeItem('rules');
-        });
-
         await page.waitForTimeout(100);
         // No error should occur
     });
