@@ -6,19 +6,16 @@ A pre-commit hook is available to automatically run tests before every commit. T
 
 ## Setup
 
-Since the repository root contains the `.git` directory, you can install the pre-commit hook by copying the provided script to your git hooks directory.
+This project uses [husky](https://typicode.github.io/husky/) to manage Git hooks. The pre-commit hook is configured in `.husky/pre-commit` and is automatically installed when you run `npm install`.
 
 ### Installation
 
-1.  Ensure you are in the root of the repository.
-2.  Make the hook executable and copy it:
+To ensure the hooks are set up, simply run:
+```bash
+npm install
+```
 
-    ```bash
-    chmod +x .husky/pre-commit
-    cp .husky/pre-commit .git/hooks/pre-commit
-    ```
-
-    *(Note: If you are using a newer version of git or a different hook manager, adjust the path accordingly. The standard git hook path is `.git/hooks/pre-commit`)*
+This will configure Git to use the hooks defined in the `.husky/` directory.
 
 ## How It Works
 
