@@ -141,6 +141,9 @@ test.describe("UI Components", () => {
 
   test.describe("Favicons", () => {
     test("should render correct Google S2 favicon URLs", async ({ page }) => {
+      // Suppress network error by aborting the request
+      await page.route("**google.com/s2/favicons**", (route) => route.abort());
+
       await page.fill("#sourceUrl", "github.com");
       await page.fill("#targetUrl", "stackoverflow.com");
       await page.click("#addRuleBtn");
@@ -149,14 +152,16 @@ test.describe("UI Components", () => {
 
       // Check source favicon
       const sourceFavicon = ruleItem.locator(".rule-favicon").first();
-      const sourceStyle = await sourceFavicon.getAttribute("style");
-      expect(sourceStyle).toContain("google.com/s2/favicons?domain=github.com");
+      await expect(sourceFavicon).toHaveAttribute(
+        "style",
+        /google\.com\/s2\/favicons\?domain=github\.com/
+      );
 
       // Check target favicon
       const targetFavicon = ruleItem.locator(".rule-favicon").nth(1);
-      const targetStyle = await targetFavicon.getAttribute("style");
-      expect(targetStyle).toContain(
-        "google.com/s2/favicons?domain=stackoverflow.com"
+      await expect(targetFavicon).toHaveAttribute(
+        "style",
+        /google\.com\/s2\/favicons\?domain=stackoverflow\.com/
       );
     });
   });

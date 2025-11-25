@@ -6,7 +6,11 @@ export const test = testBase.extend({
 
         // Start V8 coverage
         // Coverage API is usually chromium only
-        const isChromium = testBase.info().project.name === 'chromium' || testBase.info().project.name === 'Desktop Chrome' || !testBase.info().project.name;
+        // Also skip for unit tests which don't run in browser
+        const isChromium = (testBase.info().project.name === 'chromium' ||
+            testBase.info().project.name === 'Desktop Chrome' ||
+            !testBase.info().project.name) &&
+            !testBase.info().file.includes('test/unit/');
 
         if (isChromium) {
             await Promise.all([

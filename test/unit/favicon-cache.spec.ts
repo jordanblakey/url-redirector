@@ -64,41 +64,41 @@ test.describe('Favicon Cache Unit Tests', () => {
 
     // Fetch success
     const mockBlob = {
-        size: 100,
-        type: 'image/png'
+      size: 100,
+      type: 'image/png'
     };
 
     mockFetch.resolves({
-        ok: true,
-        blob: async () => mockBlob
+      ok: true,
+      blob: async () => mockBlob
     });
 
     // Mock FileReader
     const mockFileReader = {
-        readAsDataURL: function() {
-            setTimeout(() => {
-                this.result = remoteData;
-                this.onloadend();
-            }, 10);
-        },
-        onloadend: () => {},
-        onerror: () => {},
-        result: ''
+      readAsDataURL: function () {
+        setTimeout(() => {
+          this.result = remoteData;
+          this.onloadend();
+        }, 10);
+      },
+      onloadend: () => { },
+      onerror: () => { },
+      result: ''
     };
 
     // Stub FileReader constructor
     const originalFileReader = global.FileReader;
-    (global as any).FileReader = function() { return mockFileReader; };
+    (global as any).FileReader = function () { return mockFileReader; };
 
     // Set expectation for storage.set
     mockStorage.set.resolves();
 
     try {
-        const result = await getFaviconUrl(`https://${domain}`);
-        expect(result).toBe(remoteData);
-        expect(mockStorage.set.calledWith({ [cacheKey]: remoteData })).toBe(true);
+      const result = await getFaviconUrl(`https://${domain}`);
+      expect(result).toBe(remoteData);
+      expect(mockStorage.set.calledWith({ [cacheKey]: remoteData })).toBe(true);
     } finally {
-        (global as any).FileReader = originalFileReader;
+      (global as any).FileReader = originalFileReader;
     }
   });
 
@@ -109,8 +109,16 @@ test.describe('Favicon Cache Unit Tests', () => {
     mockStorage.get.withArgs([cacheKey]).yields({});
     mockFetch.rejects(new Error('Network error'));
 
-    const result = await getFaviconUrl(`https://${domain}`);
-    expect(result).toBe(`https://www.google.com/s2/favicons?domain=${domain}&sz=32`);
+    // Stub console.warn to suppress the expected error log
+    const consoleWarnStub = sinon.stub(console, 'warn');
+
+    try {
+      const result = await getFaviconUrl(`https://${domain}`);
+      expect(result).toBe(`https://www.google.com/s2/favicons?domain=${domain}&sz=32`);
+      expect(consoleWarnStub.called).toBe(true);
+    } finally {
+      consoleWarnStub.restore();
+    }
   });
 
   test('should dedupe concurrent requests', async () => {
@@ -137,24 +145,24 @@ test.describe('Favicon Cache Unit Tests', () => {
 
     // Mock FileReader again
     const mockFileReader = {
-        readAsDataURL: function() {
-            setTimeout(() => {
-                this.result = 'data:xxx';
-                this.onloadend();
-            }, 0);
-        },
-        onloadend: () => {},
-        result: ''
+      readAsDataURL: function () {
+        setTimeout(() => {
+          this.result = 'data:xxx';
+          this.onloadend();
+        }, 0);
+      },
+      onloadend: () => { },
+      result: ''
     };
     const originalFileReader = global.FileReader;
-    (global as any).FileReader = function() { return mockFileReader; };
+    (global as any).FileReader = function () { return mockFileReader; };
 
     // Ensure set is stubbed to return a promise
     mockStorage.set.resolves();
 
     fetchResolve!({
-        ok: true,
-        blob: async () => mockBlob
+      ok: true,
+      blob: async () => mockBlob
     });
 
     await Promise.all([p1, p2]);

@@ -42,4 +42,5 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     cwd: ".",
   },
+  globalTeardown: "./test/global-teardown.ts",
 });
