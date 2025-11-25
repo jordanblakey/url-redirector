@@ -31,15 +31,11 @@ export default defineConfig({
   ],
   outputDir: "test/test-results",
   use: {
-    baseURL: "http://localhost:8000",
     trace: "retain-on-failure",
     video: "retain-on-failure",
     screenshot: "only-on-failure",
-  },
-  webServer: {
-    command: "python3 -m http.server 8000 2>/dev/null",
-    url: "http://localhost:8000",
-    reuseExistingServer: !process.env.CI,
-    cwd: ".",
+    launchOptions: {
+      // slowMo: 1000,
+    },
   },
 });

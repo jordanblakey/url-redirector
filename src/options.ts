@@ -51,6 +51,11 @@ const init = () => {
     const source = sourceInput.value.trim();
     let target = targetInput.value.trim();
 
+    if (!source && !target) {
+      showFlashMessage("Please enter both source and target URLs", "error");
+      return;
+    }
+
     if (!source) {
       showFlashMessage("Please enter a source URL.", "error");
       return;

@@ -1,23 +1,9 @@
 import { test, expect } from "../fixtures";
-import fs from "fs";
-import path from "path";
-import ts from "typescript";
-
-const mockChromeTs = fs.readFileSync(
-  path.join(process.cwd(), "test/mocks/mock-chrome.ts"),
-  "utf-8"
-);
-const mockChromeScript = ts.transpileModule(mockChromeTs, {
-  compilerOptions: { module: ts.ModuleKind.ESNext },
-}).outputText;
 
 test.describe("URL Redirector Popup", () => {
-  test.beforeEach(async ({ page }) => {
-    // Inject the mock Chrome API before the page loads
-    await page.addInitScript(mockChromeScript);
-
+  test.beforeEach(async ({ page, extensionId }) => {
     // Navigate to the popup page
-    await page.goto("/dist/html/popup.html");
+    await page.goto(`chrome-extension://${extensionId}/html/popup.html`);
   });
 
   test("should display the popup correctly", async ({ page }) => {
@@ -28,36 +14,20 @@ test.describe("URL Redirector Popup", () => {
   });
 
   test("should add a new rule", async ({ page }) => {
-    // Spy on chrome.storage.local.set
-    await page.evaluate(() => {
-      const calls = [];
-      const original = window.chrome.storage.local.set;
-      window.chrome.storage.local.set = (data, callback) => {
-        calls.push(data);
-        original(data, callback);
-      };
-      (window as any).getStorageSetCalls = () => calls;
-    });
-    // Fill in the form
     await page.fill("#sourceUrl", "reddit.com");
     await page.fill("#targetUrl", "google.com");
-
-    // Click add button
-    await page.click("#addRuleBtn");
-
-    // Wait for the rule to appear
-    await page.waitForTimeout(100);
+    await page.press("#targetUrl", "Enter");
 
     // Verify the rule appears in the list
     const rulesList = page.locator("#rulesList");
     await expect(rulesList.locator(".rule-item")).toHaveCount(1);
     await expect(rulesList.locator(".rule-source")).toContainText("reddit.com");
     await expect(rulesList.locator(".rule-target")).toContainText("google.com");
-    await expect(rulesList.locator(".rule-count .count-value")).toHaveText("0");
 
-    // Verify that chrome.storage.local.set was called
-    const calls = await page.evaluate(() => (window as any).getStorageSetCalls());
-    expect(calls.length).toBe(1);
+    // Reload to verify persistence (testing storage indirectly)
+    await page.reload();
+    await expect(rulesList.locator(".rule-item")).toHaveCount(1);
+    await expect(rulesList.locator(".rule-source")).toContainText("reddit.com");
 
     // Verify inputs are cleared
     await expect(page.locator("#sourceUrl")).toHaveValue("");
