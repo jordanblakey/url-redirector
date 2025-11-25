@@ -36,11 +36,9 @@
     "@types/chrome": "^0.1.31",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^24.10.1",
-    "@types/sinon": "^21.0.0",
     "adm-zip": "^0.5.16",
     "fs-extra": "^11.3.2",
     "monocart-reporter": "^2.9.23",
-    "sinon": "^21.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
