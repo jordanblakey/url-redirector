@@ -1,16 +1,15 @@
 ## TODO
 [] CI: Push initial version through Chrome Web Store review process
 
-
 ## DELEGATED
 [] CI: improve unit and e2e test coverage for ui.ts.
 [] FEATURE: Shuffle Mode after a source url is provided, if target input is empty, change the button text to "Add Shuffle Rule". Change it back to "Add Rule" when Target URL is provided. In the rule display, it should say :shuffle: shuffle. When the target URL is visited, a random URL is selected from list of recommended URLS.
-[] BUG: Tab order should skip the copy buttons altogether, in the source and target url fields
 
 
 ## DOING
 
 ## DONE
+[x] BUG: Tab order should skip the copy buttons altogether, in the source and target url fields
 [x] BUG: Unpausing a rule on the popup page no longer immediately redirects.
 [x] CLEANUP: Remove any css that isn't referenced anywhere. Remove redundant rules. Add section comments grouping related rules. Nest where possible.
 [x] CLEANUP: Refactor duplicated logic in the src folder. Clean old comments, dead code. Particularly in ui.ts. popup.ts. background.ts and options.ts
