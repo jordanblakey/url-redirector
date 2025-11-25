@@ -2,14 +2,14 @@
 [] CI: Push initial version through Chrome Web Store review process
 
 ## DELEGATED
-[] CI: improve unit and e2e test coverage for ui.ts.
-[] FEATURE: Implement a new feature of your own imagining
-[] CI: Suggest new tasks like bugfixes, feature requests, cleanup, ci improvements in TODO.md
-[] FEATURE: Favicon caching mechanism
+[] CI: improve unit and e2e test coverage
+[] FEATURE: Playwright tests to stop using mocked Chrome APIs and instead test the actual loaded extension
 
 ## DOING
 
 ## DONE
+[-] FEATURE: Favicon caching mechanism (why? Browser caching...)
+[x] FEATURE: Implement a new feature of your own imagining
 [x] FEATURE: Shuffle Mode after a source url is provided, if target input is empty, change the button text to "Add Shuffle Rule". Change it back to "Add Rule" when Target URL is provided. In the rule display, it should say :shuffle: shuffle. When the target URL is visited, a random URL is selected from list of recommended URLS.
 [x] BUG: Find an unidentified bug, and fix it. Found localStorage race condition.
 [x] CLEANUP: Check all the documentation in the project is accurate and well written.
