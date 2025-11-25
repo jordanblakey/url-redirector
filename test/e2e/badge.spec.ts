@@ -13,8 +13,7 @@ const mockChromeScript = ts.transpileModule(mockChromeTs, {
 
 test.describe("Badge Functionality", () => {
   test.beforeEach(async ({ page }) => {
-    // Inject Sinon and the mock Chrome API
-    await page.addInitScript({ path: 'node_modules/sinon/pkg/sinon.js' });
+    // Inject the mock Chrome API
     await page.addInitScript(mockChromeScript);
 
     // Navigate to a page to provide a context
@@ -22,9 +21,15 @@ test.describe("Badge Functionality", () => {
   });
 
   test("should show badge on redirection", async ({ page }) => {
-    // Stub chrome.action.setBadgeText
+    // Spy on chrome.action.setBadgeText
     await page.evaluate(() => {
-      window.sinon.stub(window.chrome.action, "setBadgeText");
+      const calls = [];
+      const original = window.chrome.action.setBadgeText;
+      window.chrome.action.setBadgeText = (details) => {
+        calls.push(details);
+        original(details);
+      };
+      (window as any).getBadgeTextCalls = () => calls;
     });
 
     // Load the background script logic
@@ -46,18 +51,23 @@ test.describe("Badge Functionality", () => {
       });
     });
 
-    // Verify the stub was called with the correct text
+    // Verify the spy was called with the correct text
     await expect.poll(async () => {
-      return await page.evaluate(() => {
-        return (window.chrome.action.setBadgeText as any).calledWith({ text: "1" });
-      });
+      const calls = await page.evaluate(() => (window as any).getBadgeTextCalls());
+      return calls.length > 0 && calls[0].text === "1";
     }).toBe(true);
   });
 
   test("should not show badge if rule is inactive", async ({ page }) => {
-    // Stub chrome.action.setBadgeText
+    // Spy on chrome.action.setBadgeText
     await page.evaluate(() => {
-      window.sinon.stub(window.chrome.action, "setBadgeText");
+      const calls = [];
+      const original = window.chrome.action.setBadgeText;
+      window.chrome.action.setBadgeText = (details) => {
+        calls.push(details);
+        original(details);
+      };
+      (window as any).getBadgeTextCalls = () => calls;
     });
 
     await page.addScriptTag({ url: "/dist/background.js", type: "module" });
@@ -81,10 +91,8 @@ test.describe("Badge Functionality", () => {
     // Wait a bit to ensure it didn't happen
     await page.waitForTimeout(200);
 
-    // Verify the stub was not called
-    const wasCalled = await page.evaluate(() => {
-      return (window.chrome.action.setBadgeText as any).called;
-    });
-    expect(wasCalled).toBe(false);
+    // Verify the spy was not called
+    const calls = await page.evaluate(() => (window as any).getBadgeTextCalls());
+    expect(calls.length).toBe(0);
   });
 });
