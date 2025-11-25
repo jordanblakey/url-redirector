@@ -10,7 +10,7 @@ The build validation tests ensure that the `npm run build` command produces a co
 
 ```bash
 # Run only build validation tests
-npm test test/unit/build.spec.ts
+npm run test:build
 
 # Run all tests (including build tests)
 npm test
@@ -23,12 +23,12 @@ The test suite validates multiple aspects of the build output:
 ### 1. Required Files
 Validates that all essential files are present in the `dist/` folder:
 - `manifest.json` exists and is valid JSON
-- `options.html` and `options.css` exist
+- `html/options.html` and `styles/options.css` exist
 - `icons/` directory exists
 
 ### 2. Compiled JavaScript Files
 Ensures TypeScript compilation succeeded:
-- `background.js`, `options.js`, `utils.js`, `types.js` exist
+- `background.js`, `options.js`, `utils.js` exist
 - All JS files have non-zero size
 
 ### 3. Icon Files
@@ -38,7 +38,7 @@ Validates icon assets:
 
 ### 4. File Integrity
 Checks that files are properly linked:
-- `options.html` references `options.css` and `options.js`
+- `html/options.html` references `styles/options.css` and `options.js`
 - `manifest.json` background `service_worker` references an existing file
 
 ### 5. Extension Completeness
@@ -52,11 +52,11 @@ Ensures consistent build output by verifying that running the build twice produc
 
 ## Build Process
 
-The build script (`scripts/build.js`) performs these steps:
+The build script (`scripts/build.ts`) performs these steps:
 
 1. **Clean**: Empties the `dist/` directory.
 2. **Compile**: Runs TypeScript compiler (`tsc`).
-3. **Copy Assets**: Copies static files (`manifest.json`, `icons/`, `options.html`, `options.css`).
+3. **Copy Assets**: Copies the `assets/` directory and `manifest.json`.
 
 ### Manifest Adjustment
 

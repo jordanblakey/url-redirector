@@ -28,6 +28,16 @@ test.describe("URL Redirector Popup", () => {
   });
 
   test("should add a new rule", async ({ page }) => {
+    // Spy on chrome.storage.local.set
+    await page.evaluate(() => {
+      const calls = [];
+      const original = window.chrome.storage.local.set;
+      window.chrome.storage.local.set = (data, callback) => {
+        calls.push(data);
+        original(data, callback);
+      };
+      (window as any).getStorageSetCalls = () => calls;
+    });
     // Fill in the form
     await page.fill("#sourceUrl", "reddit.com");
     await page.fill("#targetUrl", "google.com");
@@ -44,6 +54,10 @@ test.describe("URL Redirector Popup", () => {
     await expect(rulesList.locator(".rule-source")).toContainText("reddit.com");
     await expect(rulesList.locator(".rule-target")).toContainText("google.com");
     await expect(rulesList.locator(".rule-count .count-value")).toHaveText("0");
+
+    // Verify that chrome.storage.local.set was called
+    const calls = await page.evaluate(() => (window as any).getStorageSetCalls());
+    expect(calls.length).toBe(1);
 
     // Verify inputs are cleared
     await expect(page.locator("#sourceUrl")).toHaveValue("");
@@ -183,7 +197,9 @@ test.describe("URL Redirector Popup", () => {
     // Check for flash message
     const flashMessage = page.locator(".flash-message.error");
     await expect(flashMessage).toBeVisible();
-    await expect(flashMessage).toContainText(/Invalid URL|enter a valid URL/i);
+    await expect(flashMessage).toContainText(
+      /Invalid Source URL|enter a valid URL/i
+    );
 
     // Capture screenshot of the error message
     await page.screenshot({

@@ -1,4 +1,5 @@
 import { Rule } from './types';
+import { getRandomProductiveUrl } from './suggestions.js';
 
 /**
  * Checks if the given URL matches the rule's source.
@@ -20,6 +21,11 @@ export function matchAndGetTarget(url: string, rule: Rule): string | null {
 
     if (currentUrlClean.startsWith(source)) {
         let target = rule.target;
+
+        if (target === ':shuffle:') {
+            target = getRandomProductiveUrl();
+        }
+
         if (!target.startsWith('http')) {
             target = 'https://' + target;
         }

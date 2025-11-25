@@ -78,8 +78,8 @@ export function renderRules(
 
     const sourceFaviconSpan = document.createElement("span");
     sourceFaviconSpan.className = "rule-favicon";
-    getFaviconUrl(rule.source).then(url => {
-        sourceFaviconSpan.style.backgroundImage = `url(${url})`;
+    getFaviconUrl(rule.source).then((url) => {
+      sourceFaviconSpan.style.backgroundImage = `url(${url})`;
     });
 
     const sourceSpan = document.createElement("span");
@@ -96,8 +96,8 @@ export function renderRules(
 
     const targetFaviconSpan = document.createElement("span");
     targetFaviconSpan.className = "rule-favicon";
-    getFaviconUrl(rule.target).then(url => {
-        targetFaviconSpan.style.backgroundImage = `url(${url})`;
+    getFaviconUrl(rule.target).then((url) => {
+      targetFaviconSpan.style.backgroundImage = `url(${url})`;
     });
 
     ruleLineDiv.appendChild(sourceFaviconSpan);
@@ -222,6 +222,10 @@ export function setupPlaceholderButtons(): void {
       }
       if (placeholder && placeholder.trim() !== "") {
         input.value = placeholder;
+        // Trigger input event to update button text
+        const event = new Event("input");
+        input.dispatchEvent(event);
+
         input.focus();
         navigator.clipboard.writeText(placeholder).catch((err) => {
           console.error("Failed to copy to clipboard: ", err);

@@ -215,3 +215,8 @@ export function getThematicPair(): { source: string; target: string } {
     target: targetSite.url,
   };
 }
+
+export function getRandomProductiveUrl(): string {
+  const site = productiveSites[Math.floor(Math.random() * productiveSites.length)];
+  return site.url;
+}

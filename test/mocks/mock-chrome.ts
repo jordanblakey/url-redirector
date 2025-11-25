@@ -25,8 +25,6 @@ interface MockChrome {
         setBadgeText: (details: { text: string }) => void;
         setBadgeBackgroundColor: (details: { color: string }) => void;
         setBadgeTextColor: (details: { color: string }) => void;
-        // Test helper to get last call
-        getLastBadgeText?: () => string;
     };
     webNavigation?: {
         onBeforeNavigate: {
@@ -137,10 +135,8 @@ if (!chromeMock.tabs) {
 }
 
 if (!chromeMock.action) {
-    let lastBadgeText = '';
     chromeMock.action = {
         setBadgeText: (details: { text: string }) => {
-            lastBadgeText = details.text;
             console.log(`[MockChrome] setBadgeText: ${details.text}`);
         },
         setBadgeBackgroundColor: (details: { color: string }) => {
@@ -149,7 +145,6 @@ if (!chromeMock.action) {
         setBadgeTextColor: (details: { color: string }) => {
             console.log(`[MockChrome] setBadgeTextColor: ${details.color}`);
         },
-        getLastBadgeText: () => lastBadgeText
     };
 }
 

@@ -6,20 +6,20 @@ The URL Redirector extension uses a composed build system where the bundle proce
 
 ## Architecture
 
-### 1. Build Script (`scripts/build.js`)
+### 1. Build Script (`scripts/build.ts`)
 
 The `build` script is responsible for creating a complete, loadable extension in the `dist/` directory.
 
 **Responsibilities:**
 1.  **Clean**: Empties the `dist/` directory.
 2.  **Compile**: Runs the TypeScript compiler (`tsc`) to transpile `.ts` files in `src/` to `.js` files in `dist/`.
-3.  **Copy Assets**: Copies static files (`options.html`, `options.css`, `icons/`) to `dist/`.
+3.  **Copy Assets**: Copies the `assets/` directory (containing `html`, `styles`, and `icons`) to `dist/`.
 4.  **Manifest Adjustment**: Copies `manifest.json` to `dist/` and updates the `service_worker` path to point to the compiled JavaScript file (e.g., changing `dist/background.js` to `background.js` so it works from the root of the `dist/` folder).
 
 **Output:**
 A `dist/` folder containing the unpacked extension, ready to be loaded into Chrome via "Load unpacked".
 
-### 2. Bundle Script (`scripts/bundle.js`)
+### 2. Bundle Script (`scripts/bundle.ts`)
 
 The `bundle` script packages the extension for publication to the Chrome Web Store. It **composes** with the build script rather than duplicating logic.
 
