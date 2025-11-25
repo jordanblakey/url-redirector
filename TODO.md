@@ -5,6 +5,11 @@
 [] CI: improve unit and e2e test coverage for ui.ts.
 [] FEATURE: Shuffle Mode after a source url is provided, if target input is empty, change the button text to "Add Shuffle Rule". Change it back to "Add Rule" when Target URL is provided. In the rule display, it should say :shuffle: shuffle. When the target URL is visited, a random URL is selected from list of recommended URLS.
 
+[] BUG: Find an unidentified bug, and fix it
+[] FEATURE: Implement a new feature of your own imagining
+[] CLEANUP: Check all the documentation in the project is accurate and well written.
+[] CLEANUP: Check if there are any unnecessary files or directories in the project
+[] CI: Suggest new tasks like bugfixes, feature requests, cleanup, ci improvements in TODO.md
 
 ## DOING
 
