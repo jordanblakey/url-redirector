@@ -14,6 +14,7 @@ const mockChromeScript = ts.transpileModule(mockChromeTs, {
 test.describe("URL Redirector Popup", () => {
   test.beforeEach(async ({ page }) => {
     // Inject the mock Chrome API before the page loads
+    await page.addInitScript({ path: 'node_modules/sinon/pkg/sinon.js' });
     await page.addInitScript(mockChromeScript);
 
     // Navigate to the popup page
@@ -28,6 +29,10 @@ test.describe("URL Redirector Popup", () => {
   });
 
   test("should add a new rule", async ({ page }) => {
+    // Spy on chrome.storage.local.set
+    await page.evaluate(() => {
+      window.sinon.spy(window.chrome.storage.local, "set");
+    });
     // Fill in the form
     await page.fill("#sourceUrl", "reddit.com");
     await page.fill("#targetUrl", "google.com");
@@ -44,6 +49,12 @@ test.describe("URL Redirector Popup", () => {
     await expect(rulesList.locator(".rule-source")).toContainText("reddit.com");
     await expect(rulesList.locator(".rule-target")).toContainText("google.com");
     await expect(rulesList.locator(".rule-count .count-value")).toHaveText("0");
+
+    // Verify that chrome.storage.local.set was called
+    const wasCalled = await page.evaluate(() => {
+      return (window.chrome.storage.local.set as any).calledOnce;
+    });
+    expect(wasCalled).toBe(true);
 
     // Verify inputs are cleared
     await expect(page.locator("#sourceUrl")).toHaveValue("");

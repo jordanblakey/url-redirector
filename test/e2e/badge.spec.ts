@@ -13,79 +13,65 @@ const mockChromeScript = ts.transpileModule(mockChromeTs, {
 
 test.describe("Badge Functionality", () => {
   test.beforeEach(async ({ page }) => {
-    // Inject the mock Chrome API
+    // Inject Sinon and the mock Chrome API
+    await page.addInitScript({ path: 'node_modules/sinon/pkg/sinon.js' });
     await page.addInitScript(mockChromeScript);
 
-    // Navigate to a page to provide a context (we use popup.html but it could be blank)
-    // We need a page that can load modules from dist/
+    // Navigate to a page to provide a context
     await page.goto("/dist/html/popup.html");
   });
 
   test("should show badge on redirection", async ({ page }) => {
-    // 1. Load the background script logic
-    // We load it as a module so it can resolve imports
-    await page.addScriptTag({ url: "/dist/background.js", type: "module" });
-
-    // Wait for script to initialize and register listeners
-    await page.waitForTimeout(500);
-
-    // 2. Set up a redirection rule in the mock storage
+    // Stub chrome.action.setBadgeText
     await page.evaluate(() => {
-      const rules = [
-        {
-          source: "reddit.com",
-          target: "google.com",
-          active: true,
-          count: 0,
-        },
-      ];
-      // @ts-ignore
-      chrome.storage.local.set({ rules });
+      window.sinon.stub(window.chrome.action, "setBadgeText");
     });
 
-    // 3. Trigger the onBeforeNavigate event via the mock
+    // Load the background script logic
+    await page.addScriptTag({ url: "/dist/background.js", type: "module" });
+    await page.waitForTimeout(500);
+
+    // Set up a redirection rule
     await page.evaluate(() => {
-      // @ts-ignore
-      chrome.webNavigation.onBeforeNavigate.dispatch({
+      const rules = [{ source: "reddit.com", target: "google.com", active: true, count: 0 }];
+      window.chrome.storage.local.set({ rules });
+    });
+
+    // Trigger the navigation event
+    await page.evaluate(() => {
+      (window.chrome.webNavigation.onBeforeNavigate as any).dispatch({
         frameId: 0,
         tabId: 1,
         url: "https://reddit.com/r/something",
       });
     });
 
-    // 4. Verify the badge text was set
-    // The background script sets the badge asynchronously (inside storage callback)
-    // so we might need to wait/poll
-    await expect
-      .poll(async () => {
-        return await page.evaluate(() => {
-          // @ts-ignore
-          return chrome.action.getLastBadgeText();
-        });
-      })
-      .toBe("1");
+    // Verify the stub was called with the correct text
+    await expect.poll(async () => {
+      return await page.evaluate(() => {
+        return (window.chrome.action.setBadgeText as any).calledWith({ text: "1" });
+      });
+    }).toBe(true);
   });
 
   test("should not show badge if rule is inactive", async ({ page }) => {
+    // Stub chrome.action.setBadgeText
+    await page.evaluate(() => {
+      window.sinon.stub(window.chrome.action, "setBadgeText");
+    });
+
     await page.addScriptTag({ url: "/dist/background.js", type: "module" });
     await page.waitForTimeout(500);
 
+    // Set up an inactive rule
     await page.evaluate(() => {
-      const rules = [
-        {
-          source: "reddit.com",
-          target: "google.com",
-          active: false, // Inactive rule
-          count: 0,
-        },
-      ];
-      // @ts-ignore
-      chrome.storage.local.set({ rules });
+      const rules = [{ source: "reddit.com", target: "google.com", active: false, count: 0 }];
+      window.chrome.storage.local.set({ rules });
     });
 
+    // Trigger the navigation event
     await page.evaluate(() => {
-      // @ts-ignore
-      chrome.webNavigation.onBeforeNavigate.dispatch({
+      (window.chrome.webNavigation.onBeforeNavigate as any).dispatch({
         frameId: 0,
         tabId: 1,
         url: "https://reddit.com/r/something",
@@ -95,11 +81,10 @@ test.describe("Badge Functionality", () => {
     // Wait a bit to ensure it didn't happen
     await page.waitForTimeout(200);
 
-    const badgeText = await page.evaluate(() => {
-      // @ts-ignore
-      return chrome.action.getLastBadgeText();
+    // Verify the stub was not called
+    const wasCalled = await page.evaluate(() => {
+      return (window.chrome.action.setBadgeText as any).called;
     });
-
-    expect(badgeText).toBe("");
+    expect(wasCalled).toBe(false);
   });
 });
