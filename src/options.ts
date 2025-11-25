@@ -4,7 +4,7 @@ import { getRandomMessage } from './messages.js';
 import { renderRules, updatePauseButtons, toggleRuleState, showFlashMessage, setupPlaceholderButtons } from './ui.js';
 import { getThematicPair } from './suggestions.js';
 
-document.addEventListener('DOMContentLoaded', () => {
+const init = () => {
     const manifest = chrome.runtime.getManifest();
 
     const versionElement = document.getElementById('app-version');
@@ -24,17 +24,44 @@ document.addEventListener('DOMContentLoaded', () => {
         updatePauseButtons(rulesList);
     }, 1000);
 
-    addBtn.addEventListener('click', () => {
+    const updateButtonText = () => {
         const source = sourceInput.value.trim();
         const target = targetInput.value.trim();
 
-        if (!source || !target) {
-            showFlashMessage('Please enter both source and target URLs.', 'error');
+        if (source && !target) {
+            addBtn.textContent = 'Add Shuffle Rule';
+        } else {
+            addBtn.textContent = 'Add Rule';
+        }
+    };
+
+    sourceInput.addEventListener('input', updateButtonText);
+    targetInput.addEventListener('input', updateButtonText);
+
+    // Call immediately to set initial state
+    updateButtonText();
+
+    addBtn.addEventListener('click', () => {
+        const source = sourceInput.value.trim();
+        let target = targetInput.value.trim();
+
+        if (!source) {
+            showFlashMessage('Please enter a source URL.', 'error');
             return;
         }
 
-        if (!isValidUrl(source) || !isValidUrl(target)) {
-            showFlashMessage('Invalid URL. Please enter a valid URL (e.g., example.com or https://example.com).', 'error');
+        // Shuffle Mode
+        if (source && !target) {
+            target = ':shuffle:';
+        }
+
+        if (!isValidUrl(source)) {
+            showFlashMessage('Invalid Source URL.', 'error');
+            return;
+        }
+
+        if (target !== ':shuffle:' && !isValidUrl(target)) {
+            showFlashMessage('Invalid Target URL.', 'error');
             return;
         }
 
@@ -89,6 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
             chrome.storage.local.set({ rules }, () => {
                 sourceInput.value = '';
                 targetInput.value = '';
+                updateButtonText();
                 renderRulesList(rules);
                 showFlashMessage('Rule added successfully!', 'success');
 
@@ -168,4 +196,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderRulesList(rules: Rule[]): void {
         renderRules(rules, rulesList, toggleRule, deleteRule);
     }
-});
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
