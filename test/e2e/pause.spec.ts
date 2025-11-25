@@ -1,23 +1,9 @@
 import { test, expect } from '../fixtures';
-import fs from 'fs';
-import path from 'path';
-import ts from 'typescript';
-
-const mockChromeTs = fs.readFileSync(
-    path.join(process.cwd(), 'test/mocks/mock-chrome.ts'),
-    'utf-8'
-);
-const mockChromeScript = ts.transpileModule(mockChromeTs, {
-    compilerOptions: { module: ts.ModuleKind.ESNext }
-}).outputText;
 
 test.describe('URL Redirector Pause Functionality', () => {
-    test.beforeEach(async ({ page }) => {
-        // Inject the mock Chrome API before the page loads
-        await page.addInitScript(mockChromeScript);
-
+    test.beforeEach(async ({ page, extensionId }) => {
         // Navigate to the popup page
-        await page.goto('/dist/html/popup.html');
+        await page.goto(`chrome-extension://${extensionId}/html/popup.html`);
     });
 
     test('should toggle rule pause state', async ({ page }) => {

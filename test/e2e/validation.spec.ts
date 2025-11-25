@@ -1,21 +1,8 @@
 import { test, expect } from "../fixtures";
-import fs from "fs";
-import path from "path";
-
-import ts from "typescript";
-
-const mockChromeTs = fs.readFileSync(
-  path.join(process.cwd(), "test/mocks/mock-chrome.ts"),
-  "utf-8"
-);
-const mockChromeScript = ts.transpileModule(mockChromeTs, {
-  compilerOptions: { module: ts.ModuleKind.ESNext },
-}).outputText;
 
 test.describe("Rule Validation", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.addInitScript(mockChromeScript);
-    await page.goto("/dist/html/options.html");
+  test.beforeEach(async ({ page, extensionId }) => {
+    await page.goto(`chrome-extension://${extensionId}/html/options.html`);
   });
 
   test("should prevent adding invalid URL", async ({ page }) => {

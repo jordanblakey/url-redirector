@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: ".",
   testMatch: ["**/*.spec.ts"],
   testIgnore: ["**/node_modules/**"],
-  fullyParallel: false,
+  fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: [
@@ -34,5 +34,8 @@ export default defineConfig({
     trace: "retain-on-failure",
     video: "retain-on-failure",
     screenshot: "only-on-failure",
+    launchOptions: {
+      // slowMo: 1000,
+    },
   },
 });
