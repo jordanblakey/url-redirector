@@ -1,177 +1,105 @@
 import { test, expect } from '../fixtures';
-import fs from 'fs';
-import path from 'path';
-import ts from 'typescript';
-
-const mockChromeTs = fs.readFileSync(
-    path.join(process.cwd(), 'test/mocks/mock-chrome.ts'),
-    'utf-8'
-);
-const mockChromeScript = ts.transpileModule(mockChromeTs, {
-    compilerOptions: { module: ts.ModuleKind.ESNext }
-}).outputText;
 
 test.describe('Immediate Redirect on Rule Change', () => {
-    test.beforeEach(async ({ page }) => {
-        // Inject the mock Chrome API
-        await page.addInitScript(mockChromeScript);
+    test('should immediately redirect tabs when a matching rule is added', async ({ context }) => {
+        const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
 
-        // Navigate to popup to have a context
-        await page.goto('/dist/html/popup.html');
+        // Open a tab to the source URL
+        const page = await context.newPage();
+        await page.goto('https://example.com');
 
-        // Load background script
-        await page.addScriptTag({ url: '/dist/background.js', type: 'module' });
-        await page.waitForTimeout(500);
-    });
-
-    test('should immediately redirect tabs when a matching rule is added', async ({ page }) => {
-        // We know mock-chrome returns a tab with url 'https://reddit.com/r/test' (id: 2)
-
-        // Setup a spy on chrome.tabs.update
-        await page.evaluate(() => {
-            (window as any).updateCalls = [];
-            // @ts-ignore
-            const originalUpdate = chrome.tabs.update;
-            // @ts-ignore
-            chrome.tabs.update = (tabId, props, callback) => {
-                (window as any).updateCalls.push({ tabId, props });
-                if (originalUpdate) originalUpdate(tabId, props, callback);
-            };
-        });
-
-        // Add a rule that matches the existing tab
-        await page.evaluate(() => {
+        // Add rule
+        await worker.evaluate(async () => {
             const rules = [{
-                source: 'reddit.com',
+                source: 'example.com',
                 target: 'google.com',
                 active: true,
                 count: 0,
                 id: 123
             }];
-            // @ts-ignore
-            chrome.storage.local.set({ rules });
+            await chrome.storage.local.set({ rules });
         });
 
-        // Verify redirection happens
-        await expect.poll(async () => {
-            return await page.evaluate(() => (window as any).updateCalls);
-        }).toEqual(expect.arrayContaining([
-            expect.objectContaining({
-                tabId: 2,
-                props: { url: 'https://google.com' }
-            })
-        ]));
+        // Verify redirect
+        await expect(page).toHaveURL(/google\.com/);
     });
 
-    test('should immediately redirect tabs when a rule is unpaused (pausedUntil removed)', async ({ page }) => {
-        // Setup spy on chrome.tabs.update
-        await page.evaluate(() => {
-            (window as any).updateCalls = [];
-            // @ts-ignore
-            const originalUpdate = chrome.tabs.update;
-            // @ts-ignore
-            chrome.tabs.update = (tabId, props, callback) => {
-                (window as any).updateCalls.push({ tabId, props });
-                if (originalUpdate) originalUpdate(tabId, props, callback);
-            };
-        });
-
+    test('should immediately redirect tabs when a rule is unpaused (pausedUntil removed)', async ({ context }) => {
+        const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
         const now = Date.now();
 
-        // Start with a paused rule (active: true, but pausedUntil is in future)
-        await page.evaluate((timestamp) => {
+        // Start with a paused rule
+        await worker.evaluate(async (timestamp) => {
             const rules = [{
-                source: 'reddit.com',
+                source: 'example.org',
                 target: 'google.com',
                 active: true,
                 count: 0,
-                id: 123,
+                id: 124,
                 pausedUntil: timestamp + 100000 // Paused
             }];
-            // @ts-ignore
-            chrome.storage.local.set({ rules });
+            await chrome.storage.local.set({ rules });
         }, now);
 
-        // Wait a bit to ensure storage set is processed
-        await page.waitForTimeout(100);
+        // Open a tab to the source URL
+        const page = await context.newPage();
+        await page.goto('https://example.org');
 
-        // Clear update calls from initial setup if any
-        await page.evaluate(() => {
-            (window as any).updateCalls = [];
-        });
+        // Ensure it stays on source (not redirected)
+        await expect(page).toHaveURL(/example\.org/);
 
-        // Unpause the rule (remove pausedUntil, active stays true)
-        await page.evaluate(() => {
+        // Unpause the rule
+        await worker.evaluate(async () => {
             const rules = [{
-                source: 'reddit.com',
+                source: 'example.org',
                 target: 'google.com',
                 active: true,
                 count: 0,
-                id: 123,
+                id: 124,
                 pausedUntil: undefined // Unpaused
             }];
-            // @ts-ignore
-            chrome.storage.local.set({ rules });
+            await chrome.storage.local.set({ rules });
         });
 
-        // Verify redirection happens
-        await expect.poll(async () => {
-            return await page.evaluate(() => (window as any).updateCalls);
-        }).toEqual(expect.arrayContaining([
-            expect.objectContaining({
-                tabId: 2,
-                props: { url: 'https://google.com' }
-            })
-        ]));
+        // Verify redirect
+        await expect(page).toHaveURL(/google\.com/);
     });
 
-    test('should immediately redirect tabs when a matching rule is resumed', async ({ page }) => {
-        // Start with a paused rule
-        await page.evaluate(() => {
+    test('should immediately redirect tabs when a matching rule is resumed', async ({ context }) => {
+        const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
+
+        // Start with an inactive rule
+        await worker.evaluate(async () => {
             const rules = [{
-                source: 'reddit.com',
+                source: 'example.net',
                 target: 'google.com',
                 active: false,
                 count: 0,
-                id: 123
+                id: 125
             }];
-            // @ts-ignore
-            chrome.storage.local.set({ rules });
+            await chrome.storage.local.set({ rules });
         });
 
-        // Setup spy
-        await page.evaluate(() => {
-            (window as any).updateCalls = [];
-            // @ts-ignore
-            const originalUpdate = chrome.tabs.update;
-            // @ts-ignore
-            chrome.tabs.update = (tabId, props, callback) => {
-                (window as any).updateCalls.push({ tabId, props });
-                if (originalUpdate) originalUpdate(tabId, props, callback);
-            };
-        });
+        // Open a tab to the source URL
+        const page = await context.newPage();
+        await page.goto('https://example.net');
+
+        // Ensure it stays on source
+        await expect(page).toHaveURL(/example\.net/);
 
         // Resume the rule
-        await page.evaluate(() => {
+        await worker.evaluate(async () => {
             const rules = [{
-                source: 'reddit.com',
+                source: 'example.net',
                 target: 'google.com',
                 active: true,
                 count: 0,
-                id: 123
+                id: 125
             }];
-            // @ts-ignore
-            chrome.storage.local.set({ rules });
+            await chrome.storage.local.set({ rules });
         });
 
-        // Verify redirection happens
-        await expect.poll(async () => {
-            return await page.evaluate(() => (window as any).updateCalls);
-        }).toEqual(expect.arrayContaining([
-            expect.objectContaining({
-                tabId: 2,
-                props: { url: 'https://google.com' }
-            })
-        ]));
+        // Verify redirect
+        await expect(page).toHaveURL(/google\.com/);
     });
 });

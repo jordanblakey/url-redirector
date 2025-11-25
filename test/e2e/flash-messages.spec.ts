@@ -1,24 +1,9 @@
 import { test, expect } from "../fixtures";
-import fs from "fs";
-import path from "path";
-import ts from "typescript";
-
-// Read the mock Chrome API script and transpile it to JS
-const mockChromeTs = fs.readFileSync(
-  path.join(process.cwd(), "test/mocks/mock-chrome.ts"),
-  "utf-8"
-);
-const mockChromeScript = ts.transpileModule(mockChromeTs, {
-  compilerOptions: { module: ts.ModuleKind.ESNext },
-}).outputText;
 
 test.describe("Flash Messages", () => {
-  test.beforeEach(async ({ page }) => {
-    // Inject the mock Chrome API before the page loads
-    await page.addInitScript(mockChromeScript);
-
+  test.beforeEach(async ({ page, extensionId }) => {
     // Navigate to the options page
-    await page.goto("/dist/html/options.html");
+    await page.goto(`chrome-extension://${extensionId}/html/options.html`);
   });
 
   test("should show flash message for empty fields", async ({ page }) => {
@@ -28,7 +13,7 @@ test.describe("Flash Messages", () => {
     // Check for flash message
     const flashMessage = page.locator(".flash-message.error");
     await expect(flashMessage).toBeVisible();
-    await expect(flashMessage).toHaveText("Please enter a source URL.");
+    await expect(flashMessage).toHaveText("Please enter both source and target URLs");
 
     // Take screenshot
     await page.screenshot({ path: "test/screenshots/flash-empty-fields.png" });
