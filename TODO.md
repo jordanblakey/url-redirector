@@ -5,6 +5,7 @@
 [] CI: improve unit and e2e test coverage for ui.ts.
 [] FEATURE: Shuffle Mode after a source url is provided, if target input is empty, change the button text to "Add Shuffle Rule". Change it back to "Add Rule" when Target URL is provided. In the rule display, it should say :shuffle: shuffle. When the target URL is visited, a random URL is selected from list of recommended URLS.
 
+
 ## DOING
 
 ## DONE
