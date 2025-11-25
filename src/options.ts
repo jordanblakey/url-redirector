@@ -1,8 +1,8 @@
-import { Rule, StorageResult } from './types';
-import { matchAndGetTarget, isValidUrl } from './utils.js';
-import { getRandomMessage } from './messages.js';
+import { Rule } from './types';
+import { isValidUrl } from './utils.js';
 import { renderRules, updatePauseButtons, toggleRuleState, showFlashMessage, setupPlaceholderButtons } from './ui.js';
 import { getThematicPair } from './suggestions.js';
+import { storage } from './storage.js';
 
 const init = () => {
     const manifest = chrome.runtime.getManifest();
@@ -41,7 +41,7 @@ const init = () => {
     // Call immediately to set initial state
     updateButtonText();
 
-    addBtn.addEventListener('click', () => {
+    addBtn.addEventListener('click', async () => {
         const source = sourceInput.value.trim();
         let target = targetInput.value.trim();
 
@@ -70,7 +70,7 @@ const init = () => {
             return;
         }
 
-        addRule(source, target);
+        await addRule(source, target);
     });
 
     const handleEnter = (e: KeyboardEvent) => {
@@ -93,104 +93,48 @@ const init = () => {
         targetInput.placeholder = `e.g. ${target}`;
     }
 
-    function loadRules(): void {
-        chrome.storage.local.get(['rules'], (result: StorageResult) => {
-            const rules = result.rules || [];
-            renderRulesList(rules);
-        });
+    async function loadRules(): Promise<void> {
+        const rules = await storage.getRules();
+        renderRulesList(rules);
     }
 
-    function addRule(source: string, target: string): void {
-        chrome.storage.local.get(['rules'], (result: StorageResult) => {
-            const rules = result.rules || [];
+    async function addRule(source: string, target: string): Promise<void> {
+        try {
+            // Note: We don't need to manually check for duplicates or redirect tabs here.
+            // storage.addRule throws on duplicate source.
+            // background.ts handles the redirect for new active rules via storage.onChanged.
 
-            // Check for duplicate source
-            if (rules.some(rule => rule.source === source)) {
+            await storage.addRule({ source, target, id: Date.now(), count: 0, active: true });
+
+            sourceInput.value = '';
+            targetInput.value = '';
+            updateButtonText(); // Update button text after clearing inputs
+            await loadRules();
+            showFlashMessage('Rule added successfully!', 'success');
+        } catch (e) {
+            const error = e as Error;
+            if (error.message === 'Duplicate source') {
                 showFlashMessage('Duplicate source. A rule for this source URL already exists.', 'error');
-                return;
+            } else {
+                showFlashMessage('Error adding rule.', 'error');
             }
-
-            const newRule: Rule = { source, target, id: Date.now(), count: 0, active: true };
-            rules.push(newRule);
-
-            chrome.storage.local.set({ rules }, () => {
-                sourceInput.value = '';
-                targetInput.value = '';
-                updateButtonText();
-                renderRulesList(rules);
-                showFlashMessage('Rule added successfully!', 'success');
-
-                // Check existing tabs for redirect
-                checkAndRedirectTabs(newRule);
-            });
-        });
+        }
     }
 
-    function checkAndRedirectTabs(rule: Rule): void {
-        chrome.tabs.query({}, (tabs) => {
-            let matchCount = 0;
-
-            for (const tab of tabs) {
-                if (tab.id && tab.url) {
-                    const targetUrl = matchAndGetTarget(tab.url, rule);
-                    if (targetUrl) {
-                        matchCount++;
-                        // Update tab immediately
-                        chrome.tabs.update(tab.id, { url: targetUrl });
-                    }
-                }
-            }
-
-            // Increment count in bulk if matches found
-            if (matchCount > 0) {
-                incrementRuleCount(rule.id, matchCount);
-            }
-        });
+    async function deleteRule(id: number): Promise<void> {
+        const newRules = await storage.deleteRule(id);
+        renderRulesList(newRules);
+        showFlashMessage('Rule deleted.', 'info');
     }
 
-    function incrementRuleCount(ruleId: number, incrementBy: number): void {
-        chrome.storage.local.get(['rules'], (result: StorageResult) => {
-            const rules = result.rules || [];
-            const rule = rules.find(r => r.id === ruleId);
-            if (rule) {
-                rule.count = (rule.count || 0) + incrementBy;
-                rule.lastCountMessage = getRandomMessage(rule.count);
-                chrome.storage.local.set({ rules }, () => {
-                    renderRulesList(rules);
-                });
-            }
-        });
-    }
-
-    function deleteRule(id: number): void {
-        chrome.storage.local.get(['rules'], (result: StorageResult) => {
-            const rules = result.rules || [];
-            const newRules = rules.filter((rule) => rule.id !== id);
-
-            chrome.storage.local.set({ rules: newRules }, () => {
-                renderRulesList(newRules);
-                showFlashMessage('Rule deleted.', 'info');
-            });
-        });
-    }
-
-    function toggleRule(id: number): void {
-        chrome.storage.local.get(['rules'], (result: StorageResult) => {
-            const rules = result.rules || [];
-            const rule = rules.find((r) => r.id === id);
-            if (rule) {
-                toggleRuleState(rule);
-
-                chrome.storage.local.set({ rules }, () => {
-                    renderRulesList(rules);
-
-                    // If we just resumed (active=true, no pausedUntil), we should check for redirects
-                    if (rule.active && !rule.pausedUntil) {
-                        checkAndRedirectTabs(rule);
-                    }
-                });
-            }
-        });
+    async function toggleRule(id: number): Promise<void> {
+        const rules = await storage.getRules();
+        const rule = rules.find((r) => r.id === id);
+        if (rule) {
+            toggleRuleState(rule);
+            await storage.saveRules(rules);
+            renderRulesList(rules);
+        }
     }
 
     function renderRulesList(rules: Rule[]): void {

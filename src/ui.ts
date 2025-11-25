@@ -72,9 +72,6 @@ export function renderRules(
         // Toggle on row click
         li.onclick = (e) => {
             // Prevent triggering if clicking directly on buttons
-            // (Buttons have their own handlers, but event bubbles. 
-            // If we handle it here, we might double toggle or interfere.
-            // Best to check target)
             const target = e.target as HTMLElement;
             if (target.closest('button')) {
                 return;
@@ -187,14 +184,10 @@ export function updatePauseButtons(listElement: HTMLElement): void {
                     button.textContent = `Paused (${remaining}s)`;
                 }
             } else {
-                // Expired, should probably reload or just show basic text,
-                // but for cleaner state we might want to trigger reload if it just expired.
-                // For now just update text.
                 button.textContent = 'Pause';
                 button.classList.remove('paused');
                 delete button.dataset.pausedUntil;
 
-                // Also update parent row style
                 const row = button.closest('.rule-item');
                 if (row) {
                     row.classList.remove('paused');
@@ -215,10 +208,11 @@ export function toggleRuleState(rule: Rule): void {
         rule.active = true;
         rule.pausedUntil = undefined;
     } else {
-        // Active and not paused, so pause it for 5 minutes (currently 5 seconds for testing?)
+        // Active and not paused, so pause it for 5 minutes
         rule.pausedUntil = now + 5 * 60 * 1000;
     }
 }
+
 export function setupPlaceholderButtons(): void {
     const usePlaceholderBtns = document.querySelectorAll('.use-placeholder-btn');
     usePlaceholderBtns.forEach(btn => {

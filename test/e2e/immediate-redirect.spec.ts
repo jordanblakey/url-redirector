@@ -63,6 +63,68 @@ test.describe('Immediate Redirect on Rule Change', () => {
         ]));
     });
 
+    test('should immediately redirect tabs when a rule is unpaused (pausedUntil removed)', async ({ page }) => {
+        // Setup spy on chrome.tabs.update
+        await page.evaluate(() => {
+            (window as any).updateCalls = [];
+            // @ts-ignore
+            const originalUpdate = chrome.tabs.update;
+            // @ts-ignore
+            chrome.tabs.update = (tabId, props, callback) => {
+                (window as any).updateCalls.push({ tabId, props });
+                if (originalUpdate) originalUpdate(tabId, props, callback);
+            };
+        });
+
+        const now = Date.now();
+
+        // Start with a paused rule (active: true, but pausedUntil is in future)
+        await page.evaluate((timestamp) => {
+            const rules = [{
+                source: 'reddit.com',
+                target: 'google.com',
+                active: true,
+                count: 0,
+                id: 123,
+                pausedUntil: timestamp + 100000 // Paused
+            }];
+            // @ts-ignore
+            chrome.storage.local.set({ rules });
+        }, now);
+
+        // Wait a bit to ensure storage set is processed
+        await page.waitForTimeout(100);
+
+        // Clear update calls from initial setup if any
+        await page.evaluate(() => {
+            (window as any).updateCalls = [];
+        });
+
+        // Unpause the rule (remove pausedUntil, active stays true)
+        await page.evaluate(() => {
+            const rules = [{
+                source: 'reddit.com',
+                target: 'google.com',
+                active: true,
+                count: 0,
+                id: 123,
+                pausedUntil: undefined // Unpaused
+            }];
+            // @ts-ignore
+            chrome.storage.local.set({ rules });
+        });
+
+        // Verify redirection happens
+        await expect.poll(async () => {
+            return await page.evaluate(() => (window as any).updateCalls);
+        }).toEqual(expect.arrayContaining([
+            expect.objectContaining({
+                tabId: 2,
+                props: { url: 'https://google.com' }
+            })
+        ]));
+    });
+
     test('should immediately redirect tabs when a matching rule is resumed', async ({ page }) => {
         // Start with a paused rule
         await page.evaluate(() => {

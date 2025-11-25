@@ -1,6 +1,8 @@
 import { Rule } from './types';
 import { renderRules, showFlashMessage, updatePauseButtons, toggleRuleState, setupPlaceholderButtons } from './ui.js';
 import { getThematicPair } from './suggestions.js';
+import { storage } from './storage.js';
+import { isValidUrl } from './utils.js';
 
 const init = () => {
     const sourceInput = document.getElementById('sourceUrl') as HTMLInputElement;
@@ -32,7 +34,7 @@ const init = () => {
     // Call immediately
     updateButtonText();
 
-    addBtn.addEventListener('click', () => {
+    addBtn.addEventListener('click', async () => {
         const source = sourceInput.value.trim();
         let target = targetInput.value.trim();
 
@@ -61,22 +63,8 @@ const init = () => {
             return;
         }
 
-        addRule(source, target);
+        await addRule(source, target);
     });
-
-    function isValidUrl(string: string): boolean {
-        try {
-            // Check if it matches a basic domain pattern or full URL
-            const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/;
-            if (urlPattern.test(string)) {
-                return true;
-            }
-            new URL(string);
-            return true;
-        } catch (_) {
-            return false;
-        }
-    }
 
     const handleEnter = (e: KeyboardEvent) => {
         if (e.key === 'Enter') {
@@ -99,62 +87,47 @@ const init = () => {
         targetInput.placeholder = `e.g. ${target}`;
     }
 
-    function loadRules(): void {
-        chrome.storage.local.get(['rules'], (result) => {
-            const rules = (result.rules as Rule[]) || [];
-            renderRulesList(rules);
-        });
+    async function loadRules(): Promise<void> {
+        const rules = await storage.getRules();
+        renderRulesList(rules);
     }
 
-    function addRule(source: string, target: string): void {
-        chrome.storage.local.get(['rules'], (result) => {
-            const rules = (result.rules as Rule[]) || [];
-
-            if (rules.some(rule => rule.source === source)) {
+    async function addRule(source: string, target: string): Promise<void> {
+        try {
+            await storage.addRule({ source, target, id: Date.now(), count: 0, active: true });
+            sourceInput.value = '';
+            targetInput.value = '';
+            updateButtonText(); // Update button text after clearing inputs
+            await loadRules();
+            showFlashMessage('Rule added successfully!', 'success');
+        } catch (e) {
+            const error = e as Error;
+            if (error.message === 'Duplicate source') {
                 showFlashMessage('Duplicate source. A rule for this source URL already exists.', 'error');
-                return;
+            } else {
+                showFlashMessage('Error adding rule.', 'error');
             }
-
-            rules.push({ source, target, id: Date.now(), count: 0, active: true });
-
-            chrome.storage.local.set({ rules }, () => {
-                sourceInput.value = '';
-                targetInput.value = '';
-                updateButtonText();
-                renderRulesList(rules);
-                showFlashMessage('Rule added successfully!', 'success');
-            });
-        });
+        }
     }
 
-    function deleteRule(id: number): void {
-        chrome.storage.local.get(['rules'], (result) => {
-            const rules = (result.rules as Rule[]) || [];
-            const newRules = rules.filter((rule) => rule.id !== id);
-
-            chrome.storage.local.set({ rules: newRules }, () => {
-                renderRulesList(newRules);
-                showFlashMessage('Rule deleted.', 'info');
-            });
-        });
+    async function deleteRule(id: number): Promise<void> {
+        const newRules = await storage.deleteRule(id);
+        renderRulesList(newRules);
+        showFlashMessage('Rule deleted.', 'info');
     }
 
     function renderRulesList(rules: Rule[]): void {
         renderRules(rules, rulesList, togglePauseRule, deleteRule);
     }
 
-    function togglePauseRule(id: number): void {
-        chrome.storage.local.get(['rules'], (result) => {
-            const rules = (result.rules as Rule[]) || [];
-            const rule = rules.find((r) => r.id === id);
-            if (rule) {
-                toggleRuleState(rule);
-
-                chrome.storage.local.set({ rules }, () => {
-                    renderRulesList(rules);
-                });
-            }
-        });
+    async function togglePauseRule(id: number): Promise<void> {
+        const rules = await storage.getRules();
+        const rule = rules.find((r) => r.id === id);
+        if (rule) {
+            toggleRuleState(rule);
+            await storage.saveRules(rules);
+            renderRulesList(rules);
+        }
     }
 };
 
