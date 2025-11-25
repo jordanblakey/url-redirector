@@ -1,7 +1,7 @@
 import { Rule } from './types';
 import { getRandomMessage } from './messages.js';
 
-const getFaviconUrl = (url: string) => {
+export const getFaviconUrl = (url: string) => {
     // Basic clean up to get the domain
     try {
         const domain = new URL(url.startsWith('http') ? url : `https://${url}`).hostname;
