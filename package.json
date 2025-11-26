@@ -1,6 +1,6 @@
 {
   "name": "url-redirector",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "",
   "main": "background.js",
   "directories": {
@@ -15,13 +15,14 @@
     "test:coverage": "npm run build && playwright test && npx monocart show-report test/coverage/index.html",
     "update-manifest": "jq --arg v $npm_package_version '.version = $v' manifest.json > tmp.json && mv tmp.json manifest.json",
     "version": "npm run update-manifest && git add manifest.json",
-    "postversion": "git push && git push --tags && gh release create v$npm_package_version --generate-notes",
+    "postversion": "npm run cws:submit -- --submit && gh release create v$npm_package_version --generate-notes",
     "record:automation": "npm run build && ./demos/record-demo.sh",
     "record:demo": "npm run build && ./demos/record-demo.sh --interactive",
-    "setup-store-auth": "ts-node scripts/setup-cws-auth.ts",
-    "check-store-status": "ts-node scripts/check-cws-status.ts",
     "jules:list": "npx jules remote list --session | less",
-    "jules:delegate": "cat TODO-JULES.md | xargs -I {} npx jules new \"{}\""
+    "jules:delegate": "cat TODO-JULES.md | xargs -I {} npx jules new \"{}\"",
+    "cws:setup-auth": "ts-node scripts/setup-cws-auth.ts",
+    "cws:check-status": "ts-node scripts/check-cws-status.ts",
+    "cws:submit": "ts-node scripts/submit-cws.ts"
   },
   "keywords": [],
   "author": "",
