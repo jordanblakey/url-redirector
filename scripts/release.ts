@@ -1,29 +1,33 @@
 #!/usr/bin/env node
 
-import { loadGcpSecrets } from './load-dotenv-from-gcp';
-import { execSync as realExecSync } from 'child_process';
+import { execSync as realExecSync, exec as realExec } from 'child_process';
 import fs from 'fs-extra';
 import path from 'path';
+import { promisify } from 'util';
+import { loadGcpSecrets } from './load-dotenv-from-gcp';
+
+const exec = promisify(realExec);
 
 // --- Configuration ---
 const EXTENSION_ID_DEFAULT = 'jhkoaofpbohfmolalpieheaeppdaminl';
-const PUBLISHER_ID_DEFAULT = 'c173d09b-31cf-48ff-bd4b-270d57317183';
+
 
 // --- Interfaces ---
-export interface SubmitCwsOptions {
+interface ReleaseOptions {
     dryRun: boolean;
+    versionLevel: 'patch' | 'minor' | 'major';
     deps?: {
         execSync?: typeof realExecSync;
-        fetch?: typeof fetch;
         log?: typeof console.log;
         warn?: typeof console.warn;
         error?: typeof console.error;
-        loadGcpSecrets?: typeof loadGcpSecrets;
         fs?: typeof fs;
+        fetch?: typeof fetch;
     };
 }
 
 // --- Helper Functions ---
+
 async function getAccessToken(clientId: string, clientSecret: string, refreshToken: string, fetchFn: typeof fetch) {
     const response = await fetchFn('https://oauth2.googleapis.com/token', {
         method: 'POST',
@@ -88,21 +92,81 @@ async function publishExtension(accessToken: string, extensionId: string, fetchF
     return data;
 }
 
+async function getLatestTag(execSync: typeof realExecSync): Promise<string> {
+    try {
+        return execSync('git describe --tags --abbrev=0').toString().trim();
+    } catch (error) {
+        return '';
+    }
+}
+
+async function checkReleaseExists(tagName: string, log: typeof console.log): Promise<boolean> {
+    if (!tagName) return false;
+    try {
+        await exec(`gh release view ${tagName}`);
+        log(`✅ Release '${tagName}' found on GitHub.`);
+        return true;
+    } catch (error) {
+        log(`ℹ️ Release '${tagName}' not found on GitHub.`);
+        return false;
+    }
+}
+
+async function deleteTag(tagName: string, execSync: typeof realExecSync, log: typeof console.log, dryRun: boolean) {
+    log(`🔥 Deleting local and remote tag: ${tagName}`);
+    if (!dryRun) {
+        execSync(`git tag -d ${tagName}`, { stdio: 'inherit' });
+        execSync(`git push origin :refs/tags/${tagName}`, { stdio: 'inherit' });
+    }
+}
+
 // --- Main Logic ---
-export async function submitCws(options: SubmitCwsOptions) {
-    const { dryRun, deps = {} } = options;
+export async function release(options: ReleaseOptions) {
+    const { dryRun, versionLevel, deps = {} } = options;
     const execSync = deps.execSync || realExecSync;
-    const fetchFn = deps.fetch || global.fetch;
     const log = deps.log || console.log;
     const warn = deps.warn || console.warn;
-    const loadSecrets = deps.loadGcpSecrets || loadGcpSecrets;
+    const fetchFn = deps.fetch || global.fetch;
     const fsFn = deps.fs || fs;
 
-    log(`🚀 CWS Submission Script (${dryRun ? 'DRY RUN' : 'SUBMIT MODE'})`);
 
-    // 1. Load Secrets
+    log(`🚀 Kicking off release process... (${dryRun ? 'DRY RUN' : 'LIVE RUN'})`);
+
+    // 1. Check for failed release
+    const latestTag = await getLatestTag(execSync);
+    const releaseExists = await checkReleaseExists(latestTag, log);
+
+    if (latestTag && !releaseExists) {
+        warn(`⚠️ Found tag '${latestTag}' without a corresponding GitHub Release.`);
+        warn('Assuming previous release failed. Re-running for the same version.');
+        await deleteTag(latestTag, execSync, log, dryRun);
+    } else {
+        // 2. Bump version
+        log(`📈 Bumping version to the next '${versionLevel}' level...`);
+        if (!dryRun) {
+            execSync(`npm version ${versionLevel} --no-git-tag-version`, { stdio: 'inherit' });
+        }
+    }
+
+    // 3. Get the current version
+    const packageJsonPath = path.resolve(__dirname, '../package.json');
+    const packageJson = fs.readJsonSync(packageJsonPath);
+    const version = packageJson.version;
+    const tagName = `v${version}`;
+
+    // Update manifest.json
+    const manifestPath = path.resolve(__dirname, '../manifest.json');
+    const manifest = fs.readJsonSync(manifestPath);
+    manifest.version = version;
+    fs.writeJsonSync(manifestPath, manifest, { spaces: 2 });
+
+    log(`📦 Version to release: ${version}`);
+
+    // 4. Submit to CWS
+    log('🚀 Submitting to Chrome Web Store...');
+        // 4.1. Load Secrets
     log('🔑 Loading secrets...');
-    await loadSecrets();
+    await loadGcpSecrets();
 
     const CLIENT_ID = process.env.CWS_CLIENT_ID;
     const CLIENT_SECRET = process.env.CWS_CLIENT_SECRET;
@@ -117,7 +181,7 @@ export async function submitCws(options: SubmitCwsOptions) {
         }
     }
 
-    // 2. Bundle Extension
+    // 4.2. Bundle Extension
     log('📦 Bundling extension...');
     execSync('npm run bundle', { stdio: 'inherit' });
     const zipPath = path.resolve(__dirname, '../build/extension.zip');
@@ -125,13 +189,11 @@ export async function submitCws(options: SubmitCwsOptions) {
     if (!fsFn.existsSync(zipPath)) {
         throw new Error(`Bundle failed: ${zipPath} not found.`);
     }
-
-    // 3. Upload & Publish (or Dry Run)
-    if (dryRun) {
+     // 4.3. Upload & Publish (or Dry Run)
+     if (dryRun) {
         log('🛑 [DRY RUN] Skipping Upload and Publish.');
         log(`   Would upload: ${zipPath}`);
         log(`   To Extension ID: ${EXTENSION_ID}`);
-        log('ℹ️  Run with --submit to actually publish.');
     } else {
         log('🔄 Authenticating with CWS...');
         const accessToken = await getAccessToken(CLIENT_ID!, CLIENT_SECRET!, REFRESH_TOKEN!, fetchFn);
@@ -145,29 +207,21 @@ export async function submitCws(options: SubmitCwsOptions) {
         log('✅ Publish successful:', publishResult);
     }
 
-    // 4. Git Tag & Push
-    const manifestPath = path.resolve(__dirname, '../manifest.json');
-    const manifest = fsFn.readJsonSync(manifestPath);
-    const version = manifest.version;
-    const tagName = `v${version}`;
 
-    if (dryRun) {
-        log(`🛑 [DRY RUN] Skipping Git Tag and Push.`);
-        log(`   Would create tag: ${tagName}`);
-        log(`   Would push tag: ${tagName}`);
-    } else {
-        log(`🏷️ Creating git tag: ${tagName}`);
-        try {
-            execSync(`git tag ${tagName}`, { stdio: 'inherit' });
-        } catch (e) {
-            warn(`⚠️ Tag ${tagName} might already exist.`);
-        }
-
-        log('⬆️ Pushing tags to remote...');
+    // 5. Create Git tag and push
+    log(`🏷️  Creating git tag: ${tagName}`);
+    if (!dryRun) {
+        execSync(`git tag ${tagName}`, { stdio: 'inherit' });
         execSync('git push && git push --tags', { stdio: 'inherit' });
     }
 
-    log('\n✅ Submission script finished successfully!');
+    // 6. Create GitHub Release
+    log('🎉 Creating GitHub Release...');
+    if (!dryRun) {
+        execSync(`gh release create ${tagName} --generate-notes`, { stdio: 'inherit' });
+    }
+
+    log('\n✅ Release process finished successfully!');
 }
 
 // --- Execution ---
@@ -175,8 +229,14 @@ if (require.main === module) {
     (async () => {
         try {
             const args = process.argv.slice(2);
-            const isSubmit = args.includes('--submit');
-            await submitCws({ dryRun: !isSubmit });
+            const isDryRun = args.includes('--dry-run');
+            const versionArg = args.find(arg => ['patch', 'minor', 'major'].includes(arg)) as 'patch' | 'minor' | 'major' | undefined;
+
+            if (!versionArg) {
+                throw new Error('Missing version level argument. Please specify "patch", "minor", or "major".');
+            }
+
+            await release({ dryRun: isDryRun, versionLevel: versionArg });
         } catch (error) {
             console.error('\n❌ Script failed:', error);
             process.exit(1);

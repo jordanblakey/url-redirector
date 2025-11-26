@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "URL Redirector",
-  "version": "1.2.0",
+  "version": "1.2.6",
   "description": "Redirects URLs based on user-defined rules.",
   "permissions": [
     "storage",
@@ -18,8 +18,8 @@
     "default_title": "URL Redirector",
     "default_popup": "assets/html/popup.html",
     "default_icon": {
-      "256": "assets/icons/icon-256.png",
-      "128": "assets/icons/icon-128.png"
+      "128": "assets/icons/icon-128.png",
+      "256": "assets/icons/icon-256.png"
     }
   },
   "background": {
