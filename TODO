@@ -1,13 +1,13 @@
 ## TODO
-[] READ: https://developer.chrome.com/docs/webstore/discovery
-[] READ: https://developer.chrome.com/docs/webstore/google-analytics
-[] READ: https://developer.chrome.com/docs/webstore/metrics
-[] READ: https://developer.chrome.com/docs/webstore/service-accounts
+[] CI: Explore using a Github workflow on demand to push new versions, ensuring tests are passing and hermetic build.
 
 ## DELEGATED
 [] CI: Before versioning, check that a tag exists with the current version number. That is to say, if it doesnt the previous push failed, and we should not version up but push the current version to the store and create a tag and push that.
 
 ## DOING
+[] READ: https://developer.chrome.com/docs/webstore/discovery
+[] READ: https://developer.chrome.com/docs/webstore/service-accounts
+[] BRAND: Create CWS assets
 
 ## DONE
 [x] CI: Create a script that uses the CWS API to submit a new version. This should support a "dry run" for testing. Write tests for the script. It should also push a tagged commit with the version number matching the npm and manifest version that has been bumped. Please do not actually version up the extension while testing.
