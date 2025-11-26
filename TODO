@@ -80,13 +80,3 @@
 [x] UX: Alpha sort rules by source url.
 [x] UX: Buttons a bit small on Popup. Fitts' Law.
 [x] UX: Move input examples from labels into placeholder text. Cleaner and more standard.
-
----
-
-## Ambitious and Not Necessarily Good Ideas
-
-### Juice
-[] FEATURE: Visually show how many times a rule has been used with a shaded area in the background https://www.figma.com/design/rTrJwTPfute4FiZwULEJGg/URL-Redirector-Screens?node-id=5-9&t=EH0NU01TjYsU23fw-0. The rule with the most usage should have about 90% of the background shaded. A bar graph. Sort by usage.
-
-### Rule Sorting
-[] FEATURE: Revisit sorting if alpha is not the best. Pinned rules. Usage sorting. Pinning + selectable sorting. Sort selection memory.
