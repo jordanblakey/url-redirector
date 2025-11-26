@@ -70,3 +70,20 @@ export function isValidUrl(string: string): boolean {
         return false;
     }
 }
+
+/**
+ * Generates a consistent integer ID from a URL string.
+ * Used for declarativeNetRequest rule IDs.
+ * @param url The URL string to hash.
+ * @returns A positive integer ID.
+ */
+export function generateRuleId(url: string): number {
+    let hash = 0;
+    if (url.length === 0) return hash;
+    for (let i = 0; i < url.length; i++) {
+        const char = url.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32bit integer
+    }
+    return Math.abs(hash);
+}

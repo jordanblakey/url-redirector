@@ -1,77 +1,111 @@
 import { Rule } from "./types";
-import { matchAndGetTarget, shouldRuleApply } from "./utils.js";
+import { matchAndGetTarget, shouldRuleApply, generateRuleId } from "./utils.js";
 import { getRandomMessage } from "./messages.js";
 import { storage } from "./storage.js";
+import { getRandomProductiveUrl } from "./suggestions.js";
 
-chrome.webNavigation.onBeforeNavigate.addListener(
-  async (details: chrome.webNavigation.WebNavigationBaseCallbackDetails) => {
-    // Only redirect main frame
-    if (details.frameId !== 0) return;
+// Initialize rules on load
+chrome.runtime.onInstalled.addListener(async () => {
+  await updateDynamicRules();
+});
 
-    const rules = await storage.getRules();
-    const currentUrl = details.url;
+chrome.runtime.onStartup.addListener(async () => {
+  await updateDynamicRules();
+});
 
-    for (const rule of rules) {
-      if (!shouldRuleApply(rule)) continue;
-
-      const target = matchAndGetTarget(currentUrl, rule);
-
-      if (target) {
-        // Increment count and update message
-        const message = getRandomMessage((rule.count || 0) + 1);
-        await storage.incrementCount(rule.id, 1, message);
-
-        // Show badge to indicate redirection (if available)
-        showBadge(rule.count + 1);
-
-        chrome.tabs.update(details.tabId, { url: target });
-        break; // Stop after first match
-      }
-    }
-  }
-);
-
-// Listen for rule changes to immediately redirect open tabs
-chrome.storage.onChanged.addListener((changes, areaName) => {
+// Listen for rule changes
+chrome.storage.onChanged.addListener(async (changes, areaName) => {
   if (areaName === "local" && changes.rules) {
+    await updateDynamicRules();
+
     const newRules = (changes.rules.newValue || []) as Rule[];
     const oldRules = (changes.rules.oldValue || []) as Rule[];
 
     // Find rules that are new or have become active
     const activeRules = newRules.filter((newRule) => {
       const oldRule = oldRules.find((r) => r.id === newRule.id);
-
       const isNowActive = shouldRuleApply(newRule);
       const wasActive = oldRule ? shouldRuleApply(oldRule) : false;
-
-      // Rule is now active AND (it wasn't before OR it didn't exist)
       return isNowActive && !wasActive;
     });
 
     if (activeRules.length > 0) {
-      chrome.tabs.query({}, async (tabs) => {
-        for (const tab of tabs) {
-          if (!tab.url || !tab.id) continue;
-
-          for (const rule of activeRules) {
-            const target = matchAndGetTarget(tab.url, rule);
-            if (target) {
-              // Update count safely
-              // Since we filtered for "became active", incrementing count won't change "active" state,
-              // so it won't trigger this block again.
-              const message = getRandomMessage((rule.count || 0) + 1);
-              await storage.incrementCount(rule.id, 1, message);
-
-              showBadge(rule.count + 1);
-              chrome.tabs.update(tab.id, { url: target });
-              break; // Match first rule
-            }
-          }
-        }
-      });
+      await scanAndRedirect(activeRules);
     }
   }
 });
+
+async function updateDynamicRules() {
+  const rules = await storage.getRules();
+  const dnrRules: chrome.declarativeNetRequest.Rule[] = [];
+
+  for (const rule of rules) {
+    if (!shouldRuleApply(rule)) continue;
+
+    let target = rule.target;
+    if (target === ':shuffle:') {
+      target = getRandomProductiveUrl();
+    }
+
+    const id = generateRuleId(rule.source);
+
+    // Normalize source for DNR
+    // rule.source might be "example.com" or "example.com/foo"
+    // We strip protocol and www for the filter
+    let source = rule.source.toLowerCase();
+    source = source.replace(/^https?:\/\//, '');
+    source = source.replace(/^www\./, '');
+
+    const dnrRule: chrome.declarativeNetRequest.Rule = {
+      id: id,
+      priority: 1,
+      action: {
+        type: chrome.declarativeNetRequest.RuleActionType.REDIRECT,
+        redirect: {
+          url: target.startsWith('http') ? target : `https://${target}`
+        }
+      },
+      condition: {
+        urlFilter: `||${source}`,
+        resourceTypes: [chrome.declarativeNetRequest.ResourceType.MAIN_FRAME]
+      }
+    };
+
+    dnrRules.push(dnrRule);
+  }
+
+  const oldRules = await chrome.declarativeNetRequest.getDynamicRules();
+  const oldRuleIds = oldRules.map(r => r.id);
+
+  await chrome.declarativeNetRequest.updateDynamicRules({
+    removeRuleIds: oldRuleIds,
+    addRules: dnrRules
+  });
+}
+
+async function scanAndRedirect(activeRules: Rule[]) {
+  // The Sweeper: Redirect currently open tabs
+  const tabs = await chrome.tabs.query({});
+
+  for (const tab of tabs) {
+    if (!tab.url || !tab.id) continue;
+
+    for (const rule of activeRules) {
+      // matchAndGetTarget handles :shuffle: dynamically
+      const target = matchAndGetTarget(tab.url, rule);
+      if (target) {
+        chrome.tabs.update(tab.id, { url: target });
+
+        // Increment count for sweeper hits
+        const message = getRandomMessage((rule.count || 0) + 1);
+        await storage.incrementCount(rule.id, 1, message);
+
+        showBadge(rule.count + 1);
+        break;
+      }
+    }
+  }
+}
 
 function showBadge(count?: number) {
   try {
@@ -85,7 +119,6 @@ function showBadge(count?: number) {
       });
       chrome.action.setBadgeTextColor({ color: "#ffffff" });
       chrome.action.setBadgeBackgroundColor({ color: "#5f33ffff" });
-      // Clear badge after 10 seconds
       setTimeout(() => {
         try {
           if (
@@ -96,11 +129,11 @@ function showBadge(count?: number) {
             chrome.action.setBadgeText({ text: "" });
           }
         } catch (e) {
-          // Silently fail if action API not available
+          // Silently fail
         }
       }, 10000);
     }
   } catch (e) {
-    // Silently fail if action API not available
+    // Silently fail
   }
 }

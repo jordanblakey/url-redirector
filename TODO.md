@@ -1,13 +1,14 @@
 ## TODO
 [] CI: RELEASE patch version 1.0.1 with the latest changes.
-[] CI: Create a script that uses the CWS API to submit a new version. This should support a "dry run" for testing. Write tests for the script. It should also push a tagged commit with the version number matching the npm and manifest version that has been bumped.
 
 ## DELEGATED
-[] CI: improve unit and e2e test coverage
+[] CI: Create a script that uses the CWS API to submit a new version. This should support a "dry run" for testing. Write tests for the script. It should also push a tagged commit with the version number matching the npm and manifest version that has been bumped. Please do not actually version up the extension while testing.
 
 ## DOING
+[] FEATURE: Create extension docs homepage on github pages: https://jordanblakey.github.io/url-redirector/. Enable github issues, link as contact. Need privacy policy. Need verification meta tag.
 
 ## DONE
+[x]: migrate from a listener-based approach to declarativeNetRequest (DNR) to improve performance and remove the tabs permission (to avoid the "Read History" warning).
 [x] CI: Push initial version through Chrome Web Store review process
 [x] FEATURE: Favicon caching mechanism (why? Browser caching...)
 [x] BUG: "Active Rules" is a bit misleading with new pause/resume feature. "Redirection Rules"? "Rules"?

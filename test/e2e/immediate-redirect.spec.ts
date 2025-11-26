@@ -102,4 +102,27 @@ test.describe('Immediate Redirect on Rule Change', () => {
         // Verify redirect
         await expect(page).toHaveURL(/google\.com/);
     });
+
+    test('should redirect new tabs using DNR rules', async ({ context }) => {
+        const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
+
+        // Add rule
+        await worker.evaluate(async () => {
+            const rules = [{
+                source: 'example.edu',
+                target: 'google.com',
+                active: true,
+                count: 0,
+                id: 126
+            }];
+            await chrome.storage.local.set({ rules });
+        });
+
+        // Open a NEW tab to the source URL
+        const page = await context.newPage();
+        await page.goto('https://example.edu');
+
+        // Verify redirect
+        await expect(page).toHaveURL(/google\.com/);
+    });
 });
