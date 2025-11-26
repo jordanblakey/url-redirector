@@ -1,5 +1,6 @@
 ## TODO
-[] CI: Push initial version through Chrome Web Store review process
+[] CI: RELEASE patch version 1.0.1 with the latest changes.
+[] CI: Create a script that uses the CWS API to submit a new version. This should support a "dry run" for testing. Write tests for the script. It should also push a tagged commit with the version number matching the npm and manifest version that has been bumped.
 
 ## DELEGATED
 [] CI: improve unit and e2e test coverage
@@ -7,27 +8,20 @@
 ## DOING
 
 ## DONE
-[x] FEATURE: Playwright tests to stop using mocked Chrome APIs and instead test the actual loaded extension
-[-] FEATURE: Favicon caching mechanism (why? Browser caching...)
-[x] FEATURE: Implement a new feature of your own imagining
-[x] FEATURE: Shuffle Mode after a source url is provided, if target input is empty, change the button text to "Add Shuffle Rule". Change it back to "Add Rule" when Target URL is provided. In the rule display, it should say :shuffle: shuffle. When the target URL is visited, a random URL is selected from list of recommended URLS.
-[x] BUG: Find an unidentified bug, and fix it. Found localStorage race condition.
-[x] CLEANUP: Check all the documentation in the project is accurate and well written.
-[x] CI: Explore replacing all chrome API mocks with https://github.com/acvetkov/sinon-chrome. Is this a good idea?
-[x] BUG: Tab order should skip the copy buttons altogether, in the source and target url fields
-[x] BUG: Unpausing a rule on the popup page no longer immediately redirects.
-[x] CLEANUP: Remove any css that isn't referenced anywhere. Remove redundant rules. Add section comments grouping related rules. Nest where possible.
-[x] CLEANUP: Refactor duplicated logic in the src folder. Clean old comments, dead code. Particularly in ui.ts. popup.ts. background.ts and options.ts
-[x] FEATURE: Add a "use" button on hover to inputs that makes the placeholder the value.
+[x] CI: Push initial version through Chrome Web Store review process
+[x] FEATURE: Favicon caching mechanism (why? Browser caching...)
 [x] BUG: "Active Rules" is a bit misleading with new pause/resume feature. "Redirection Rules"? "Rules"?
 [x] BUG: adding a rule to popup should immediately redirect tabs currently on the source url. Write test.
-[x] BUG: is there an alternative layout for URL Redirector E2E Coverage Report when running npm tests? The current layout hides the pass/fail status and you have to scroll up.
+[x] BUG: Find an unidentified bug, and fix it. Found localStorage race condition.
+[x] BUG: alt layout for coverage report? Hides the pass/fail status and you have to scroll up.
 [x] BUG: long urls are truncated. Especially in the popup.
 [x] BUG: persist badge for 10 seconds
-[x] BUG: prevent new rules by validation criteria: must be url, must not be empty, must not be duplicate, source and dest must not be the same. Write tests.
+[x] BUG: Rule validation: must be url, not empty, not duplicate, urls not the same. Write tests.
 [x] BUG: Prevent the entry of rules where a rule with the same source url exists
 [x] BUG: resuming should immediately redirect tabs currently on the source url. Write test.
+[x] BUG: Tab order should skip the copy buttons altogether, in the source and target url fields
 [x] BUG: types.js should not be in dist
+[x] BUG: Unpausing a rule on the popup page no longer immediately redirects.
 [x] BUG: Use flash messages instead of alerts.
 [x] BUG: when new rules are added, reloads should redirect tabs currently on the source url.
 [x] BUG: why are CSS files in the coverage report?
@@ -35,13 +29,17 @@
 [x] CI: add github actions to run tests on PR
 [x] CI: add script to run tests suites (Playwright)
 [x] CI: create a versioning strategy for the extension
+[x] CI: Explore replacing all chrome API mocks with https://github.com/acvetkov/sinon-chrome. Good idea?
 [x] CI: run tests on precommit hook
 [x] CI: understand the different coverage categories. improve branch coverage if needed.
 [x] CI: Write instructions for Chrome Web Store reviewer to test the extension.
 [x] CLEANUP: bundles should go in a gitignored build/ top level directory.
+[x] CLEANUP: Check all the documentation in the project is accurate and well written.
 [x] CLEANUP: combine CSS for popup and options pages if feasible.
 [x] CLEANUP: evaluate the use of 'any' in the codebase. Replace with appropriate types where desirable.
 [x] CLEANUP: look at all comments in the codebase to make sure they make sense, and are needed.
+[x] CLEANUP: Refactor duplicated logic in the src folder. Clean old comments, dead code. Particularly in ui.ts. popup.ts. background.ts and options.ts
+[x] CLEANUP: Remove any css that isn't referenced anywhere. Remove redundant rules. Add section comments grouping related rules. Nest where possible.
 [x] CLEANUP: reorg to assets/ folder
 [x] CLEANUP: there are too many top level test directories. playwright-report, test-results, test.
 [x] CLEANUP: understand the purpose of sourcemaps in dist/ and remove them if not needed. What's the value?
@@ -49,7 +47,7 @@
 [x] CLEANUP: Update readme based on recent changes
 [x] FEAT: Add a test coverage report.
 [x] FEAT: add script to bundle extension (crx)
-[x] FEAT: add TS type annotations anywhere appropriate throughout the codebase. Create type definitions and interfaces if needed.
+[x] FEAT: add TS type annotations throughout the codebase. Create type defs and interfaces if needed.
 [x] FEAT: also expose the options page as a popup.
 [x] FEAT: badge indicating a redirection event
 [x] FEAT: create a utility script to read dotenv from Secret Manager. Refactor check-cws-status to use it.
@@ -59,14 +57,18 @@
 [x] FEAT: submit a rule on enter keypress
 [x] FEAT:convert to typescript
 [x] FEATURE: Add a "demo" recording of the extension for the Chrome Web Store.
-[x] FEATURE: Automated demo recording - named recording. migrate to top level folder demos/. visible mouse actions.
+[x] FEATURE: Add a "use" button on hover to inputs that makes the placeholder the value.
+[x] FEATURE: Automated demo recording. Named recording. Migrate demos/ to top. Visible mouse actions.
 [x] FEATURE: Automated demo recording utility.
 [x] Feature: Convert the "Pause" button into a Temporary Snooze (e.g., 5-10 minutes)UI: Visual indicator that the rule is "Snoozed" (maybe a countdown or a different icon color) so the user knows it will come back.
 [x] FEATURE: Expand messages.ts to include more microcopy options.
 [x] Feature: Implement "Thematic Matching" logic for placeholders (map specific source categories to relevant target categories, e.g., Video → Education vs. Social Scroll → Deep Reading) to replace pure randomization.
+[x] FEATURE: Implement a new feature of your own imagining
 [x] FEATURE: Include preset templates for common distracting sites paired with healthier alternatives. Hook into the psychology of why people use these sites and satisfy it in a different way. Bad habit? Replace with a good one.
 [x] FEATURE: Microcopy ideas for rule counts. Randomized.
+[x] FEATURE: Playwright tests to stop using mocked Chrome APIs and instead test the actual loaded extension
 [x] FEATURE: Randomly select a top distracting site to populate source and wholesome site populate target placeholder text
+[x] FEATURE: Shuffle Mode after a source url is provided, if target input is empty, change the button text to "Add Shuffle Rule". Change it back to "Add Rule" when Target URL is provided. In the rule display, it should say :shuffle: shuffle. When the target URL is visited, a random URL is selected from list of recommended URLS.
 [x] STYLE: make the rule display one line like source -> target
 [x] UX: Alpha sort rules by source url.
 [x] UX: Buttons a bit small on Popup. Fitts' Law.
