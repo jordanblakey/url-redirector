@@ -27,6 +27,7 @@
     "dotenv": "^17.0.0"
   },
   "devDependencies": {
+    "@google/genai": "^1.30.0",
     "@google/jules": "^0.1.40",
     "@playwright/test": "^1.56.1",
     "@types/adm-zip": "^0.5.7",
@@ -35,6 +36,7 @@
     "@types/node": "^24.10.1",
     "adm-zip": "^0.5.16",
     "fs-extra": "^11.3.2",
+    "googleapis": "^166.0.0",
     "monocart-reporter": "^2.9.23",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"

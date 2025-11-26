@@ -1,36 +1,28 @@
 # Release Process
 
-To release a new version of the extension:
+The release process is managed by an on-demand GitHub Actions workflow. This ensures a consistent, tested, and automated release to the Chrome Web Store (CWS) and GitHub.
 
-1.  **Ensure you are on the main branch** and have pulled the latest changes.
-2.  **Run the version command**:
-    ```bash
-    npm version <major|minor|patch>
-    # Example: npm version patch
-    ```
-    This command will automatically:
-    *   Update the version in `package.json` and `manifest.json`.
-    *   Create a git commit and tag.
-    *   **Submit the new version to the Chrome Web Store** (via `postversion` hook).
-    *   Push the commit and tag to GitHub.
-    *   Create a GitHub Release.
+## Prerequisites
 
-> [!CAUTION]
-> **Do NOT run `npm run version <arg>`**.
-> You must run `npm version <arg>` directly.
-> The `version` script in `package.json` is a lifecycle hook used internally by `npm version`, not a standalone script.
+1.  **Version Bump**: Manually update the `version` field in `package.json`. Follow semantic versioning (`major.minor.patch`).
+2.  **Commit and Merge**: Ensure your changes, including the version bump in `package.json`, are committed and merged into the `main` branch. The workflow should always be run from the `main` branch.
 
-> [!IMPORTANT]
-> The submission process requires `CWS_CLIENT_ID`, `CWS_CLIENT_SECRET`, and `CWS_REFRESH_TOKEN` environment variables to be set (or available via Google Secret Manager).
+## How to Release
 
-## Manual Submission / Dry Run
+1.  **Navigate to the Actions tab** in the GitHub repository.
+2.  **Select the "Publish to Chrome Web Store (On-Demand)" workflow** from the list on the left.
+3.  **Click the "Run workflow" dropdown button** on the right.
+4.  **Confirm the branch is `main`**.
+5.  **Enter Release Notes**: In the "Release notes" text field, provide a brief summary of the changes for this version. These notes will be used in the body of the GitHub Release.
+6.  **Click "Run workflow"**.
 
-You can also run the submission script manually:
+## What the Workflow Does
 
-```bash
-# Dry Run (Default) - Checks credentials and bundle, but does NOT upload
-npm run cws:submit
+The workflow will automate the following steps:
 
-# Actual Submission
-npm run cws:submit -- --submit
-```
+1.  **Runs Tests**: Executes the full test suite (`npm run test`) to ensure there are no regressions.
+2.  **Bundles the Extension**: Creates a production-ready `.zip` file of the extension.
+3.  **Publishes to CWS**: Uploads and publishes the new version to the Chrome Web Store.
+4.  **Creates a GitHub Release**: Creates a new release on GitHub, tagged with the version from `package.json`, and includes the release notes you provided.
+
+This automated process replaces the previous `npm version` and manual submission scripts.

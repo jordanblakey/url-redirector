@@ -6,27 +6,38 @@ import { execSync } from 'child_process';
 const rootDir = path.resolve(__dirname, '..');
 const distDir = path.join(rootDir, 'dist');
 const buildDir = path.join(rootDir, 'build');
-const zipPath = path.join(buildDir, 'extension.zip');
 
 async function bundle() {
     try {
         console.log('📦 Starting bundle process...\n');
 
-        // 1. Ensure build directory exists
+        // 1. Get version from package.json
+        const packageJson = fs.readJsonSync(path.join(rootDir, 'package.json'));
+        const version = packageJson.version;
+        if (!version) {
+            throw new Error('Version not found in package.json');
+        }
+        console.log(`   Detected version: ${version}`);
+
+        // 2. Define versioned zip path
+        const zipName = `url-redirector-v${version}.zip`;
+        const zipPath = path.join(buildDir, zipName);
+
+        // 3. Ensure build directory exists
         fs.ensureDirSync(buildDir);
 
-        // 2. Run the build script (which handles cleaning, compiling, and copying)
+        // 4. Run the build script (which handles cleaning, compiling, and copying)
         console.log('🔨 Running build...');
         execSync('npm run build', { stdio: 'inherit', cwd: rootDir });
         console.log('');
 
-        // 3. Verify dist directory has content
+        // 5. Verify dist directory has content
         if (!fs.existsSync(distDir) || fs.readdirSync(distDir).length === 0) {
             throw new Error('Build failed: dist directory is empty');
         }
 
-        // 4. Create ZIP for Chrome Web Store
-        console.log('🤐 Creating Web Store package...');
+        // 6. Create ZIP for Chrome Web Store
+        console.log(`🤐 Creating Web Store package: ${zipName}...`);
         const webStoreZip = new AdmZip();
         webStoreZip.addLocalFolder(distDir);
         webStoreZip.writeZip(zipPath);
