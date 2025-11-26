@@ -7,7 +7,6 @@ import path from 'path';
 
 // --- Configuration ---
 const EXTENSION_ID_DEFAULT = 'jhkoaofpbohfmolalpieheaeppdaminl';
-const PUBLISHER_ID_DEFAULT = 'c173d09b-31cf-48ff-bd4b-270d57317183';
 
 // --- Interfaces ---
 export interface SubmitCwsOptions {
@@ -108,12 +107,13 @@ export async function submitCws(options: SubmitCwsOptions) {
     const CLIENT_SECRET = process.env.CWS_CLIENT_SECRET;
     const REFRESH_TOKEN = process.env.CWS_REFRESH_TOKEN;
     const EXTENSION_ID = process.env.CWS_EXTENSION_ID || EXTENSION_ID_DEFAULT;
+    const PUBLISHER_ID = process.env.CWS_PUBLISHER_ID;
 
-    if (!CLIENT_ID || !CLIENT_SECRET || !REFRESH_TOKEN) {
+    if (!CLIENT_ID || !CLIENT_SECRET || !REFRESH_TOKEN || !PUBLISHER_ID) {
         if (dryRun) {
             warn('⚠️ Missing CWS credentials, but proceeding in DRY RUN mode.');
         } else {
-            throw new Error('Missing required environment variables (CWS_CLIENT_ID, CWS_CLIENT_SECRET, CWS_REFRESH_TOKEN).');
+            throw new Error('Missing required environment variables (CWS_CLIENT_ID, CWS_CLIENT_SECRET, CWS_REFRESH_TOKEN, CWS_PUBLISHER_ID).');
         }
     }
 
