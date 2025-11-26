@@ -1,0 +1,58 @@
+name: Publish to Chrome Web Store (On-Demand)
+
+on:
+  workflow_dispatch:
+    inputs:
+      notes:
+        description: 'Release notes'
+        required: true
+        default: 'Routine update.'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    name: Publish to CWS
+
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-jammy
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Tests
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run test
+        env:
+          HOME: /root
+
+      - name: Bundle Extension
+        run: npm run bundle
+
+      - name: Upload to Chrome Web Store
+        uses: mnao305/chrome-extension-upload@v5.0.0
+        with:
+          file-path: 'build/extension.zip'
+          extension-id: ${{ secrets.CWS_EXTENSION_ID }}
+          client-id: ${{ secrets.CWS_CLIENT_ID }}
+          client-secret: ${{ secrets.CWS_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.CWS_REFRESH_TOKEN }}
+          publish: true
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(jq -r .version package.json)
+          gh release create "v$VERSION" \
+            --title "v$VERSION" \
+            --notes "${{ github.event.inputs.notes }}"
