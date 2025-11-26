@@ -1,13 +1,18 @@
 ## TODO
 [] CI: RELEASE patch version 1.0.1 with the latest changes.
+[] READ: https://developer.chrome.com/docs/webstore/discovery
+[] READ: https://developer.chrome.com/docs/webstore/google-analytics
+[] READ: https://developer.chrome.com/docs/webstore/metrics
+[] READ: https://developer.chrome.com/docs/webstore/service-accounts
 
 ## DELEGATED
 [] CI: Create a script that uses the CWS API to submit a new version. This should support a "dry run" for testing. Write tests for the script. It should also push a tagged commit with the version number matching the npm and manifest version that has been bumped. Please do not actually version up the extension while testing.
 
 ## DOING
-[] FEATURE: Create extension docs homepage on github pages: https://jordanblakey.github.io/url-redirector/. Enable github issues, link as contact. Need privacy policy. Need verification meta tag.
 
 ## DONE
+[x] FEATURE: Create extension docs homepage on github pages: https://jordanblakey.github.io/url-redirector/. Enable github issues, link as contact. Need privacy policy. Need verification meta tag.
+[x] CI: Create a service account for CWS API access.
 [x]: migrate from a listener-based approach to declarativeNetRequest (DNR) to improve performance and remove the tabs permission (to avoid the "Read History" warning).
 [x] CI: Push initial version through Chrome Web Store review process
 [x] FEATURE: Favicon caching mechanism (why? Browser caching...)
