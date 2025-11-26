@@ -47,6 +47,10 @@ The extension will now redirect `reddit.com` and all its subpages (e.g., `reddit
 | `npm test` | Runs the full test suite (E2E and Build validation) |
 | `npm run bundle` | Creates `extension.zip` for Chrome Web Store publication |
 
+### Release Process
+
+See **[Releasing](docs/releasing.md)** for instructions on how to version and submit the extension to the Chrome Web Store.
+
 ### Project Structure
 
 ```
