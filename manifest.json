@@ -5,8 +5,10 @@
   "description": "Redirects URLs based on user-defined rules.",
   "permissions": [
     "storage",
-    "webNavigation",
-    "tabs"
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "host_permissions": [
+    "*://*/*"
   ],
   "options_page": "assets/html/options.html",
   "icons": {
