@@ -1,6 +1,6 @@
 {
   "name": "url-redirector",
-  "version": "1.2.12",
+  "version": "1.2.0",
   "description": "",
   "main": "background.js",
   "directories": {
