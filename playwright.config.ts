@@ -2,7 +2,7 @@ import { defineConfig } from "@playwright/test";
 
 export default defineConfig({
   testDir: ".",
-  testMatch: ["**/*.spec.ts"],
+  testMatch: ["**/e2e/*.spec.ts"],
   testIgnore: ["**/node_modules/**"],
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
@@ -15,6 +15,7 @@ export default defineConfig({
         outputFile: "test/coverage/index.html",
         open: true,
         logging: "warn", // "debug", "info", "warn", "error"
+        clear: false, // Keep the output directory after test runs
         coverage: {
           lcov: true,
           reports: [
@@ -23,10 +24,14 @@ export default defineConfig({
             ['console-details'], // shows CLI table with summary
           ],
           entryFilter: (entry: any) => {
+            // Exclude external URLs (e.g., from CDNs)
+            if (entry.url.startsWith('http://') || entry.url.startsWith('https://')) {
+              return false;
+            }
             // Only accept files that are part of YOUR project
             if (entry.url.includes('node_modules')) return false;
             // Only include files that are likely your source code
-            const isProjectFile = entry.url.includes('/dist/') || entry.url.includes('src/') || entry.url.includes('scripts') || entry.url.includes('unit/');
+            const isProjectFile = entry.url.includes('/dist/') || entry.url.includes('/src/') || entry.url.includes('scripts');
             // Exclude CSS files
             return isProjectFile && !entry.url.endsWith('.css');
           },
@@ -35,8 +40,8 @@ export default defineConfig({
         },
       },
     ],
-    ["dot"], // compact progress
-    // ["list"], // show tests
+    // ["dot"], // compact progress
+    ["list"], // show tests
     ["html", { outputFolder: "test/playwright-report", open: true }], // artifacts
   ],
   outputDir: "test/test-results",
