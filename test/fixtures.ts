@@ -10,23 +10,22 @@ export const test = base.extend<{
   context: BrowserContext;
   extensionId: string;
 }>({
-  context: async ({}, use) => {
+  context: async ({ }, use) => {
     const userDataDir = `/tmp/playwright-user-data-${Math.random()}`;
     userDataDirs.push(userDataDir);
     const context = await chromium.launchPersistentContext(userDataDir, {
       headless: false,
-      slowMo: 100,
       viewport: null,
       ignoreDefaultArgs: ['--enable-automation'],
       args: [
-          '--no-sandbox',
-          '--test-type',
-          '--no-default-browser-check',
-          '--suppress-message-center-popups',
-          '--window-size=1920,1080',
-          '--window-position=3840,0',
-          `--disable-extensions-except=${path.resolve(__dirname, '../dist')}`,
-          `--load-extension=${path.resolve(__dirname, '../dist')}`,
+        '--no-sandbox',
+        '--test-type',
+        '--no-default-browser-check',
+        '--suppress-message-center-popups',
+        '--window-size=1920,1080',
+        '--window-position=3840,0',
+        `--disable-extensions-except=${path.resolve(__dirname, '../dist')}`,
+        `--load-extension=${path.resolve(__dirname, '../dist')}`,
       ]
     });
     await use(context);
@@ -37,9 +36,9 @@ export const test = base.extend<{
   extensionId: async ({ context }, use) => {
     let background: { url(): string; };
     if (context.serviceWorkers().length > 0) {
-        background = context.serviceWorkers()[0];
+      background = context.serviceWorkers()[0];
     } else {
-        background = await context.waitForEvent('serviceworker');
+      background = await context.waitForEvent('serviceworker');
     }
     const extensionId = background.url().split('/')[2];
     await use(extensionId);

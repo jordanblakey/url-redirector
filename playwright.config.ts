@@ -8,8 +8,6 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: [
-    // ["monocart-reporter", ...], // Removed
-
     ["dot"], // compact
     // ['list'], // verbose
     ["html", { outputFolder: "test/playwright-report", open: true }], // artifacts
@@ -20,7 +18,7 @@ export default defineConfig({
     video: "retain-on-failure",
     screenshot: "only-on-failure",
     launchOptions: {
-      // slowMo: 1000,
+      slowMo: 100,
     },
   },
 });
