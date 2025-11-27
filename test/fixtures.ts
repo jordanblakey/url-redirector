@@ -12,7 +12,13 @@ export const test = base.extend<{
   extensionId: string;
   autoCoverage: void;
 }>({
-  context: async ({ }, use) => {
+  context: async ({ }, use, testInfo) => {
+    // Check if this is a script test (Node.js only)
+    if (testInfo.file.includes('test/scripts/')) {
+      await use(undefined as any);
+      return;
+    }
+
     const userDataDir = `/tmp/playwright-user-data-${Math.random()}`;
     userDataDirs.push(userDataDir);
     const context = await chromium.launchPersistentContext(userDataDir, {
@@ -37,7 +43,7 @@ export const test = base.extend<{
 
   autoCoverage: [async ({ context }, use, testInfo) => {
     // Check if we are running in a browser context (E2E tests)
-    const isBrowserTest = !!context;
+    const isBrowserTest = context && typeof context.pages === 'function';
 
     // --- Browser Coverage Setup ---
     if (isBrowserTest) {
