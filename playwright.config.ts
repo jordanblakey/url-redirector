@@ -1,5 +1,7 @@
 import { defineConfig } from "@playwright/test";
 
+// https://playwright.dev/docs/test-reporters
+
 export default defineConfig({
   testDir: ".",
   testMatch: ["**/*.spec.ts"],
@@ -8,8 +10,7 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: [
-    ["dot"], // compact
-    // ['list'], // verbose
+    !!process.env.CI ? ["github"] : ["dot"],
     ["html", { outputFolder: "test/playwright-report", open: true }], // artifacts
   ],
   outputDir: "test/test-results",
