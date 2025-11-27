@@ -1,49 +1,68 @@
 import fs from 'fs-extra';
 import path from 'path';
 import AdmZip from 'adm-zip';
-import { execSync } from 'child_process';
+import { execSync as realExecSync } from 'child_process';
 
 const rootDir = path.resolve(__dirname, '..');
 const distDir = path.join(rootDir, 'dist');
 const buildDir = path.join(rootDir, 'build');
 const zipPath = path.join(buildDir, 'extension.zip');
 
-async function bundle() {
+export interface BundleOptions {
+    deps?: {
+        execSync?: typeof realExecSync;
+        fs?: typeof fs;
+        AdmZip?: typeof AdmZip;
+        log?: typeof console.log;
+        error?: typeof console.error;
+    };
+}
+
+export async function bundle(options: BundleOptions = {}) {
+    const { deps = {} } = options;
+    const execSync = deps.execSync || realExecSync;
+    const fsFn = deps.fs || fs;
+    const AdmZipFn = deps.AdmZip || AdmZip;
+    const log = deps.log || console.log;
+    const error = deps.error || console.error;
+
     try {
-        console.log('📦 Starting bundle process...\n');
+        log('📦 Starting bundle process...\n');
 
         // 1. Ensure build directory exists
-        fs.ensureDirSync(buildDir);
+        fsFn.ensureDirSync(buildDir);
 
         // 2. Run the build script (which handles cleaning, compiling, and copying)
-        console.log('🔨 Running build...');
+        log('🔨 Running build...');
         execSync('npm run build', { stdio: 'inherit', cwd: rootDir });
-        console.log('');
+        log('');
 
         // 3. Verify dist directory has content
-        if (!fs.existsSync(distDir) || fs.readdirSync(distDir).length === 0) {
+        if (!fsFn.existsSync(distDir) || fsFn.readdirSync(distDir).length === 0) {
             throw new Error('Build failed: dist directory is empty');
         }
 
         // 4. Create ZIP for Chrome Web Store
-        console.log('🤐 Creating Web Store package...');
-        const webStoreZip = new AdmZip();
+        log('🤐 Creating Web Store package...');
+        const webStoreZip = new AdmZipFn();
         webStoreZip.addLocalFolder(distDir);
         webStoreZip.writeZip(zipPath);
 
-        const stats = fs.statSync(zipPath);
+        const stats = fsFn.statSync(zipPath);
         const sizeKB = (stats.size / 1024).toFixed(2);
-        console.log(`   ✅ Created ${zipPath} (${sizeKB} KB)\n`);
+        log(`   ✅ Created ${zipPath} (${sizeKB} KB)\n`);
 
-        console.log('🎉 Bundle complete!');
-        console.log(`📂 Extension: ${distDir}`);
-        console.log(`📦 Web Store ZIP: ${zipPath}`);
+        log('🎉 Bundle complete!');
+        log(`📂 Extension: ${distDir}`);
+        log(`📦 Web Store ZIP: ${zipPath}`);
 
-    } catch (error: unknown) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        console.error('❌ Bundling failed:', errorMessage);
+    } catch (err: unknown) {
+        const errorMessage = err instanceof Error ? err.message : String(err);
+        error('❌ Bundling failed:', errorMessage);
         process.exit(1);
     }
 }
 
-bundle();
+if (require.main === module) {
+    bundle();
+}

@@ -26,12 +26,12 @@ export default defineConfig({
             // Only accept files that are part of YOUR project
             if (entry.url.includes('node_modules')) return false;
             // Only include files that are likely your source code
-            const isProjectFile = entry.url.includes('/dist/') || entry.url.includes('/src/');
+            const isProjectFile = entry.url.includes('/dist/') || entry.url.includes('/src/') || entry.url.includes('scripts');
             // Exclude CSS files
             return isProjectFile && !entry.url.endsWith('.css');
           },
           // Keep source filter to ensure we map back to TS files if possible
-          sourceFilter: (sourcePath: string) => sourcePath.search(/src\//) !== -1,
+          sourceFilter: (sourcePath: string) => sourcePath.search(/src\//) !== -1 || sourcePath.search(/scripts\//) !== -1,
         },
       },
     ],
