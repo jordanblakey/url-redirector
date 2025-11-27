@@ -11,6 +11,8 @@
     "bundle": "ts-node scripts/bundle.ts",
     "test:install": "playwright install --with-deps chromium",
     "test": "npm run build && playwright test",
+    "test:unit": "playwright test /test/unit /test/scripts",
+    "test:e2e": "playwright test /test/e2e",
     "test:ui": "npm run build && playwright test --ui",
     "test:coverage": "npm run build && playwright test",
     "update-manifest": "jq --arg v $npm_package_version '.version = $v' manifest.json > tmp.json && mv tmp.json manifest.json",

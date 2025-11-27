@@ -30,8 +30,10 @@ export function matchAndGetTarget(url: string, rule: Rule): string | null {
             target = 'https://' + target;
         }
 
-        // Avoid infinite redirect loops if target is same as source (or contained in it)
-        if (url.includes(target)) {
+        // Avoid infinite redirect loops
+        // If the target URL starts with the source (normalized), it will trigger the same rule again
+        let targetClean = target.replace(/^https?:\/\//, '').replace(/^www\./, '');
+        if (targetClean.startsWith(source)) {
             return null;
         }
 

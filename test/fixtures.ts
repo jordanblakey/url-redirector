@@ -13,8 +13,8 @@ export const test = base.extend<{
   autoCoverage: void;
 }>({
   context: async ({ }, use, testInfo) => {
-    // Check if this is a script test (Node.js only)
-    if (testInfo.file.includes('test/scripts/')) {
+    // Check if this is a script test or unit test (Node.js only)
+    if (testInfo.file.includes('test/scripts/') || testInfo.file.includes('test/unit/')) {
       await use(undefined as any);
       return;
     }
@@ -118,7 +118,7 @@ export const test = base.extend<{
 
         if (coverage) {
           const filtered = coverage.filter((entry: any) =>
-            entry.url.includes('/scripts/') &&
+            (entry.url.includes('/scripts/') || entry.url.includes('/src/')) &&
             !entry.url.includes('node_modules') &&
             !entry.url.includes('test/')
           ).map((entry: any) => {

@@ -26,7 +26,7 @@ export default defineConfig({
             // Only accept files that are part of YOUR project
             if (entry.url.includes('node_modules')) return false;
             // Only include files that are likely your source code
-            const isProjectFile = entry.url.includes('/dist/') || entry.url.includes('/src/') || entry.url.includes('scripts');
+            const isProjectFile = entry.url.includes('/dist/') || entry.url.includes('src/') || entry.url.includes('scripts') || entry.url.includes('unit/');
             // Exclude CSS files
             return isProjectFile && !entry.url.endsWith('.css');
           },
@@ -35,7 +35,8 @@ export default defineConfig({
         },
       },
     ],
-    ["list"], // compact
+    ["dot"], // compact progress
+    // ["list"], // show tests
     ["html", { outputFolder: "test/playwright-report", open: true }], // artifacts
   ],
   outputDir: "test/test-results",

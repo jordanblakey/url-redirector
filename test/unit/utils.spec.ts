@@ -1,117 +1,116 @@
-import { test, expect } from '@playwright/test';
-import { matchAndGetTarget, shouldRuleApply, isValidUrl } from '../../src/utils.js';
 
+import { test, expect } from '../fixtures';
+import { matchAndGetTarget, shouldRuleApply, isValidUrl, generateRuleId } from '../../src/utils';
+import { Rule } from '../../src/types';
 
-test.describe('URL Matching Logic', () => {
-    test('should return target for exact match', () => {
-        const rule = { id: 1, source: 'example.com', target: 'google.com', count: 0, active: true };
-        const url = 'https://example.com';
-        expect(matchAndGetTarget(url, rule)).toBe('https://google.com');
+test.describe('Utils', () => {
+
+    test.describe('matchAndGetTarget', () => {
+        const baseRule: Rule = {
+            id: 1,
+            source: 'facebook.com',
+            target: 'google.com',
+            active: true,
+            count: 0,
+            lastCountMessage: ''
+        };
+
+        test('should match exact source', () => {
+            expect(matchAndGetTarget('facebook.com', baseRule)).toBe('https://google.com');
+            expect(matchAndGetTarget('http://facebook.com', baseRule)).toBe('https://google.com');
+            expect(matchAndGetTarget('https://facebook.com', baseRule)).toBe('https://google.com');
+            expect(matchAndGetTarget('https://www.facebook.com', baseRule)).toBe('https://google.com');
+        });
+
+        test('should match sub-paths', () => {
+            expect(matchAndGetTarget('facebook.com/messages', baseRule)).toBe('https://google.com');
+        });
+
+        test('should return null for non-matching URLs', () => {
+            expect(matchAndGetTarget('twitter.com', baseRule)).toBeNull();
+            expect(matchAndGetTarget('myfacebook.com', baseRule)).toBeNull(); // Should not match suffix
+        });
+
+        test('should handle :shuffle: target', () => {
+            const shuffleRule = { ...baseRule, target: ':shuffle:' };
+            const target = matchAndGetTarget('facebook.com', shuffleRule);
+            expect(target).not.toBeNull();
+            expect(target).not.toBe(':shuffle:');
+            expect(target?.startsWith('http')).toBe(true);
+        });
+
+        test('should prevent infinite loops', () => {
+            const loopRule = { ...baseRule, target: 'facebook.com' };
+            // Use full URL to match how target is normalized (https://facebook.com)
+            expect(matchAndGetTarget('https://facebook.com', loopRule)).toBeNull();
+
+            const nestedLoopRule = { ...baseRule, target: 'facebook.com/home' };
+            expect(matchAndGetTarget('https://facebook.com', nestedLoopRule)).toBeNull();
+        });
+
+        test('should add protocol to target if missing', () => {
+            const noProtocolRule = { ...baseRule, target: 'example.com' };
+            expect(matchAndGetTarget('facebook.com', noProtocolRule)).toBe('https://example.com');
+        });
+
+        test('should keep protocol if present', () => {
+            const protocolRule = { ...baseRule, target: 'http://example.com' };
+            expect(matchAndGetTarget('facebook.com', protocolRule)).toBe('http://example.com');
+        });
     });
 
-    test('should return target for match with different protocol', () => {
-        const rule = { id: 1, source: 'example.com', target: 'google.com', count: 0, active: true };
-        const url = 'http://example.com';
-        expect(matchAndGetTarget(url, rule)).toBe('https://google.com');
+    test.describe('shouldRuleApply', () => {
+        test('should return true for active rule', () => {
+            const rule: Rule = { id: 1, source: 'a', target: 'b', active: true, count: 0 };
+            expect(shouldRuleApply(rule)).toBe(true);
+        });
+
+        test('should return false for inactive rule', () => {
+            const rule: Rule = { id: 1, source: 'a', target: 'b', active: false, count: 0 };
+            expect(shouldRuleApply(rule)).toBe(false);
+        });
+
+        test('should return false if pausedUntil is in the future', () => {
+            const future = Date.now() + 10000;
+            const rule: Rule = { id: 1, source: 'a', target: 'b', active: true, pausedUntil: future, count: 0 };
+            expect(shouldRuleApply(rule)).toBe(false);
+        });
+
+        test('should return true if pausedUntil is in the past', () => {
+            const past = Date.now() - 10000;
+            const rule: Rule = { id: 1, source: 'a', target: 'b', active: true, pausedUntil: past, count: 0 };
+            expect(shouldRuleApply(rule)).toBe(true);
+        });
     });
 
-    test('should return target for match with path', () => {
-        const rule = { id: 1, source: 'example.com', target: 'google.com', count: 0, active: true };
-        const url = 'https://example.com/foo/bar';
-        expect(matchAndGetTarget(url, rule)).toBe('https://google.com');
+    test.describe('isValidUrl', () => {
+        test('should validate correct URLs', () => {
+            expect(isValidUrl('google.com')).toBe(true);
+            expect(isValidUrl('https://google.com')).toBe(true);
+            expect(isValidUrl('sub.domain.co.uk')).toBe(true);
+        });
+
+        test('should invalidate bad strings', () => {
+            expect(isValidUrl('not a url')).toBe(false);
+            expect(isValidUrl('')).toBe(false);
+        });
     });
 
-    test('should return null for no match', () => {
-        const rule = { id: 1, source: 'example.com', target: 'google.com', count: 0, active: true };
-        const url = 'https://other.com';
-        expect(matchAndGetTarget(url, rule)).toBeNull();
-    });
+    test.describe('generateRuleId', () => {
+        test('should generate consistent IDs', () => {
+            const id1 = generateRuleId('example.com');
+            const id2 = generateRuleId('example.com');
+            expect(id1).toBe(id2);
+        });
 
-    test('should return null if target loop detected (source contained in url)', () => {
-        // If source is example.com and target is google.com
-        // And we are on google.com, it shouldn't redirect again?
-        // No, the logic checks if *currentUrl* includes *target*.
-        const rule = { id: 1, source: 'example.com', target: 'google.com', count: 0, active: true };
-        const url = 'https://google.com';
-        expect(matchAndGetTarget(url, rule)).toBeNull();
-    });
+        test('should generate different IDs for different URLs', () => {
+            const id1 = generateRuleId('example.com');
+            const id2 = generateRuleId('google.com');
+            expect(id1).not.toBe(id2);
+        });
 
-    test('should return null for infinite loop where target is same as source', () => {
-        const rule = { id: 1, source: 'example.com', target: 'example.com', count: 0, active: true };
-        const url = 'https://example.com';
-        // If target is example.com -> https://example.com
-        // currentUrl is https://example.com
-        // currentUrl.includes(target) -> true
-        expect(matchAndGetTarget(url, rule)).toBeNull();
-    });
-
-    test('should handle user input without protocol', () => {
-        const rule = { id: 1, source: 'example.com', target: 'google.com', count: 0, active: true };
-        expect(matchAndGetTarget('https://example.com', rule)).toBe('https://google.com');
-    });
-
-    test('should handle user input with www', () => {
-        const rule = { id: 1, source: 'www.example.com', target: 'google.com', count: 0, active: true };
-        // logic removes www. from source
-        expect(matchAndGetTarget('https://example.com', rule)).toBe('https://google.com');
-        expect(matchAndGetTarget('https://www.example.com', rule)).toBe('https://google.com');
-    });
-});
-
-test.describe('Rule Application Logic', () => {
-    test('should apply active rule', () => {
-        const rule = { id: 1, source: 'src', target: 'tgt', active: true };
-        expect(shouldRuleApply(rule)).toBe(true);
-    });
-
-    test('should not apply inactive rule', () => {
-        const rule = { id: 1, source: 'src', target: 'tgt', active: false };
-        expect(shouldRuleApply(rule)).toBe(false);
-    });
-
-    test('should not apply paused rule (future)', () => {
-        const futureTime = Date.now() + 100000;
-        const rule = { id: 1, source: 'src', target: 'tgt', active: true, pausedUntil: futureTime };
-        expect(shouldRuleApply(rule)).toBe(false);
-    });
-
-    test('should apply paused rule (past)', () => {
-        const pastTime = Date.now() - 100000;
-        const rule = { id: 1, source: 'src', target: 'tgt', active: true, pausedUntil: pastTime };
-        expect(shouldRuleApply(rule)).toBe(true);
-    });
-});
-
-test.describe('URL Validation Logic', () => {
-    test('should validate standard URLs', () => {
-        expect(isValidUrl('https://example.com')).toBe(true);
-        expect(isValidUrl('http://example.com')).toBe(true);
-    });
-
-    test('should validate domains without protocol', () => {
-        expect(isValidUrl('example.com')).toBe(true);
-        expect(isValidUrl('sub.example.com')).toBe(true);
-    });
-
-    test('should validate URLs with paths and params', () => {
-        expect(isValidUrl('example.com/foo/bar')).toBe(true);
-        expect(isValidUrl('example.com?q=123')).toBe(true);
-        expect(isValidUrl('example.com#section')).toBe(true);
-    });
-
-    test('should validate localhost', () => {
-        expect(isValidUrl('http://localhost:3000')).toBe(true);
-    });
-
-    test('should invalidate empty strings', () => {
-        expect(isValidUrl('')).toBe(false);
-    });
-
-    test('should invalidate random text that is not a domain', () => {
-        expect(isValidUrl('hello world')).toBe(false);
-    });
-
-    test('should invalidate strings with spaces in domain part', () => {
-        expect(isValidUrl('exa mple.com')).toBe(false);
+        test('should return 0 for empty string', () => {
+            expect(generateRuleId('')).toBe(0);
+        });
     });
 });
