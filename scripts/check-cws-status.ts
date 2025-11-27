@@ -2,9 +2,13 @@
 
 import { loadGcpSecrets } from './load-dotenv-from-gcp';
 
+const TOKEN_URL = process.env.TOKEN_URL || 'https://oauth2.googleapis.com/token';
+const STATUS_URL_TEMPLATE = process.env.STATUS_URL_TEMPLATE || 'https://chromewebstore.googleapis.com/v2/publishers/{publisherId}/items/{itemId}:fetchStatus';
+
+
 // --- Helper Functions ---
-async function getAccessToken(clientId: string, clientSecret: string, refreshToken: string) {
-  const response = await fetch('https://oauth2.googleapis.com/token', {
+export async function getAccessToken(clientId: string, clientSecret: string, refreshToken: string) {
+  const response = await fetch(TOKEN_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
@@ -22,8 +26,11 @@ async function getAccessToken(clientId: string, clientSecret: string, refreshTok
   return (await response.json()).access_token;
 }
 
-async function checkStatus(accessToken: string, publisherId: string, extensionId: string) {
-  const fetchStatusUrl = `https://chromewebstore.googleapis.com/v2/publishers/${publisherId}/items/${extensionId}:fetchStatus`;
+export async function checkStatus(accessToken: string, publisherId: string, extensionId: string) {
+    const fetchStatusUrl = STATUS_URL_TEMPLATE
+        .replace('{publisherId}', publisherId)
+        .replace('{itemId}', extensionId);
+
   const response = await fetch(fetchStatusUrl, {
     headers: { 'Authorization': `Bearer ${accessToken}` },
   });
@@ -39,10 +46,12 @@ async function checkStatus(accessToken: string, publisherId: string, extensionId
 }
 
 // --- Main Execution ---
-(async () => {
+export async function main() {
   try {
-    console.log('Loading secrets from Google Cloud...');
-    await loadGcpSecrets();
+    if (process.env.NODE_ENV !== 'test') {
+        console.log('Loading secrets from Google Cloud...');
+        await loadGcpSecrets();
+    }
 
     // Extract required environment variables
     const CLIENT_ID = process.env.CWS_CLIENT_ID;
@@ -65,4 +74,8 @@ async function checkStatus(accessToken: string, publisherId: string, extensionId
     console.error(error);
     process.exit(1);
   }
-})();
+}
+
+if (require.main === module) {
+  main();
+}

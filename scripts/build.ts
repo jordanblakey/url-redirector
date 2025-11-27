@@ -2,14 +2,9 @@ import fs from 'fs-extra';
 import path from 'path';
 import { execSync } from 'child_process';
 
-
-
 const rootDir = path.resolve(__dirname, '..');
-const args = process.argv.slice(2);
-const customDist = args[0];
-const distDir = customDist ? path.resolve(customDist) : path.join(rootDir, 'dist');
 
-async function build() {
+export async function build(distDir: string = path.join(rootDir, 'dist')) {
     try {
         console.log('🚀 Starting build process...');
 
@@ -19,7 +14,6 @@ async function build() {
 
         // 2. Compile TypeScript
         console.log('🔨 Compiling TypeScript...');
-        // Compile TypeScript with explicit ES2020 module output for the extension
         execSync(
             `tsc --module ES2020 --rootDir src --outDir "${distDir}" --lib ES2020,DOM --sourceMap true`,
             { stdio: 'inherit', cwd: rootDir }
@@ -33,19 +27,15 @@ async function build() {
         const manifestDestPath = path.join(distDir, 'manifest.json');
 
         if (fs.existsSync(manifestSrcPath)) {
-            // Read and adjust manifest for dist folder
             const manifestContent = fs.readFileSync(manifestSrcPath, 'utf8');
             const manifest = JSON.parse(manifestContent);
 
-            // Adjust background script path: dist/background.js -> background.js
             if (manifest.background && manifest.background.service_worker) {
                 manifest.background.service_worker = manifest.background.service_worker.replace('dist/', '');
             }
 
-            // Adjust asset paths: assets/... -> ... (since we copy assets to dist root)
             const manifestStr = JSON.stringify(manifest, null, 2);
             const adjustedManifest = manifestStr.replace(/assets\//g, '');
-
             fs.writeFileSync(manifestDestPath, adjustedManifest);
             console.log(`   ✅ Copied and adjusted manifest.json`);
         }
@@ -68,4 +58,10 @@ async function build() {
     }
 }
 
-build();
+// Self-execute if run directly
+if (require.main === module) {
+    const args = process.argv.slice(2);
+    const customDist = args[0];
+    const distDir = customDist ? path.resolve(customDist) : path.join(rootDir, 'dist');
+    build(distDir);
+}

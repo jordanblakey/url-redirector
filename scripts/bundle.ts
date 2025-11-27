@@ -8,7 +8,7 @@ const distDir = path.join(rootDir, 'dist');
 const buildDir = path.join(rootDir, 'build');
 const zipPath = path.join(buildDir, 'extension.zip');
 
-async function bundle() {
+export async function bundle() {
     try {
         console.log('📦 Starting bundle process...\n');
 
@@ -46,4 +46,6 @@ async function bundle() {
     }
 }
 
-bundle();
+if (require.main === module) {
+    bundle();
+}

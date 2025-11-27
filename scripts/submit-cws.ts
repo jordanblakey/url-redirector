@@ -7,7 +7,6 @@ import path from 'path';
 
 // --- Configuration ---
 const EXTENSION_ID_DEFAULT = 'jhkoaofpbohfmolalpieheaeppdaminl';
-const PUBLISHER_ID_DEFAULT = 'c173d09b-31cf-48ff-bd4b-270d57317183';
 
 // --- Interfaces ---
 export interface SubmitCwsOptions {
@@ -19,7 +18,7 @@ export interface SubmitCwsOptions {
         warn?: typeof console.warn;
         error?: typeof console.error;
         loadGcpSecrets?: typeof loadGcpSecrets;
-        fs?: typeof fs;
+        fs?: any;
     };
 }
 
@@ -43,7 +42,7 @@ async function getAccessToken(clientId: string, clientSecret: string, refreshTok
     return (await response.json()).access_token;
 }
 
-async function uploadExtension(accessToken: string, extensionId: string, zipPath: string, fetchFn: typeof fetch, fsFn: typeof fs) {
+async function uploadExtension(accessToken: string, extensionId: string, zipPath: string, fetchFn: typeof fetch, fsFn: any) {
     const uploadUrl = `https://www.googleapis.com/upload/chromewebstore/v1.1/items/${extensionId}`;
     const zipStream = fsFn.createReadStream(zipPath);
 
@@ -103,6 +102,7 @@ export async function submitCws(options: SubmitCwsOptions) {
     // 1. Load Secrets
     log('🔑 Loading secrets...');
     await loadSecrets();
+
 
     const CLIENT_ID = process.env.CWS_CLIENT_ID;
     const CLIENT_SECRET = process.env.CWS_CLIENT_SECRET;

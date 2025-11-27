@@ -28,8 +28,6 @@ export async function loadGcpSecrets(projectId?: string, secretName?: string): P
 
   } catch (error: unknown) {
     const err = error as SecretManagerError;
-    // --- ADC GUARD CLAUSE ---
-    // Check for common credential errors (Missing ADC, invalid paths, or gRPC Unauthenticated)
     if (
       err.message.includes('Could not load the default credentials') ||
       err.message.includes('no credentials found') ||
@@ -43,7 +41,6 @@ export async function loadGcpSecrets(projectId?: string, secretName?: string): P
       process.exit(1); // Exit gracefully
     }
 
-    // If it's a different error (e.g., Secret doesn't exist, Permission Denied), rethrow it
     throw error;
   }
 }
