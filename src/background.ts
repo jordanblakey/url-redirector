@@ -1,8 +1,7 @@
 import { Rule } from "./types";
-import { matchAndGetTarget, shouldRuleApply, generateRuleId } from "./utils.js";
+import { buildDNRRules, findActivelyChangedRules, findMatchingTabs } from "./background-logic.js";
 import { getRandomMessage } from "./messages.js";
 import { storage } from "./storage.js";
-import { getRandomProductiveUrl } from "./suggestions.js";
 
 // Initialize rules on load
 chrome.runtime.onInstalled.addListener(async () => {
@@ -22,12 +21,7 @@ chrome.storage.onChanged.addListener(async (changes, areaName) => {
     const oldRules = (changes.rules.oldValue || []) as Rule[];
 
     // Find rules that are new or have become active
-    const activeRules = newRules.filter((newRule) => {
-      const oldRule = oldRules.find((r) => r.id === newRule.id);
-      const isNowActive = shouldRuleApply(newRule);
-      const wasActive = oldRule ? shouldRuleApply(oldRule) : false;
-      return isNowActive && !wasActive;
-    });
+    const activeRules = findActivelyChangedRules(newRules, oldRules);
 
     if (activeRules.length > 0) {
       await scanAndRedirect(activeRules);
@@ -35,44 +29,9 @@ chrome.storage.onChanged.addListener(async (changes, areaName) => {
   }
 });
 
-async function updateDynamicRules() {
+export async function updateDynamicRules() {
   const rules = await storage.getRules();
-  const dnrRules: chrome.declarativeNetRequest.Rule[] = [];
-
-  for (const rule of rules) {
-    if (!shouldRuleApply(rule)) continue;
-
-    let target = rule.target;
-    if (target === ':shuffle:') {
-      target = getRandomProductiveUrl();
-    }
-
-    const id = generateRuleId(rule.source);
-
-    // Normalize source for DNR
-    // rule.source might be "example.com" or "example.com/foo"
-    // We strip protocol and www for the filter
-    let source = rule.source.toLowerCase();
-    source = source.replace(/^https?:\/\//, '');
-    source = source.replace(/^www\./, '');
-
-    const dnrRule: chrome.declarativeNetRequest.Rule = {
-      id: id,
-      priority: 1,
-      action: {
-        type: chrome.declarativeNetRequest.RuleActionType.REDIRECT,
-        redirect: {
-          url: target.startsWith('http') ? target : `https://${target}`
-        }
-      },
-      condition: {
-        urlFilter: `||${source}`,
-        resourceTypes: [chrome.declarativeNetRequest.ResourceType.MAIN_FRAME]
-      }
-    };
-
-    dnrRules.push(dnrRule);
-  }
+  const dnrRules = buildDNRRules(rules);
 
   const oldRules = await chrome.declarativeNetRequest.getDynamicRules();
   const oldRuleIds = oldRules.map(r => r.id);
@@ -83,31 +42,23 @@ async function updateDynamicRules() {
   });
 }
 
-async function scanAndRedirect(activeRules: Rule[]) {
+export async function scanAndRedirect(activeRules: Rule[]) {
   // The Sweeper: Redirect currently open tabs
   const tabs = await chrome.tabs.query({});
+  const redirects = findMatchingTabs(tabs, activeRules);
 
-  for (const tab of tabs) {
-    if (!tab.url || !tab.id) continue;
+  for (const redirect of redirects) {
+    chrome.tabs.update(redirect.tabId, { url: redirect.targetUrl });
 
-    for (const rule of activeRules) {
-      // matchAndGetTarget handles :shuffle: dynamically
-      const target = matchAndGetTarget(tab.url, rule);
-      if (target) {
-        chrome.tabs.update(tab.id, { url: target });
+    // Increment count for sweeper hits
+    const message = getRandomMessage(redirect.ruleCount + 1);
+    await storage.incrementCount(redirect.ruleId, 1, message);
 
-        // Increment count for sweeper hits
-        const message = getRandomMessage((rule.count || 0) + 1);
-        await storage.incrementCount(rule.id, 1, message);
-
-        showBadge(rule.count + 1);
-        break;
-      }
-    }
+    showBadge(redirect.ruleCount + 1);
   }
 }
 
-function showBadge(count?: number) {
+export function showBadge(count?: number) {
   try {
     if (
       typeof chrome !== "undefined" &&
