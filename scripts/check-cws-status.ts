@@ -2,9 +2,19 @@
 
 import { loadGcpSecrets } from './load-dotenv-from-gcp';
 
+export interface CheckStatusOptions {
+  deps?: {
+    loadGcpSecrets?: typeof loadGcpSecrets;
+    fetch?: typeof fetch;
+    log?: typeof console.log;
+    dir?: typeof console.dir;
+    error?: typeof console.error;
+  };
+}
+
 // --- Helper Functions ---
-async function getAccessToken(clientId: string, clientSecret: string, refreshToken: string) {
-  const response = await fetch('https://oauth2.googleapis.com/token', {
+async function getAccessToken(clientId: string, clientSecret: string, refreshToken: string, fetchFn: typeof fetch) {
+  const response = await fetchFn('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
@@ -22,9 +32,9 @@ async function getAccessToken(clientId: string, clientSecret: string, refreshTok
   return (await response.json()).access_token;
 }
 
-async function checkStatus(accessToken: string, publisherId: string, extensionId: string) {
+async function checkStatus(accessToken: string, publisherId: string, extensionId: string, fetchFn: typeof fetch, log: typeof console.log, dir: typeof console.dir) {
   const fetchStatusUrl = `https://chromewebstore.googleapis.com/v2/publishers/${publisherId}/items/${extensionId}:fetchStatus`;
-  const response = await fetch(fetchStatusUrl, {
+  const response = await fetchFn(fetchStatusUrl, {
     headers: { 'Authorization': `Bearer ${accessToken}` },
   });
 
@@ -34,15 +44,22 @@ async function checkStatus(accessToken: string, publisherId: string, extensionId
   }
 
   const data = await response.json();
-  console.log('Chrome Web Store Extension Status:\n');
-  console.dir(data, { depth: null, colors: true });
+  log('Chrome Web Store Extension Status:\n');
+  dir(data, { depth: null, colors: true });
 }
 
 // --- Main Execution ---
-(async () => {
+export async function runCheckStatus(options: CheckStatusOptions = {}) {
+  const { deps = {} } = options;
+  const loadSecrets = deps.loadGcpSecrets || loadGcpSecrets;
+  const fetchFn = deps.fetch || global.fetch;
+  const log = deps.log || console.log;
+  const dir = deps.dir || console.dir;
+  const error = deps.error || console.error;
+
   try {
-    console.log('Loading secrets from Google Cloud...');
-    await loadGcpSecrets();
+    log('Loading secrets from Google Cloud...');
+    await loadSecrets();
 
     // Extract required environment variables
     const CLIENT_ID = process.env.CWS_CLIENT_ID;
@@ -55,14 +72,18 @@ async function checkStatus(accessToken: string, publisherId: string, extensionId
       throw new Error('Missing required environment variables after secret load.');
     }
 
-    console.log('Fetching access token...');
-    const accessToken = await getAccessToken(CLIENT_ID, CLIENT_SECRET, REFRESH_TOKEN);
+    log('Fetching access token...');
+    const accessToken = await getAccessToken(CLIENT_ID, CLIENT_SECRET, REFRESH_TOKEN, fetchFn);
 
-    console.log('Checking extension status...');
-    await checkStatus(accessToken, PUBLISHER_ID, EXTENSION_ID);
+    log('Checking extension status...');
+    await checkStatus(accessToken, PUBLISHER_ID, EXTENSION_ID, fetchFn, log, dir);
 
-  } catch (error) {
-    console.error(error);
+  } catch (err: unknown) {
+    error(err);
     process.exit(1);
   }
-})();
+}
+
+if (require.main === module) {
+  runCheckStatus();
+}

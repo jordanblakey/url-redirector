@@ -1,4 +1,14 @@
-console.log(`
+export interface SetupAuthOptions {
+    deps?: {
+        log?: typeof console.log;
+    };
+}
+
+export function setupAuth(options: SetupAuthOptions = {}) {
+    const { deps = {} } = options;
+    const log = deps.log || console.log;
+
+    log(`
 To check the status of your Chrome Web Store listing, you need to configure OAuth2 credentials.
 
 Please follow these steps to obtain the required environment variables:
@@ -48,3 +58,8 @@ Please follow these steps to obtain the required environment variables:
 
     npm run check-store-status
 `);
+}
+
+if (require.main === module) {
+    setupAuth();
+}
