@@ -126,7 +126,7 @@ test.describe('URL Redirector Options Page', () => {
         await page.fill('#sourceUrl', 'example.com');
         await page.fill('#targetUrl', 'google.com');
         await page.click('#addRuleBtn');
-        await page.waitForTimeout(200);
+
 
         // Verify the rule was added (which triggers checkAndRedirectTabs)
         await expect(page.locator('#rulesList .rule-item')).toHaveCount(1);
