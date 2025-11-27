@@ -1,8 +1,17 @@
-import { test, expect } from '../fixtures';
-import { buildDNRRules, findActivelyChangedRules, findMatchingTabs } from '../../src/background-logic.js';
+import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
+import { buildDNRRules, findActivelyChangedRules, findMatchingTabs } from '../../../src/background-logic.js';
 
-test.describe('background-logic.ts - Pure Functions', () => {
-    test.describe('buildDNRRules', () => {
+describe('background-logic.ts - Pure Functions', () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+        vi.setSystemTime(Date.now());
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    describe('buildDNRRules', () => {
         test('should create DNR rules for active rules', () => {
             const rules = [
                 {
@@ -18,8 +27,8 @@ test.describe('background-logic.ts - Pure Functions', () => {
 
             expect(dnrRules).toHaveLength(1);
             expect(dnrRules[0].condition.urlFilter).toBe('||example.com');
-            expect(dnrRules[0].action.redirect.url).toBe('https://google.com');
-            expect(dnrRules[0].priority).toBe(1);
+            expect(dnrRules[0]!.action!.redirect!.url).toBe('https://google.com');
+            expect(dnrRules[0]!.priority).toBe(1);
         });
 
         test('should skip inactive rules', () => {
@@ -117,7 +126,7 @@ test.describe('background-logic.ts - Pure Functions', () => {
 
             const dnrRules = buildDNRRules(rules);
 
-            expect(dnrRules[0].action.redirect.url).toBe('https://google.com');
+            expect(dnrRules[0]!.action!.redirect!.url).toBe('https://google.com');
         });
 
         test('should not add protocol if target already has https', () => {
@@ -133,7 +142,7 @@ test.describe('background-logic.ts - Pure Functions', () => {
 
             const dnrRules = buildDNRRules(rules);
 
-            expect(dnrRules[0].action.redirect.url).toBe('https://google.com');
+            expect(dnrRules[0]!.action!.redirect!.url).toBe('https://google.com');
         });
 
         test('should not add protocol if target already has http', () => {
@@ -149,7 +158,7 @@ test.describe('background-logic.ts - Pure Functions', () => {
 
             const dnrRules = buildDNRRules(rules);
 
-            expect(dnrRules[0].action.redirect.url).toBe('http://google.com');
+            expect(dnrRules[0]!.action!.redirect!.url).toBe('http://google.com');
         });
 
         test('should handle shuffle target', () => {
@@ -166,8 +175,8 @@ test.describe('background-logic.ts - Pure Functions', () => {
             const dnrRules = buildDNRRules(rules);
 
             expect(dnrRules).toHaveLength(1);
-            expect(dnrRules[0].action.redirect.url).not.toBe(':shuffle:');
-            expect(dnrRules[0].action.redirect.url).toBeTruthy();
+            expect(dnrRules[0]!.action!.redirect!.url).not.toBe(':shuffle:');
+            expect(dnrRules[0]!.action!.redirect!.url).toBeTruthy();
         });
 
         test('should generate consistent rule IDs', () => {
@@ -235,7 +244,7 @@ test.describe('background-logic.ts - Pure Functions', () => {
         });
     });
 
-    test.describe('findActivelyChangedRules', () => {
+    describe('findActivelyChangedRules', () => {
         test('should find newly activated rules', () => {
             const oldRules = [
                 {
@@ -377,7 +386,7 @@ test.describe('background-logic.ts - Pure Functions', () => {
         });
     });
 
-    test.describe('findMatchingTabs', () => {
+    describe('findMatchingTabs', () => {
         test('should find matching tabs', () => {
             const tabs = [
                 { id: 1, url: 'https://example.com' },

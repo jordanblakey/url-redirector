@@ -1,11 +1,11 @@
 
-import { test, expect } from '../fixtures';
-import { matchAndGetTarget, shouldRuleApply, isValidUrl, generateRuleId } from '../../src/utils';
-import { Rule } from '../../src/types';
+import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
+import { matchAndGetTarget, shouldRuleApply, isValidUrl, generateRuleId } from '../../../src/utils';
+import { Rule } from '../../../src/types';
 
-test.describe('Utils', () => {
+describe('Utils', () => {
 
-    test.describe('matchAndGetTarget', () => {
+    describe('matchAndGetTarget', () => {
         const baseRule: Rule = {
             id: 1,
             source: 'facebook.com',
@@ -59,7 +59,16 @@ test.describe('Utils', () => {
         });
     });
 
-    test.describe('shouldRuleApply', () => {
+    describe('shouldRuleApply', () => {
+        beforeEach(() => {
+            vi.useFakeTimers();
+            vi.setSystemTime(Date.now());
+        });
+
+        afterEach(() => {
+            vi.useRealTimers();
+        });
+
         test('should return true for active rule', () => {
             const rule: Rule = { id: 1, source: 'a', target: 'b', active: true, count: 0 };
             expect(shouldRuleApply(rule)).toBe(true);
@@ -83,7 +92,7 @@ test.describe('Utils', () => {
         });
     });
 
-    test.describe('isValidUrl', () => {
+    describe('isValidUrl', () => {
         test('should validate correct URLs', () => {
             expect(isValidUrl('google.com')).toBe(true);
             expect(isValidUrl('https://google.com')).toBe(true);
@@ -96,7 +105,7 @@ test.describe('Utils', () => {
         });
     });
 
-    test.describe('generateRuleId', () => {
+    describe('generateRuleId', () => {
         test('should generate consistent IDs', () => {
             const id1 = generateRuleId('example.com');
             const id2 = generateRuleId('example.com');

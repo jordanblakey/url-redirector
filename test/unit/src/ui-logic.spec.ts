@@ -1,4 +1,4 @@
-import { test, expect } from '../fixtures';
+import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
 import {
     getFaviconUrl,
     shouldShowFavicon,
@@ -11,10 +11,10 @@ import {
     sortRulesBySource,
     extractPlaceholderValue,
     getNextRuleState,
-} from '../../src/ui-logic.js';
+} from '../../../src/ui-logic.js';
 
-test.describe('ui-logic.ts - Pure Functions', () => {
-    test.describe('getFaviconUrl', () => {
+describe('ui-logic.ts - Pure Functions', () => {
+    describe('getFaviconUrl', () => {
         test('should generate favicon URL for domain with http', () => {
             const url = getFaviconUrl('http://example.com');
             expect(url).toBe('https://www.google.com/s2/favicons?domain=example.com&sz=32');
@@ -36,7 +36,7 @@ test.describe('ui-logic.ts - Pure Functions', () => {
         });
     });
 
-    test.describe('shouldShowFavicon', () => {
+    describe('shouldShowFavicon', () => {
         test('should return true for normal URLs', () => {
             expect(shouldShowFavicon('google.com')).toBe(true);
             expect(shouldShowFavicon('https://example.com')).toBe(true);
@@ -47,7 +47,7 @@ test.describe('ui-logic.ts - Pure Functions', () => {
         });
     });
 
-    test.describe('formatPauseButtonText', () => {
+    describe('formatPauseButtonText', () => {
         test('should return "Pause" for active rule', () => {
             const rule = { id: 1, source: 'a', target: 'b', active: true, count: 0 };
             expect(formatPauseButtonText(rule)).toBe('Pause');
@@ -73,7 +73,7 @@ test.describe('ui-logic.ts - Pure Functions', () => {
         });
     });
 
-    test.describe('formatRemainingTime', () => {
+    describe('formatRemainingTime', () => {
         test('should format seconds correctly', () => {
             const pausedUntil = Date.now() + 45 * 1000;
             const text = formatRemainingTime(pausedUntil);
@@ -87,7 +87,7 @@ test.describe('ui-logic.ts - Pure Functions', () => {
         });
     });
 
-    test.describe('isRulePaused', () => {
+    describe('isRulePaused', () => {
         test('should return true for paused rule', () => {
             const futureTime = Date.now() + 100000;
             const rule = { id: 1, source: 'a', target: 'b', active: true, count: 0, pausedUntil: futureTime };
@@ -106,7 +106,7 @@ test.describe('ui-logic.ts - Pure Functions', () => {
         });
     });
 
-    test.describe('shouldDisplayAsPaused', () => {
+    describe('shouldDisplayAsPaused', () => {
         test('should return true for inactive rule', () => {
             const rule = { id: 1, source: 'a', target: 'b', active: false, count: 0 };
             expect(shouldDisplayAsPaused(rule)).toBe(true);
@@ -124,7 +124,7 @@ test.describe('ui-logic.ts - Pure Functions', () => {
         });
     });
 
-    test.describe('getTargetDisplayText', () => {
+    describe('getTargetDisplayText', () => {
         test('should return shuffle emoji for shuffle target', () => {
             expect(getTargetDisplayText(':shuffle:')).toBe('🔀 shuffle');
         });
@@ -135,7 +135,7 @@ test.describe('ui-logic.ts - Pure Functions', () => {
         });
     });
 
-    test.describe('getCountMessage', () => {
+    describe('getCountMessage', () => {
         test('should return lastCountMessage if present', () => {
             const rule = { id: 1, source: 'a', target: 'b', active: true, count: 5, lastCountMessage: 'Custom message!' };
             expect(getCountMessage(rule)).toBe('Custom message!');
@@ -149,7 +149,7 @@ test.describe('ui-logic.ts - Pure Functions', () => {
         });
     });
 
-    test.describe('sortRulesBySource', () => {
+    describe('sortRulesBySource', () => {
         test('should sort rules alphabetically by source', () => {
             const rules = [
                 { id: 1, source: 'zebra.com', target: 'b', active: true, count: 0 },
@@ -177,7 +177,7 @@ test.describe('ui-logic.ts - Pure Functions', () => {
         });
     });
 
-    test.describe('extractPlaceholderValue', () => {
+    describe('extractPlaceholderValue', () => {
         test('should extract value after "e.g. " prefix', () => {
             expect(extractPlaceholderValue('e.g. example.com')).toBe('example.com');
             expect(extractPlaceholderValue('E.G. test.com')).toBe('test.com');
@@ -189,7 +189,16 @@ test.describe('ui-logic.ts - Pure Functions', () => {
         });
     });
 
-    test.describe('getNextRuleState', () => {
+    describe('getNextRuleState', () => {
+        beforeEach(() => {
+            vi.useFakeTimers();
+            vi.setSystemTime(Date.now());
+        });
+
+        afterEach(() => {
+            vi.useRealTimers();
+        });
+
         test('should resume paused rule', () => {
             const futureTime = Date.now() + 100000;
             const rule = { id: 1, source: 'a', target: 'b', active: true, count: 0, pausedUntil: futureTime };
@@ -214,11 +223,10 @@ test.describe('ui-logic.ts - Pure Functions', () => {
             expect(nextState.pausedUntil).toBeDefined();
             expect(nextState.pausedUntil).toBeGreaterThan(Date.now());
 
-            // Should be approximately 5 minutes (allow 1 second tolerance)
+            // Should be exactly 5 minutes because time is frozen
             const fiveMinutes = 5 * 60 * 1000;
             const diff = (nextState.pausedUntil || 0) - Date.now();
-            expect(diff).toBeGreaterThan(fiveMinutes - 1000);
-            expect(diff).toBeLessThan(fiveMinutes + 1000);
+            expect(diff).toBe(fiveMinutes); 
         });
     });
 });

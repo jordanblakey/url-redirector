@@ -1,9 +1,9 @@
-import { test, expect } from '../fixtures';
+import { test, expect, getServiceWorker } from '../fixtures';
 
 test.describe('Utils Coverage - E2E', () => {
     test.describe('URL Matching and Redirection', () => {
         test('should handle protocol normalization (http vs https)', async ({ context }) => {
-            const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
+            const worker = await getServiceWorker(context);
 
             await worker.evaluate(async () => {
                 const rules = [{
@@ -16,13 +16,16 @@ test.describe('Utils Coverage - E2E', () => {
                 await chrome.storage.local.set({ rules });
             });
 
+            // Wait for background script to process rule changes
+            await new Promise(r => setTimeout(r, 500));
+
             const page = await context.newPage();
             await page.goto('https://http-test.com');
             await expect(page).toHaveURL(/google\.com/);
         });
 
         test('should handle www normalization', async ({ context }) => {
-            const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
+            const worker = await getServiceWorker(context);
 
             await worker.evaluate(async () => {
                 const rules = [{
@@ -35,13 +38,16 @@ test.describe('Utils Coverage - E2E', () => {
                 await chrome.storage.local.set({ rules });
             });
 
+            // Wait for background script to process rule changes
+            await new Promise(r => setTimeout(r, 500));
+
             const page = await context.newPage();
             await page.goto('https://www.www-test.com');
             await expect(page).toHaveURL(/google\.com/);
         });
 
         test('should add https protocol to target if missing', async ({ context }) => {
-            const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
+            const worker = await getServiceWorker(context);
 
             await worker.evaluate(async () => {
                 const rules = [{
@@ -54,13 +60,16 @@ test.describe('Utils Coverage - E2E', () => {
                 await chrome.storage.local.set({ rules });
             });
 
+            // Wait for background script to process rule changes
+            await new Promise(r => setTimeout(r, 500));
+
             const page = await context.newPage();
             await page.goto('https://protocol-test.com');
             await expect(page).toHaveURL(/https:\/\/example\.com/);
         });
 
         test('should handle shuffle target', async ({ context }) => {
-            const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
+            const worker = await getServiceWorker(context);
 
             await worker.evaluate(async () => {
                 const rules = [{
@@ -72,6 +81,9 @@ test.describe('Utils Coverage - E2E', () => {
                 }];
                 await chrome.storage.local.set({ rules });
             });
+
+            // Wait for background script to process rule changes
+            await new Promise(r => setTimeout(r, 500));
 
             const page = await context.newPage();
             await page.goto('https://shuffle-test.com');
@@ -85,7 +97,7 @@ test.describe('Utils Coverage - E2E', () => {
         });
 
         test('should match URL with path', async ({ context }) => {
-            const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
+            const worker = await getServiceWorker(context);
 
             await worker.evaluate(async () => {
                 const rules = [{
@@ -97,6 +109,9 @@ test.describe('Utils Coverage - E2E', () => {
                 }];
                 await chrome.storage.local.set({ rules });
             });
+
+            // Wait for background script to process rule changes
+            await new Promise(r => setTimeout(r, 500));
 
             const page = await context.newPage();
             await page.goto('https://path-test.com/some/path');

@@ -1,7 +1,7 @@
-import { test, expect } from '../fixtures';
-import { loadGcpSecrets } from '../../scripts/load-dotenv-from-gcp';
+import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
+import { loadGcpSecrets } from '../../../scripts/load-dotenv-from-gcp';
 
-test.describe('Load GCP Secrets Script', () => {
+describe('Load GCP Secrets Script', () => {
     let mockSecretManagerServiceClient: any;
     let mockLog: any;
     let mockError: any;
@@ -10,7 +10,7 @@ test.describe('Load GCP Secrets Script', () => {
     let errors: string[] = [];
     let exitCode: number | undefined;
 
-    test.beforeEach(() => {
+    beforeEach(() => {
         logs = [];
         errors = [];
         exitCode = undefined;

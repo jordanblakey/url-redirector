@@ -40,8 +40,9 @@ export default defineConfig({
         },
       },
     ],
+    process.env.CI ? ["github"] : ["dot"],
     // ["dot"], // compact progress
-    ["list"], // show tests
+    // ["list"], // show tests
     ["html", { outputFolder: "test/playwright-report", open: true }], // artifacts
   ],
   outputDir: "test/test-results",

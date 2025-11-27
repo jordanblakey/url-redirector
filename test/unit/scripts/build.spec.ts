@@ -1,8 +1,8 @@
-import { test, expect } from '../fixtures';
-import { build } from '../../scripts/build';
+import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
+import { build } from '../../../scripts/build';
 import path from 'path';
 
-test.describe('Build Script', () => {
+describe('Build Script', () => {
     let mockExecSync: any;
     let mockFs: any;
     let mockLog: any;
@@ -14,7 +14,7 @@ test.describe('Build Script', () => {
     let executedCommands: string[] = [];
     let fsOperations: any[] = [];
 
-    test.beforeEach(() => {
+    beforeEach(() => {
         logs = [];
         warns = [];
         errors = [];

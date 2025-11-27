@@ -1,8 +1,8 @@
-import { test, expect } from '../fixtures';
+import { test, expect, getServiceWorker } from '../fixtures';
 
 test.describe('Immediate Redirect on Rule Change', () => {
     test('should immediately redirect tabs when a matching rule is added', async ({ context }) => {
-        const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
+        const worker = await getServiceWorker(context);
 
         // Open a tab to the source URL
         const page = await context.newPage();
@@ -25,7 +25,7 @@ test.describe('Immediate Redirect on Rule Change', () => {
     });
 
     test('should immediately redirect tabs when a rule is unpaused (pausedUntil removed)', async ({ context }) => {
-        const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
+        const worker = await getServiceWorker(context);
         const now = Date.now();
 
         // Start with a paused rule
@@ -66,7 +66,7 @@ test.describe('Immediate Redirect on Rule Change', () => {
     });
 
     test('should immediately redirect tabs when a matching rule is resumed', async ({ context }) => {
-        const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
+        const worker = await getServiceWorker(context);
 
         // Start with an inactive rule
         await worker.evaluate(async () => {
@@ -104,7 +104,7 @@ test.describe('Immediate Redirect on Rule Change', () => {
     });
 
     test('should redirect new tabs using DNR rules', async ({ context }) => {
-        const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
+        const worker = await getServiceWorker(context);
 
         // Add rule
         await worker.evaluate(async () => {

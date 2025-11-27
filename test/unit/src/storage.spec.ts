@@ -1,12 +1,12 @@
 
-import { test, expect } from '../fixtures';
-import { storage } from '../../src/storage';
-import { Rule } from '../../src/types';
+import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
+import { storage } from '../../../src/storage';
+import { Rule } from '../../../src/types';
 
-test.describe('Storage', () => {
+describe('Storage', () => {
     let mockStorage: Record<string, any> = {};
 
-    test.beforeAll(() => {
+    beforeAll(() => {
         // Mock global chrome object
         global.chrome = {
             storage: {
@@ -27,7 +27,7 @@ test.describe('Storage', () => {
         } as any;
     });
 
-    test.beforeEach(() => {
+    beforeEach(() => {
         mockStorage = {};
     });
 

@@ -1,8 +1,8 @@
 
-import { expect, test } from '@playwright/test';
-import { getRandomMessage, MESSAGES } from '../../src/messages';
+import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
+import { getRandomMessage, MESSAGES } from '../../../src/messages';
 
-test.describe('Message Logic', () => {
+describe('Message Logic', () => {
     test('should return standard message for count 0', () => {
         const message = getRandomMessage(0);
         expect(message).toBe('Used <span class="count-value">0</span> times');

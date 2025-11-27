@@ -7,6 +7,24 @@ import { promisify } from 'util';
 
 const userDataDirs: string[] = [];
 
+export async function getServiceWorker(context: BrowserContext) {
+  let background: { url(): string; } | undefined = context.serviceWorkers()[0];
+  if (!background) {
+    background = await Promise.race([
+      context.waitForEvent('serviceworker'),
+      new Promise<{ url(): string; }>(resolve => {
+        const interval = setInterval(() => {
+          if (context.serviceWorkers().length > 0) {
+            clearInterval(interval);
+            resolve(context.serviceWorkers()[0]);
+          }
+        }, 50);
+      })
+    ]);
+  }
+  return background;
+}
+
 export const test = base.extend<{
   context: BrowserContext;
   extensionId: string;
@@ -171,12 +189,7 @@ export const test = base.extend<{
   }, { scope: 'test', auto: true }],
 
   extensionId: async ({ context }, use) => {
-    let background: { url(): string; };
-    if (context.serviceWorkers().length > 0) {
-      background = context.serviceWorkers()[0];
-    } else {
-      background = await context.waitForEvent('serviceworker');
-    }
+    const background = await getServiceWorker(context);
     const extensionId = background.url().split('/')[2];
     await use(extensionId);
   },

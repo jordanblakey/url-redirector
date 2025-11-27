@@ -1,7 +1,7 @@
-import { test, expect } from '../fixtures';
-import { runCheckStatus } from '../../scripts/check-cws-status';
+import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
+import { runCheckStatus } from '../../../scripts/check-cws-status';
 
-test.describe('Check CWS Status Script', () => {
+describe('Check CWS Status Script', () => {
     let mockLoadSecrets: any;
     let mockFetch: any;
     let mockLog: any;
@@ -12,7 +12,7 @@ test.describe('Check CWS Status Script', () => {
     let errors: any[] = [];
     let fetchCalls: any[] = [];
 
-    test.beforeEach(() => {
+    beforeEach(() => {
         logs = [];
         dirs = [];
         errors = [];

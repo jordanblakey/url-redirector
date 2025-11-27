@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from "vitest";
 import * as fs from "fs";
 import * as path from "path";
 import { execSync } from "child_process";
@@ -7,10 +7,10 @@ const rootDir = path.resolve(__dirname, "../..");
 // Create a unique temporary directory for this test run
 const distDir = path.join(rootDir, `dist-test-${Date.now()}`);
 
-test.describe.configure({ mode: "serial" });
+// describe.configure({ mode: "serial" });
 
-test.describe("Build Process Validation", () => {
-  test.beforeAll(() => {
+describe("Build Process Validation", () => {
+  beforeAll(() => {
     // Run the build command with the custom output directory
 
     execSync(`npm run build -- "${distDir}"`, {
@@ -19,7 +19,7 @@ test.describe("Build Process Validation", () => {
     });
   });
 
-  test.afterAll(() => {
+  afterAll(() => {
     // Clean up the temporary directory
 
     if (fs.existsSync(distDir)) {
@@ -31,7 +31,7 @@ test.describe("Build Process Validation", () => {
     expect(fs.existsSync(distDir)).toBe(true);
   });
 
-  test.describe("Required Files", () => {
+  describe("Required Files", () => {
     test("manifest.json should exist in dist", () => {
       const manifestPath = path.join(distDir, "manifest.json");
       expect(fs.existsSync(manifestPath)).toBe(true);
@@ -69,7 +69,7 @@ test.describe("Build Process Validation", () => {
     });
   });
 
-  test.describe("Compiled JavaScript Files", () => {
+  describe("Compiled JavaScript Files", () => {
     test("background.js should exist in dist", () => {
       const backgroundPath = path.join(distDir, "background.js");
       expect(fs.existsSync(backgroundPath)).toBe(true);
@@ -95,7 +95,7 @@ test.describe("Build Process Validation", () => {
     });
   });
 
-  test.describe("Icon Files", () => {
+  describe("Icon Files", () => {
     test("icon-128.png should exist", () => {
       const iconPath = path.join(distDir, "icons", "icon-128.png");
       expect(fs.existsSync(iconPath)).toBe(true);
@@ -148,7 +148,7 @@ test.describe("Build Process Validation", () => {
     });
   });
 
-  test.describe("File Integrity", () => {
+  describe("File Integrity", () => {
     test("all JavaScript files should have non-zero size", () => {
       const jsFiles = ["background.js", "options.js", "utils.js"];
 
@@ -185,7 +185,7 @@ test.describe("Build Process Validation", () => {
     });
   });
 
-  test.describe("Extension Completeness", () => {
+  describe("Extension Completeness", () => {
     test("dist should contain all files needed for a working extension", () => {
       const requiredFiles = [
         "manifest.json",
@@ -237,7 +237,7 @@ test.describe("Build Process Validation", () => {
     });
   });
 
-  test.describe("Build Reproducibility", () => {
+  describe("Build Reproducibility", () => {
     test("running build twice should produce same files", () => {
       // Get current file list
       const getFileList = (dir: string): string[] => {

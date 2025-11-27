@@ -1,13 +1,8 @@
-import { test, expect } from "../fixtures";
+import { test, expect, getServiceWorker } from '../fixtures';
 
-test.describe("Badge Functionality", () => {
-  // test("should show badge on redirection", async ({ page, context }) => {
-  // });
-
-  test("should not show badge if rule is inactive", async ({ page, context }) => {
-    const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
-
-    // Set up an inactive rule
+test.describe('Badge Functionality', () => {
+  test('should not show badge if rule is inactive', async ({ context, page }) => {
+    const worker = await getServiceWorker(context);
     await worker.evaluate(async () => {
       const rules = [{ source: "example.org", target: "google.com", active: false, count: 0 }];
       await chrome.storage.local.set({ rules });
