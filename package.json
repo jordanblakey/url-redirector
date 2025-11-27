@@ -12,7 +12,7 @@
     "test:install": "playwright install --with-deps chromium",
     "test": "npm run build && playwright test",
     "test:ui": "npm run build && playwright test --ui",
-    "test:coverage": "npm run build && playwright test && npx monocart show-report test/coverage/index.html",
+    "test:coverage": "npm run build && playwright test",
     "update-manifest": "jq --arg v $npm_package_version '.version = $v' manifest.json > tmp.json && mv tmp.json manifest.json",
     "version": "npm run update-manifest && git add manifest.json",
     "postversion": "npm run cws:submit -- --submit && gh release create v$npm_package_version --generate-notes",

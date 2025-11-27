@@ -10,7 +10,7 @@ test.describe("Rule Validation", () => {
     await page.fill("#targetUrl", "google.com");
 
     await page.click("#addRuleBtn");
-    await page.waitForTimeout(100);
+
 
     const rulesList = page.locator("#rulesList");
     // It should fail to add, so count should be 0
@@ -35,14 +35,14 @@ test.describe("Rule Validation", () => {
     await page.fill("#sourceUrl", "example.com");
     await page.fill("#targetUrl", "target1.com");
     await page.click("#addRuleBtn");
-    await page.waitForTimeout(100);
+
 
     // Try to add duplicate source
     await page.fill("#sourceUrl", "example.com");
     await page.fill("#targetUrl", "target2.com");
 
     await page.click("#addRuleBtn");
-    await page.waitForTimeout(100);
+
 
     // Expect only 1 rule
     const rulesList = page.locator("#rulesList");
@@ -67,7 +67,7 @@ test.describe("Rule Validation", () => {
     await page.fill("#targetUrl", "same.com");
 
     await page.click("#addRuleBtn");
-    await page.waitForTimeout(100);
+
 
     const rulesList = page.locator("#rulesList");
     await expect(rulesList.locator(".rule-item")).toHaveCount(0);

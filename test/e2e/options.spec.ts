@@ -22,7 +22,7 @@ test.describe('URL Redirector Options Page', () => {
         await page.click('#addRuleBtn');
 
         // Wait for the rule to appear
-        await page.waitForTimeout(100);
+
 
         // Verify the rule appears in the list
         const rulesList = page.locator('#rulesList');
@@ -45,7 +45,7 @@ test.describe('URL Redirector Options Page', () => {
         await page.fill('#targetUrl', 'works.com');
         await page.press('#targetUrl', 'Enter');
 
-        await page.waitForTimeout(100);
+
 
         const rulesList = page.locator('#rulesList');
         await expect(rulesList.locator('.rule-item')).toHaveCount(1);
@@ -57,7 +57,7 @@ test.describe('URL Redirector Options Page', () => {
         await page.fill('#sourceUrl', 'example.com');
         await page.fill('#targetUrl', 'test.com');
         await page.click('#addRuleBtn');
-        await page.waitForTimeout(100);
+
 
         // Reload the page
         await page.reload();
@@ -74,7 +74,7 @@ test.describe('URL Redirector Options Page', () => {
         await page.fill('#sourceUrl', 'delete-me.com');
         await page.fill('#targetUrl', 'target.com');
         await page.click('#addRuleBtn');
-        await page.waitForTimeout(100);
+
 
         // Verify rule exists
         const ruleItem = page.locator('#rulesList .rule-item');
@@ -85,7 +85,7 @@ test.describe('URL Redirector Options Page', () => {
 
         // Click delete button
         await page.click('.delete-btn');
-        await page.waitForTimeout(100);
+
 
         // Verify rule is gone
         await expect(page.locator('#rulesList')).toContainText('No rules added yet');
@@ -97,13 +97,13 @@ test.describe('URL Redirector Options Page', () => {
         await page.fill('#sourceUrl', 'site1.com');
         await page.fill('#targetUrl', 'target1.com');
         await page.click('#addRuleBtn');
-        await page.waitForTimeout(100);
+
 
         // Add second rule
         await page.fill('#sourceUrl', 'site2.com');
         await page.fill('#targetUrl', 'target2.com');
         await page.click('#addRuleBtn');
-        await page.waitForTimeout(100);
+
 
         // Verify both rules exist
         await expect(page.locator('#rulesList .rule-item')).toHaveCount(2);
@@ -126,7 +126,7 @@ test.describe('URL Redirector Options Page', () => {
         await page.fill('#sourceUrl', 'example.com');
         await page.fill('#targetUrl', 'google.com');
         await page.click('#addRuleBtn');
-        await page.waitForTimeout(200);
+
 
         // Verify the rule was added (which triggers checkAndRedirectTabs)
         await expect(page.locator('#rulesList .rule-item')).toHaveCount(1);
@@ -140,7 +140,7 @@ test.describe('URL Redirector Options Page', () => {
         await page.fill('#sourceUrl', 'toggle.com');
         await page.fill('#targetUrl', 'target.com');
         await page.click('#addRuleBtn');
-        await page.waitForTimeout(100);
+
 
         const ruleItem = page.locator('.rule-item').first();
         const toggleBtn = ruleItem.locator('.toggle-btn');
@@ -153,7 +153,7 @@ test.describe('URL Redirector Options Page', () => {
 
         // Click to Pause
         await toggleBtn.click();
-        await page.waitForTimeout(100);
+
 
         await ruleItem.hover();
 
@@ -161,7 +161,7 @@ test.describe('URL Redirector Options Page', () => {
 
         // Click to Resume
         await toggleBtn.click();
-        await page.waitForTimeout(100);
+
 
         await ruleItem.hover();
         await expect(ruleItem).not.toHaveClass(/paused/);
@@ -171,7 +171,7 @@ test.describe('URL Redirector Options Page', () => {
         await page.fill('#sourceUrl', 'delete-fail.com');
         await page.fill('#targetUrl', 'target.com');
         await page.click('#addRuleBtn');
-        await page.waitForTimeout(100);
+
 
         // Clear storage directly
         await page.evaluate(() => {
@@ -185,7 +185,7 @@ test.describe('URL Redirector Options Page', () => {
 
         // Click Delete
         await page.click('.delete-btn');
-        await page.waitForTimeout(100);
+
         // No error should occur
     });
 
@@ -193,7 +193,7 @@ test.describe('URL Redirector Options Page', () => {
         await page.fill('#sourceUrl', 'toggle-fail.com');
         await page.fill('#targetUrl', 'target.com');
         await page.click('#addRuleBtn');
-        await page.waitForTimeout(100);
+
 
         await page.evaluate(() => {
             return new Promise<void>((resolve) => {
@@ -205,7 +205,7 @@ test.describe('URL Redirector Options Page', () => {
         await ruleItem.hover();
 
         await page.click('.toggle-btn');
-        await page.waitForTimeout(100);
+
         // No error should occur
     });
 
@@ -214,17 +214,17 @@ test.describe('URL Redirector Options Page', () => {
         await page.fill('#sourceUrl', 'zebra.com');
         await page.fill('#targetUrl', 'target.com');
         await page.click('#addRuleBtn');
-        await page.waitForTimeout(100);
+
 
         await page.fill('#sourceUrl', 'apple.com');
         await page.fill('#targetUrl', 'target.com');
         await page.click('#addRuleBtn');
-        await page.waitForTimeout(100);
+
 
         await page.fill('#sourceUrl', 'beta.com');
         await page.fill('#targetUrl', 'target.com');
         await page.click('#addRuleBtn');
-        await page.waitForTimeout(100);
+
 
         // Get all source elements
         const sourceElements = page.locator('.rule-source');
@@ -244,7 +244,7 @@ test.describe('URL Redirector Options Page', () => {
         await page.fill('#sourceUrl', 'plural-test-options.com');
         await page.fill('#targetUrl', 'target.com');
         await page.click('#addRuleBtn');
-        await page.waitForTimeout(100);
+
 
         const ruleItem = page.locator('.rule-item').first();
         const countSpan = ruleItem.locator('.rule-count');

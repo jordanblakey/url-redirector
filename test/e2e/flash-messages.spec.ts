@@ -38,7 +38,11 @@ test.describe("Flash Messages", () => {
     await page.click("#addRuleBtn");
 
     // Wait for success message to disappear or just wait a bit
-    await page.waitForTimeout(3500);
+    // Wait for the rule to be added to ensure persistence
+    await expect(page.locator('.rule-item')).toHaveCount(1);
+
+    // Reload to clear success message instantly
+    await page.reload();
 
     // Try to add the same rule again
     await page.fill("#sourceUrl", "duplicate.com");
