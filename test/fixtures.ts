@@ -132,9 +132,22 @@ export const test = base.extend<{
 
             let source;
             try {
-              source = fs.readFileSync(url, 'utf-8');
+              // Read the source file content
+              const absolutePath = path.resolve(process.cwd(), url);
+              const rawSource = fs.readFileSync(absolutePath, 'utf-8');
+
+              // Transpile TS to JS, stripping types but keeping line numbers
+              // This fixes "Unparsable source" errors in monocart-reporter
+              const babel = require('@babel/core');
+              const result = babel.transformSync(rawSource, {
+                presets: ['@babel/preset-typescript'],
+                retainLines: true,
+                compact: false,
+                filename: url
+              });
+              source = result.code;
             } catch (e) {
-              console.warn('Failed to read source for', url);
+              console.warn('Failed to read/transpile source for', url);
             }
 
             return {
