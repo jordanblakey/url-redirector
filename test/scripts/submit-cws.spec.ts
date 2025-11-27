@@ -1,4 +1,4 @@
-import { test, expect } from './coverage-fixture';
+import { test, expect } from '../fixtures';
 import { submitCws } from '../../scripts/submit-cws';
 import path from 'path';
 

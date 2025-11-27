@@ -1,4 +1,4 @@
-import { test, expect } from './coverage-fixture';
+import { test, expect } from '../fixtures';
 import { loadGcpSecrets } from '../../scripts/load-dotenv-from-gcp';
 
 test.describe('Load GCP Secrets Script', () => {

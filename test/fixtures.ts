@@ -2,6 +2,8 @@ import { test as base, chromium, type BrowserContext, type Page } from '@playwri
 import { addCoverageReport } from 'monocart-reporter';
 import path from 'path';
 import fs from 'fs';
+import { Session } from 'inspector';
+import { promisify } from 'util';
 
 const userDataDirs: string[] = [];
 
@@ -33,57 +35,119 @@ export const test = base.extend<{
     fs.rmSync(userDataDir, { recursive: true, force: true });
   },
 
-  autoCoverage: [async ({ context }, use) => {
-    // 1. Coverage Collection Logic
-    const startCoverage = async (page: Page) => {
-      if (page.isClosed()) return;
-      try {
-        await Promise.all([
-          page.coverage.startJSCoverage({ resetOnNavigation: false }),
-          page.coverage.startCSSCoverage({ resetOnNavigation: false }),
-        ]);
-      } catch (e) { /* ignore */ }
-    };
+  autoCoverage: [async ({ context }, use, testInfo) => {
+    // Check if we are running in a browser context (E2E tests)
+    const isBrowserTest = !!context;
 
-    for (const page of context.pages()) await startCoverage(page);
-    context.on('page', startCoverage);
+    // --- Browser Coverage Setup ---
+    if (isBrowserTest) {
+      const startCoverage = async (page: Page) => {
+        if (page.isClosed()) return;
+        try {
+          await Promise.all([
+            page.coverage.startJSCoverage({ resetOnNavigation: false }),
+            page.coverage.startCSSCoverage({ resetOnNavigation: false }),
+          ]);
+        } catch (e) { /* ignore */ }
+      };
+
+      for (const page of context.pages()) await startCoverage(page);
+      context.on('page', startCoverage);
+    }
+
+    // --- Node.js Coverage Setup (for Scripts) ---
+    let session: Session | undefined;
+    let post: any;
+
+    if (!isBrowserTest) {
+      session = new Session();
+      session.connect();
+      post = promisify(session.post).bind(session);
+
+      try {
+        await post('Profiler.enable');
+        await post('Profiler.startPreciseCoverage', { callCount: true, detailed: true });
+      } catch (e) {
+        console.warn('Failed to start Node.js coverage:', e);
+      }
+    }
 
     await use();
 
-    // 2. Stop Collection
-    const coverageList: any[] = [];
-    for (const page of context.pages()) {
-      if (page.isClosed()) continue;
-      try {
-        const [jsCoverage, cssCoverage] = await Promise.all([
-          page.coverage.stopJSCoverage(),
-          page.coverage.stopCSSCoverage()
-        ]);
-        coverageList.push(...jsCoverage, ...cssCoverage);
-      } catch (e) { /* ignore */ }
-    }
-
-    const distDir = path.resolve(__dirname, '../dist');
-
-    const calibratedList = coverageList.map(entry => {
-      // Check if this is actually an extension file
-      if (entry.url.startsWith('chrome-extension://')) {
-        const relativePath = entry.url.replace(/^chrome-extension:\/\/.*?\//, '');
-        const localPath = path.join(distDir, relativePath);
-
-        return {
-          ...entry,
-          url: localPath
-        };
+    // --- Browser Coverage Collection ---
+    if (isBrowserTest) {
+      const coverageList: any[] = [];
+      for (const page of context.pages()) {
+        if (page.isClosed()) continue;
+        try {
+          const [jsCoverage, cssCoverage] = await Promise.all([
+            page.coverage.stopJSCoverage(),
+            page.coverage.stopCSSCoverage()
+          ]);
+          coverageList.push(...jsCoverage, ...cssCoverage);
+        } catch (e) { /* ignore */ }
       }
 
-      // Return external URLs (http/https) as-is
-      // The entryFilter in your config will catch and exclude these later
-      return entry;
-    });
+      const distDir = path.resolve(__dirname, '../dist');
+      const calibratedList = coverageList.map(entry => {
+        if (entry.url.startsWith('chrome-extension://')) {
+          const relativePath = entry.url.replace(/^chrome-extension:\/\/.*?\//, '');
+          const localPath = path.join(distDir, relativePath);
+          return { ...entry, url: localPath };
+        }
+        return entry;
+      });
 
-    // 4. Send clean data to reporter
-    await addCoverageReport(calibratedList, test.info());
+      await addCoverageReport(calibratedList, testInfo);
+    }
+
+    // --- Node.js Coverage Collection ---
+    if (!isBrowserTest && session && post) {
+      try {
+        const { result } = await post('Profiler.takePreciseCoverage') as any;
+        await post('Profiler.stopPreciseCoverage');
+        await post('Profiler.disable');
+
+        const coverage = result;
+
+        if (coverage) {
+          const filtered = coverage.filter((entry: any) =>
+            entry.url.includes('/scripts/') &&
+            !entry.url.includes('node_modules') &&
+            !entry.url.includes('test/')
+          ).map((entry: any) => {
+            let url = entry.url;
+            if (url.startsWith('file://')) {
+              url = url.replace('file://', '');
+            }
+
+            // Make relative to project root
+            url = path.relative(process.cwd(), url);
+
+            let source;
+            try {
+              source = fs.readFileSync(url, 'utf-8');
+            } catch (e) {
+              console.warn('Failed to read source for', url);
+            }
+
+            return {
+              ...entry,
+              url,
+              source
+            };
+          });
+
+          if (filtered.length > 0) {
+            await addCoverageReport(filtered, testInfo);
+          }
+        }
+      } catch (e) {
+        console.warn('Failed to collect Node.js coverage:', e);
+      } finally {
+        session.disconnect();
+      }
+    }
 
   }, { scope: 'test', auto: true }],
 

@@ -1,4 +1,4 @@
-import { test, expect } from './coverage-fixture';
+import { test, expect } from '../fixtures';
 import { build } from '../../scripts/build';
 import path from 'path';
 

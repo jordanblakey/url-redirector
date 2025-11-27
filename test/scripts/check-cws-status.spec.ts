@@ -1,4 +1,4 @@
-import { test, expect } from './coverage-fixture';
+import { test, expect } from '../fixtures';
 import { runCheckStatus } from '../../scripts/check-cws-status';
 
 test.describe('Check CWS Status Script', () => {

@@ -1,4 +1,4 @@
-import { test, expect } from './coverage-fixture';
+import { test, expect } from '../fixtures';
 import { setupAuth } from '../../scripts/setup-cws-auth';
 
 test.describe('Setup CWS Auth Script', () => {

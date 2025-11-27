@@ -1,4 +1,4 @@
-import { test, expect } from './coverage-fixture';
+import { test, expect } from '../fixtures';
 import { bundle } from '../../scripts/bundle';
 
 test.describe('Bundle Script', () => {
