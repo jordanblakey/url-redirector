@@ -92,7 +92,7 @@ test.describe('UI Components', () => {
             // It might be called in a loop in options.ts/popup.ts)
 
             // Wait a bit for the interval to tick (usually 1 sec)
-            await page.waitForTimeout(1500);
+
 
             // Trigger a re-render or wait for update
             // Since we updated storage, the interval in options.ts (which reads data-paused-until)

@@ -39,7 +39,7 @@ test.describe("URL Redirector Popup", () => {
     await page.fill("#targetUrl", "works.com");
     await page.press("#targetUrl", "Enter");
 
-    await page.waitForTimeout(100);
+
 
     const rulesList = page.locator("#rulesList");
     await expect(rulesList.locator(".rule-item")).toHaveCount(1);
@@ -53,7 +53,7 @@ test.describe("URL Redirector Popup", () => {
     await page.fill("#sourceUrl", "example.com");
     await page.fill("#targetUrl", "test.com");
     await page.click("#addRuleBtn");
-    await page.waitForTimeout(100);
+
 
     // Reload the page
     await page.reload();
@@ -72,7 +72,7 @@ test.describe("URL Redirector Popup", () => {
     await page.fill("#sourceUrl", "delete-me.com");
     await page.fill("#targetUrl", "target.com");
     await page.click("#addRuleBtn");
-    await page.waitForTimeout(100);
+
 
     // Verify rule exists
     const ruleItem = page.locator("#rulesList .rule-item");
@@ -83,7 +83,7 @@ test.describe("URL Redirector Popup", () => {
 
     // Click delete button
     await page.click(".delete-btn");
-    await page.waitForTimeout(100);
+
 
     // Verify rule is gone
     await expect(page.locator("#rulesList")).toContainText(
@@ -97,13 +97,13 @@ test.describe("URL Redirector Popup", () => {
     await page.fill("#sourceUrl", "site1.com");
     await page.fill("#targetUrl", "target1.com");
     await page.click("#addRuleBtn");
-    await page.waitForTimeout(100);
+
 
     // Add second rule
     await page.fill("#sourceUrl", "site2.com");
     await page.fill("#targetUrl", "target2.com");
     await page.click("#addRuleBtn");
-    await page.waitForTimeout(100);
+
 
     // Verify both rules exist
     await expect(page.locator("#rulesList .rule-item")).toHaveCount(2);
@@ -127,7 +127,7 @@ test.describe("URL Redirector Popup", () => {
     await page.fill("#sourceUrl", "duplicate-test.com");
     await page.fill("#targetUrl", "target1.com");
     await page.click("#addRuleBtn");
-    await page.waitForTimeout(100);
+
 
     // Try to add duplicate source
     await page.fill("#sourceUrl", "duplicate-test.com");
@@ -140,7 +140,7 @@ test.describe("URL Redirector Popup", () => {
     });
 
     await page.click("#addRuleBtn");
-    await page.waitForTimeout(100);
+
 
     // Expect only 1 rule
     const rulesList = page.locator("#rulesList");
@@ -158,7 +158,7 @@ test.describe("URL Redirector Popup", () => {
     await page.fill("#targetUrl", "google.com");
 
     await page.click("#addRuleBtn");
-    await page.waitForTimeout(100);
+
 
     const rulesList = page.locator("#rulesList");
     // It should fail to add, so count should be 0
@@ -183,7 +183,7 @@ test.describe("URL Redirector Popup", () => {
     await page.fill("#targetUrl", "same.com");
 
     await page.click("#addRuleBtn");
-    await page.waitForTimeout(100);
+
 
     const rulesList = page.locator("#rulesList");
     await expect(rulesList.locator(".rule-item")).toHaveCount(0);
@@ -205,7 +205,7 @@ test.describe("URL Redirector Popup", () => {
     await page.fill("#sourceUrl", "plural-test.com");
     await page.fill("#targetUrl", "target.com");
     await page.click("#addRuleBtn");
-    await page.waitForTimeout(100);
+
 
     const ruleItem = page.locator(".rule-item").first();
     const countSpan = ruleItem.locator(".rule-count");

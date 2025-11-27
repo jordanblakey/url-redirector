@@ -11,7 +11,7 @@ test.describe('URL Redirector Pause Functionality', () => {
         await page.fill('#sourceUrl', 'pause-test.com');
         await page.fill('#targetUrl', 'target.com');
         await page.click('#addRuleBtn');
-        await page.waitForTimeout(100);
+
 
         // Verify rule exists and is active by default
         const ruleItem = page.locator('#rulesList .rule-item').first();
@@ -25,7 +25,7 @@ test.describe('URL Redirector Pause Functionality', () => {
 
         // Click pause
         await toggleBtn.click();
-        await page.waitForTimeout(100);
+
 
         // Hover again
         await ruleItem.hover();
@@ -36,7 +36,7 @@ test.describe('URL Redirector Pause Functionality', () => {
 
         // Click resume
         await toggleBtn.click();
-        await page.waitForTimeout(100);
+
 
         // Hover again
         await ruleItem.hover();
@@ -51,13 +51,13 @@ test.describe('URL Redirector Pause Functionality', () => {
         await page.fill('#sourceUrl', 'persist-pause.com');
         await page.fill('#targetUrl', 'target.com');
         await page.click('#addRuleBtn');
-        await page.waitForTimeout(100);
+
 
         // Pause the rule
         const ruleItem = page.locator('#rulesList .rule-item').first();
         await ruleItem.hover();
         await ruleItem.locator('.toggle-btn').click();
-        await page.waitForTimeout(100);
+
 
         // Reload page
         await page.reload();
