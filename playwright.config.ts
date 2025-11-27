@@ -7,7 +7,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  reporter: [
+  reporter: [ // https://playwright.dev/docs/test-reporters
     [
       "monocart-reporter",
       {
@@ -18,9 +18,9 @@ export default defineConfig({
         coverage: {
           lcov: true,
           reports: [
-            ['v8'],              // JSON format
-            ['console-details'], // CLI table - with summary
-            ['html']             // HTML report
+            ['v8'],              // generates JSON format files
+            ['html'],             // generates HTML report files
+            ['console-details'], // shows CLI table with summary
           ],
           entryFilter: (entry: any) => {
             // Only accept files that are part of YOUR project
@@ -35,7 +35,7 @@ export default defineConfig({
         },
       },
     ],
-    ["dot"], // compact
+    ["list"], // compact
     ["html", { outputFolder: "test/playwright-report", open: true }], // artifacts
   ],
   outputDir: "test/test-results",
@@ -44,7 +44,8 @@ export default defineConfig({
     video: "retain-on-failure",
     screenshot: "only-on-failure",
     launchOptions: {
-      // slowMo: 1000,
+      // slowMo: 100, // Optionally slow down the test execution in the browser. Use with workers: 1 to watch the test execution.
     },
   },
+  // workers: 1, // Use 1 worker to run tests serially and watch the test execution.
 });

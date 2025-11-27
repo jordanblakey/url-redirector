@@ -15,7 +15,6 @@ export const test = base.extend<{
     userDataDirs.push(userDataDir);
     const context = await chromium.launchPersistentContext(userDataDir, {
       headless: false,
-      slowMo: 100,
       viewport: null,
       ignoreDefaultArgs: ['--enable-automation'],
       args: [
