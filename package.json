@@ -39,6 +39,7 @@
     "@types/node": "^24.10.1",
     "adm-zip": "^0.5.16",
     "fs-extra": "^11.3.2",
+    "monocart-reporter": "^2.9.23",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
