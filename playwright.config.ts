@@ -8,23 +8,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: [
-    [
-      "monocart-reporter",
-      {
-        name: "URL Redirector E2E Coverage Report",
-        outputFile: "test/coverage/index.html",
-        open: true,
-        logging: "warn", // "debug", "info", "warn", "error"
-        coverage: {
-          lcov: true,
-          reports: ["v8", "console-details"],
-          entryFilter: (entry: any) =>
-            entry.url.includes("dist/") && !entry.url.endsWith(".css"),
-          sourceFilter: (sourcePath: string) =>
-            sourcePath.search(/src\/.+/) !== -1,
-        },
-      },
-    ],
+    // ["monocart-reporter", ...], // Removed
+
     ["dot"], // compact
     // ['list'], // verbose
     ["html", { outputFolder: "test/playwright-report", open: true }], // artifacts
