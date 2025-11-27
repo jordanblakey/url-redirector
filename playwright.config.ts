@@ -12,7 +12,7 @@ export default defineConfig({
       "monocart-reporter",
       {
         name: "URL Redirector E2E Coverage Report",
-        outputFile: "test/coverage/index.html",
+        outputFile: "test/artifacts/coverage/index.html",
         open: true,
         logging: "warn", // "debug", "info", "warn", "error"
         clear: false, // Keep the output directory after test runs
@@ -40,12 +40,11 @@ export default defineConfig({
         },
       },
     ],
-    process.env.CI ? ["github"] : ["dot"],
-    // ["dot"], // compact progress
+    ["dot"], // compact progress
     // ["list"], // show tests
-    ["html", { outputFolder: "test/playwright-report", open: true }], // artifacts
+    ["html", { outputFolder: "test/artifacts/playwright-report", open: true }], // artifacts
   ],
-  outputDir: "test/test-results",
+  outputDir: "test/artifacts/test-results",
   use: {
     trace: "retain-on-failure",
     video: "retain-on-failure",

@@ -25,7 +25,7 @@ test.describe("Rule Validation", () => {
 
     // Capture screenshot of the error message
     await page.screenshot({
-      path: "test/screenshots/options-invalid-url-error.png",
+      path: "test/artifacts/screenshots/options-invalid-url-error.png",
       fullPage: true,
     });
   });
@@ -57,7 +57,7 @@ test.describe("Rule Validation", () => {
 
     // Capture screenshot of the error message
     await page.screenshot({
-      path: "test/screenshots/options-duplicate-source-error.png",
+      path: "test/artifacts/screenshots/options-duplicate-source-error.png",
       fullPage: true,
     });
   });
@@ -79,7 +79,7 @@ test.describe("Rule Validation", () => {
 
     // Capture screenshot of the error message
     await page.screenshot({
-      path: "test/screenshots/options-same-source-target-error.png",
+      path: "test/artifacts/screenshots/options-same-source-target-error.png",
       fullPage: true,
     });
   });

@@ -12,10 +12,7 @@ demos/recordings/*
 demos/screenshots/*
 
 # Test reports and results
-test/playwright-report
-test/test-results
-test/coverage
-test/screenshots
+test/artifacts
 
 # Build artifacts and caches
 .cache
