@@ -44,3 +44,33 @@ This runs a dry run, validating credentials (from GCP) and showing a preview of 
 3.  Click **Run workflow**.
 4.  Ensure "Run in dry-run mode" is checked (it is by default).
 5.  Run the workflow to see the build and description update preview in the logs.
+
+## Architecture
+
+```mermaid
+graph TD
+    subgraph Local[Local Developer Environment]
+        Dev[Developer] -->|Runs| NPM[npm version patch/minor/major]
+        NPM -->|Triggers| Changelog[scripts/generate-changelog.ts]
+        Changelog <-->|Reads| Git[Git History]
+        Changelog -->|Calls| Gemini1[Gemini API]
+        Gemini1 -->|Generates| Notes[metadata/recent_updates.txt]
+        NPM -->|Updates| Manifest[manifest.json]
+        NPM -->|Creates| CommitTag[Git Commit & Tag]
+        NPM -->|Triggers| PostVersion[postversion script]
+        PostVersion -->|Runs| GHRelease[gh release create]
+    end
+
+    subgraph GitHub[GitHub Cloud]
+        GHRelease -->|Pushes| RemoteTag[Remote Tag & Release]
+        RemoteTag -->|Triggers| Action[GitHub Action: Publish Web Extension]
+        Action -->|Runs| SubmitScript[scripts/submit-cws.ts]
+    end
+
+    subgraph CWS[Chrome Web Store]
+        SubmitScript -->|Bundles & Uploads| Store[Store Item]
+        SubmitScript -->|Calls| Gemini2[Gemini API]
+        Gemini2 -->|Merges| Desc[Store Description]
+        SubmitScript -->|Updates| Listing[Store Listing]
+    end
+```

@@ -6,6 +6,33 @@ The URL Redirector extension uses a composed build system where the bundle proce
 
 ## Architecture
 
+```mermaid
+graph LR
+    subgraph Bundle["Bundle Process (npm run bundle)"]
+        direction LR
+        StartBundle(Start Bundle) --> EnsureBuildDir[Ensure 'build/' exists]
+        EnsureBuildDir --> RunBuild[Run 'npm run build']
+
+        subgraph Build["Build Process (scripts/build.ts)"]
+            direction LR
+            CleanDist[Clean 'dist/' directory]
+            CompileTS[Compile TypeScript<br/>src/ -> dist/]
+            CopyAssets[Copy Assets<br/>assets/ -> dist/]
+            ProcessManifest[Process Manifest<br/>Adjust paths & copy to dist/]
+
+            CleanDist --> CompileTS
+            CompileTS --> CopyAssets
+            CopyAssets --> ProcessManifest
+        end
+
+        RunBuild --> CleanDist
+        ProcessManifest --> VerifyDist[Verify 'dist/' content]
+        VerifyDist --> ReadVersion[Read Version from package.json]
+        ReadVersion --> ZipDist[Zip 'dist/' to 'build/url-redirector-vX.Y.Z.zip']
+        ZipDist --> EndBundle(End Bundle)
+    end
+```
+
 ### 1. Build Script (`scripts/build.ts`)
 
 The `build` script is responsible for creating a complete, loadable extension in the `dist/` directory.

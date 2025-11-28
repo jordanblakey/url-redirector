@@ -56,7 +56,7 @@ export async function submitCws(options: SubmitCwsOptions) {
     log('📦 Bundling extension...');
     execSync('npm run bundle', { stdio: 'inherit' });
     const zipPath = path.resolve(__dirname, '../build/extension.zip');
-    
+
     // Resolve actual zip path
     const buildDir = path.resolve(__dirname, '../build');
     const files = fsFn.readdirSync(buildDir);
@@ -91,7 +91,7 @@ export async function submitCws(options: SubmitCwsOptions) {
         const currentVersion = manifest.version;
         const previousVersion = await getPreviousVersion(currentVersion, execSync);
         const versionType = getVersionType(currentVersion, previousVersion);
-        
+
         log(`Current version: ${currentVersion}, Previous version: ${previousVersion}, Version type: ${versionType}`);
 
         // Read changelog
@@ -115,7 +115,7 @@ export async function submitCws(options: SubmitCwsOptions) {
         if (changelog && descriptionTemplate && GEMINI_API_KEY) {
             log('Fetching current store listing...');
             const listingData = await getStoreListing(accessToken, EXTENSION_ID, fetchFn);
-            const currentListing = listingData.items[0]; 
+            const currentListing = listingData.items[0];
 
             if (currentListing) {
                 const currentDescription = currentListing.fullDescription;
@@ -166,9 +166,9 @@ export async function submitCws(options: SubmitCwsOptions) {
                 const userFacingMatch = changelog.match(/## User Facing\n([\s\S]*?)(?=\n##|$)/);
                 const userFacingChanges = userFacingMatch ? userFacingMatch[1].trim() : '';
                 const firstUserFacingChange = userFacingChanges.split('\n')[0].replace(/^\*\s*/, '');
-                
+
                 if (firstUserFacingChange) {
-                     if (versionType === 'patch') {
+                    if (versionType === 'patch') {
                         newPromotionalText += ` | v${currentVersion}: ${firstUserFacingChange}`;
                     } else {
                         newPromotionalText = `v${currentVersion}: ${firstUserFacingChange}`;
@@ -192,12 +192,12 @@ export async function submitCws(options: SubmitCwsOptions) {
     // Actually, if CI runs on Release event, the tag ALREADY EXISTS. 
     // So we should skip tagging if running in CI/Release flow? 
     // Or submitCws handles everything.
-    
+
     // If we run submitCws from CI triggered by Release:
     // The tag already exists (created by local npm version).
     // So 'git tag' will fail or warn.
     // We should check if tag exists.
-    
+
     // For now, let's keep existing logic, it catches error: "Tag ... might already exist."
     const manifestPath = path.resolve(__dirname, '../manifest.json');
     const manifest = fsFn.readJsonSync(manifestPath);
@@ -213,8 +213,10 @@ export async function submitCws(options: SubmitCwsOptions) {
         } catch (e) {
             warn(`⚠️ Tag ${tagName} might already exist or push failed.`);
         }
+    } else {
+        log('🛑 [DRY RUN] Skipping Git Tag and Push.');
     }
-    
+
     log('\n✅ Submission script finished successfully!');
 }
 
