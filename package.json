@@ -21,7 +21,7 @@
     "update-manifest": "jq --arg v $npm_package_version '.version = $v' manifest.json > tmp.json && mv tmp.json manifest.json",
     "changelog": "ts-node scripts/generate-changelog.ts",
     "version": "npm run update-manifest && git add manifest.json",
-    "postversion": "npm run cws:submit -- --submit && gh release create v$npm_package_version --generate-notes",
+    "postversion": "gh release create v$npm_package_version build/url-redirector-v$npm_package_version.zip --notes-file metadata/recent_updates.txt",
     "record:automation": "npm run build && ./demos/record-demo.sh",
     "record:demo": "npm run build && ./demos/record-demo.sh --interactive",
     "jules:list": "npx jules remote list --session | less",
