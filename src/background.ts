@@ -1,4 +1,4 @@
-import { Rule } from "./types";
+import { Rule, RedirectMessage } from "./types";
 import { buildDNRRules, findActivelyChangedRules, findMatchingTabs } from "./background-logic.js";
 import { normalizeUrl } from "./utils.js";
 import { getRandomMessage } from "./messages.js";
@@ -14,7 +14,7 @@ chrome.runtime.onStartup.addListener(async () => {
 });
 
 // Listen for redirect messages from content script
-chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (message: RedirectMessage, sender, sendResponse: (response?: any) => void) => {
   if (message.type === 'REDIRECT_DETECTED' && message.source) {
     const activeRules = await storage.getRules();
     const source = message.source;
@@ -25,7 +25,7 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
         if (rule.target === ':shuffle:') {
           console.log("Shuffle rule hit, re-rolling target...");
           // Catch errors to avoid crashing if rate limited
-          updateDynamicRules().catch(e => console.error("Failed to update shuffle rule:", e));
+          updateDynamicRules().catch((e: unknown) => console.error("Failed to update shuffle rule:", e));
         }
         const countMessage = getRandomMessage(rule.count + 1);
         await storage.incrementCount(rule.id, 1, countMessage);
@@ -128,12 +128,12 @@ export function showBadge(count?: number) {
           ) {
             chrome.action.setBadgeText({ text: "" });
           }
-        } catch (e) {
+        } catch (e: unknown) {
           // Silently fail
         }
       }, 10000);
     }
-  } catch (e) {
+  } catch (e: unknown) {
     // Silently fail
   }
 }

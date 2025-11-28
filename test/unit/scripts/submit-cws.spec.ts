@@ -1,12 +1,14 @@
 import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
 import { submitCws } from '../../../scripts/submit-cws';
 import path from 'path';
+import { ExecSyncOptions } from 'child_process';
+import fs from 'fs-extra';
 
 describe('CWS Submission Script', () => {
-    let mockExecSync: any;
-    let mockFetch: any;
-    let mockLog: any;
-    let mockWarn: any;
+    let mockExecSync: (cmd: string, options?: ExecSyncOptions) => Buffer;
+    let mockFetch: (url: string, options?: any) => Promise<any>;
+    let mockLog: (...args: any[]) => void;
+    let mockWarn: (...args: any[]) => void;
     let mockLoadSecrets: any;
     let mockFs: any;
     let logs: string[] = [];

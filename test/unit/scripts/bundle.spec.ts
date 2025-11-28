@@ -1,11 +1,14 @@
 import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
 import { bundle } from '../../../scripts/bundle';
+import { ExecSyncOptions } from 'child_process';
+import fs from 'fs-extra';
+import AdmZip from 'adm-zip';
 
 describe('Bundle Script', () => {
-    let mockExecSync: any;
-    let mockFs: any;
-    let mockAdmZip: any;
-    let mockLog: any;
+    let mockExecSync: (cmd: string, options: ExecSyncOptions) => Buffer;
+    let mockFs: Partial<typeof fs>;
+    let mockAdmZip: typeof AdmZip;
+    let mockLog: (...args: any[]) => void;
     let mockError: any;
     let logs: string[] = [];
     let errors: string[] = [];
@@ -23,7 +26,7 @@ describe('Bundle Script', () => {
         mockLog = (...args: any[]) => logs.push(args.join(' '));
         mockError = (...args: any[]) => errors.push(args.join(' '));
 
-        mockExecSync = (cmd: string, options: any) => {
+        mockExecSync = (cmd: string, options: ExecSyncOptions) => {
             executedCommands.push(cmd);
             return Buffer.from('');
         };
@@ -81,7 +84,7 @@ describe('Bundle Script', () => {
         process.exit = ((code?: number) => {
             exitCode = code;
             throw new Error('Process Exited');
-        }) as any;
+        }) as (code?: number) => never;
 
         try {
             await bundle({

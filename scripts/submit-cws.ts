@@ -4,6 +4,7 @@ import fs from 'fs-extra';
 import path from 'path';
 import { getAccessToken, uploadExtension, publishExtension, updateStoreListing, getStoreListing } from './cws-utils';
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { CwsListing } from '../src/types';
 
 // --- Configuration ---
 const EXTENSION_ID_DEFAULT = 'jhkoaofpbohfmolalpieheaeppdaminl';
@@ -114,7 +115,7 @@ export async function submitCws(options: SubmitCwsOptions) {
 
         if (changelog && descriptionTemplate && GEMINI_API_KEY) {
             log('Fetching current store listing...');
-            const listingData = await getStoreListing(accessToken, EXTENSION_ID, fetchFn);
+            const listingData: CwsListing = await getStoreListing(accessToken, EXTENSION_ID, fetchFn);
             const currentListing = listingData.items[0];
 
             if (currentListing) {

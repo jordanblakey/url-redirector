@@ -81,7 +81,7 @@ export const test = base.extend<{
 
     // --- Node.js Coverage Setup (for Scripts) ---
     let session: Session | undefined;
-    let post: any;
+    let post: (method: string, params?: object) => Promise<any>;
 
     if (!isBrowserTest) {
       session = new Session();

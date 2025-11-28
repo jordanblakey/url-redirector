@@ -19,3 +19,15 @@ export interface StorageSchema {
 export interface StorageResult {
     rules?: Rule[];
 }
+
+export interface RedirectMessage {
+    type: 'REDIRECT_DETECTED';
+    source: string;
+}
+
+export interface CwsListing {
+    items: {
+        fullDescription: string;
+        promotionalText: string;
+    }[];
+}

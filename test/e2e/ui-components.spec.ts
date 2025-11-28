@@ -1,4 +1,5 @@
 import { test, expect } from '../fixtures';
+import { Rule } from '../../src/types';
 
 test.describe('UI Components', () => {
     test.beforeEach(async ({ page, extensionId }) => {
@@ -76,7 +77,7 @@ test.describe('UI Components', () => {
             await page.evaluate((timestamp) => {
                 return new Promise<void>((resolve) => {
                     chrome.storage.local.get(['rules'], (result) => {
-                        const rules = result.rules as any;
+                        const rules = result.rules as Rule[];
                         if (rules && rules.length > 0) {
                             rules[0].pausedUntil = timestamp;
                             chrome.storage.local.set({ rules }, resolve);

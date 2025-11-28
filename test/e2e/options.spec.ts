@@ -1,4 +1,5 @@
 import { test, expect } from '../fixtures';
+import { Rule } from '../../src/types';
 
 test.describe('URL Redirector Options Page', () => {
     test.beforeEach(async ({ page, extensionId }) => {
@@ -256,10 +257,14 @@ test.describe('URL Redirector Options Page', () => {
         await page.evaluate(() => {
             return new Promise<void>((resolve) => {
                 chrome.storage.local.get(['rules'], (result) => {
-                    const rules = result.rules as any;
-                    rules[0].count = 1;
-                    delete rules[0].lastCountMessage;
-                    chrome.storage.local.set({ rules }, resolve);
+                    const rules = result.rules as Rule[];
+                    if (rules && rules.length > 0) {
+                        rules[0].count = 1;
+                        delete rules[0].lastCountMessage;
+                        chrome.storage.local.set({ rules }, resolve);
+                    } else {
+                        resolve();
+                    }
                 });
             });
         });
@@ -271,10 +276,14 @@ test.describe('URL Redirector Options Page', () => {
         await page.evaluate(() => {
             return new Promise<void>((resolve) => {
                 chrome.storage.local.get(['rules'], (result) => {
-                    const rules = result.rules as any;
-                    rules[0].count = 5;
-                    delete rules[0].lastCountMessage;
-                    chrome.storage.local.set({ rules }, resolve);
+                    const rules = result.rules as Rule[];
+                    if (rules && rules.length > 0) {
+                        rules[0].count = 5;
+                        delete rules[0].lastCountMessage;
+                        chrome.storage.local.set({ rules }, resolve);
+                    } else {
+                        resolve();
+                    }
                 });
             });
         });
