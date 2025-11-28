@@ -40,18 +40,15 @@ export async function generateChangelog(options: GenerateChangelogOptions = {}) 
         // 1. Get the last tag
         let lastTag = '';
         try {
-            // @ts-ignore
             lastTag = execSync('git describe --tags --abbrev=0', { encoding: 'utf-8' }).trim();
-        } catch (e) {
+        } catch (e: unknown) {
             log('No tags found. Using first commit.');
-            // @ts-ignore
             lastTag = execSync('git rev-list --max-parents=0 HEAD', { encoding: 'utf-8' }).trim();
         }
         log(`Last tag/commit: ${lastTag}`);
 
         // 2. Get commits since last tag
         // Format: hash subject body
-        // @ts-ignore
         const commits = execSync(`git log ${lastTag}..HEAD --pretty=format:"%h %s%n%b"`, { encoding: 'utf-8' }).trim();
 
         if (!commits) {

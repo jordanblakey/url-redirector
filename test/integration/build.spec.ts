@@ -46,7 +46,7 @@ describe("Build Process Validation", () => {
 
     test("manifest.json should have required fields", () => {
       const manifestPath = path.join(distDir, "manifest.json");
-      const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+      const manifest: { [key: string]: any } = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
 
       expect(manifest.manifest_version).toBe(3);
       expect(manifest.name).toBeTruthy();

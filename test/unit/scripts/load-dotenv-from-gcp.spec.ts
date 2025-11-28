@@ -1,11 +1,12 @@
 import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
 import { loadGcpSecrets } from '../../../scripts/load-dotenv-from-gcp';
+import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 
 describe('Load GCP Secrets Script', () => {
-    let mockSecretManagerServiceClient: any;
-    let mockLog: any;
-    let mockError: any;
-    let mockExit: any;
+    let mockSecretManagerServiceClient: typeof SecretManagerServiceClient;
+    let mockLog: (...args: any[]) => void;
+    let mockError: (...args: any[]) => void;
+    let mockExit: (code?: number) => void;
     let logs: string[] = [];
     let errors: string[] = [];
     let exitCode: number | undefined;
@@ -17,10 +18,10 @@ describe('Load GCP Secrets Script', () => {
 
         mockLog = (...args: any[]) => logs.push(args.join(' '));
         mockError = (...args: any[]) => errors.push(args.join(' '));
-        mockExit = (code: number) => { exitCode = code; };
+        mockExit = (code?: number) => { exitCode = code; };
 
-        mockSecretManagerServiceClient = class {
-            async accessSecretVersion(request: any) {
+        mockSecretManagerServiceClient = class extends SecretManagerServiceClient {
+            accessSecretVersion = vi.fn().mockImplementation(async (request: any) => {
                 if (request.name.includes('latest')) {
                     return [{
                         payload: {
@@ -29,7 +30,7 @@ describe('Load GCP Secrets Script', () => {
                     }];
                 }
                 throw new Error('Secret not found');
-            }
+            });
         };
     });
 
@@ -51,12 +52,12 @@ describe('Load GCP Secrets Script', () => {
     });
 
     test('should handle missing credentials', async () => {
-        mockSecretManagerServiceClient = class {
-            async accessSecretVersion() {
+        mockSecretManagerServiceClient = class extends SecretManagerServiceClient {
+            accessSecretVersion = vi.fn().mockImplementation(async () => {
                 const error: any = new Error('Could not load the default credentials');
                 error.code = 16;
                 throw error;
-            }
+            });
         };
 
         await loadGcpSecrets('test-project', 'test-secret', {
@@ -73,10 +74,10 @@ describe('Load GCP Secrets Script', () => {
     });
 
     test('should throw other errors', async () => {
-        mockSecretManagerServiceClient = class {
-            async accessSecretVersion() {
+        mockSecretManagerServiceClient = class extends SecretManagerServiceClient {
+            accessSecretVersion = vi.fn().mockImplementation(async () => {
                 throw new Error('Permission Denied');
-            }
+            });
         };
 
         await expect(loadGcpSecrets('test-project', 'test-secret', {

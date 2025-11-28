@@ -43,15 +43,13 @@ export async function uploadExtension(accessToken: string, extensionId: string, 
     const uploadUrl = `https://www.googleapis.com/upload/chromewebstore/v1.1/items/${extensionId}`;
     const zipStream = fsFn.createReadStream(zipPath);
 
-    // @ts-ignore
     const response = await fetchFn(uploadUrl, {
         method: 'PUT',
         headers: {
             'Authorization': `Bearer ${accessToken}`,
             'x-goog-api-version': '2',
         },
-        // @ts-ignore
-        body: zipStream,
+        body: zipStream as any,
         duplex: 'half'
     });
 

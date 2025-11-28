@@ -35,14 +35,14 @@ export function buildDNRRules(rules: Rule[]): chrome.declarativeNetRequest.Rule[
             id: id,
             priority: 1,
             action: {
-                type: 'redirect' as any,
+                type: 'redirect',
                 redirect: {
                     url: targetUrl.toString()
                 }
             },
             condition: {
                 urlFilter: `||${source}`,
-                resourceTypes: ['main_frame' as any]
+                resourceTypes: ['main_frame']
             }
         };
 

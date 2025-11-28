@@ -1,4 +1,5 @@
 import { test, expect, getServiceWorker } from '../fixtures';
+import { Rule } from '../../src/types';
 
 test.describe('Rule Count Updates', () => {
     test('should increment rule count after redirect', async ({ context }) => {
@@ -26,8 +27,8 @@ test.describe('Rule Count Updates', () => {
         // Wait for count update (it happens asynchronously in background)
         await expect.poll(async () => {
             return await worker.evaluate(async () => {
-                const { rules } = await chrome.storage.local.get('rules') as { rules: any[] };
-                return rules.find((r: any) => r.id === 999)?.count;
+                const { rules } = await chrome.storage.local.get('rules') as { rules: Rule[] };
+                return rules.find((r) => r.id === 999)?.count;
             });
         }).toBe(1);
     });
@@ -57,8 +58,8 @@ test.describe('Rule Count Updates', () => {
         // Verify count incremented despite casing/protocol differences
         await expect.poll(async () => {
             return await worker.evaluate(async () => {
-                const { rules } = await chrome.storage.local.get('rules') as { rules: any[] };
-                return rules.find((r: any) => r.id === 1000)?.count;
+                const { rules } = await chrome.storage.local.get('rules') as { rules: Rule[] };
+                return rules.find((r) => r.id === 1000)?.count;
             });
         }).toBe(1);
     });
