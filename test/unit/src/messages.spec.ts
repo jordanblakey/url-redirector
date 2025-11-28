@@ -34,7 +34,7 @@ describe('Message Logic', () => {
 
             const rawMessage = message.replace(/<span class="count-value">2<\/span>/, '{count}');
             const possiblePlurals = MESSAGES.map(m =>
-                m.replace('{count}', '{count}')
+                m.replace('{count}', '<span class="count-value">2</span>')
                     .replace('{s}', 's')
                     .replace('{es}', 'es')
                     .replace('{ies}', 'ies')
