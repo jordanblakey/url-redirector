@@ -8,9 +8,7 @@
 
 
 ## DELEGATED
-    [] CI: Where does release.yml fit in. Is this needed? Would this have been better than genai release notes.
-    [] CI: Before versioning, check that the tag to version up to exists is greater than the latest remote tag. If not, fail and warn the user. 
-
+[] CI: Where does release.yml fit in. Is this needed? Would this have been better than genai release notes.
 
 ## DOING
 

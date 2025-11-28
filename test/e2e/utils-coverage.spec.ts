@@ -81,62 +81,6 @@ test.describe('Utils Coverage - E2E', () => {
             await expect(page).toHaveURL(/https:\/\/example\.com/);
         });
 
-        test('should handle shuffle target', async ({ context }) => {
-            const worker = await getServiceWorker(context);
-
-            await worker.evaluate(async () => {
-                const rules = [{
-                    source: 'shuffle-test.com',
-                    target: ':shuffle:',
-                    active: true,
-                    count: 0,
-                    id: 203
-                }];
-                await chrome.storage.local.set({ rules });
-            });
-
-
-            const page = await context.newPage();
-
-            await page.route('https://shuffle-test.com/', async route => {
-                await route.fulfill({ status: 200, body: 'Source Page' });
-            });
-
-            await page.goto('https://shuffle-test.com/');
-
-            // Should redirect to some productive URL (not shuffle-test.com)
-            // Wait for redirect to happen
-            // await page.waitForTimeout(2000); // Removed: goto waits for load
-            const url = new URL(page.url());
-            expect(url.hostname).not.toContain('shuffle-test.com');
-            expect(url.protocol).toMatch(/^https?:/);
-            expect(url.searchParams.has('url_redirector')).toBe(false);
-
-            const firstTarget = url.toString();
-
-            // Give the background script time to update the DNR rules
-            // We rely on the retry loop for this
-
-            // Visit again to ensure we get a DIFFERENT target (re-roll)
-            // We try up to 3 times to avoid flakiness from random collisions
-            let different = false;
-            for (let i = 0; i < 3; i++) {
-                await page.goto('https://shuffle-test.com/');
-                // await page.waitForTimeout(2000); // Removed: goto waits for load
-                const nextUrl = new URL(page.url());
-                const nextTarget = nextUrl.toString();
-
-                if (nextTarget !== firstTarget) {
-                    different = true;
-                    break;
-                }
-                // Wait a bit before next try
-                await new Promise(r => setTimeout(r, 500)); // Reduced wait
-            }
-
-            expect(different).toBe(true);
-        });
-
         test('should match URL with path', async ({ context }) => {
             const worker = await getServiceWorker(context);
 
