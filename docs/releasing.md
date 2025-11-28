@@ -48,56 +48,24 @@ This runs a dry run, validating credentials (from GCP) and showing a preview of 
 ## Architecture
 
 ```mermaid
-%%{init: {"flowchart": {"htmlLabels": false, "nodeSpacing": 30, "rankSpacing": 40}} }%%
-graph LR
-    %% 1. LOCAL: We force this specific box to be Vertical (TB)
-    subgraph Local[Local Developer Environment]
-        direction TB
-
-        %% Invisible padding for title
-        subgraph PadLocal[" "]
-            style PadLocal fill:none,stroke:none
-
-            Dev[Developer] -->|Runs| NPM[npm version]
-
-            %% Because this is TB, these will branch out sideways, creating a compact 'tree'
-            NPM -->|Triggers| Changelog[scripts/generate-changelog.ts]
-            NPM -->|Updates| Manifest[manifest.json]
-            NPM -->|Creates| CommitTag[Git Commit & Tag]
-            NPM -->|Triggers| PostVersion[postversion script]
-
-            %% This sub-flow will hang below the changelog script
-            Changelog <-->|Reads| Git[Git History]
-            Changelog -->|Calls| Gemini1[Gemini API]
-            Gemini1 -->|Generates| Notes[metadata/recent_updates.txt]
-        end
+%%{init: {'theme': 'neutral', 'flowchart': {'curve': 'monotoneY'}} }%%
+graph TD
+    subgraph Local[Local Environment]
+        Dev(Developer) -->|Runs| NPM["npm version patch/minor/major"]
+        
+        %% FIX: Added quotes around the label to support parentheses
+        NPM -->|Generates| Changelog["AI Changelog (Gemini)"]
+        
+        Changelog -->|Triggers| Release[gh release create]
     end
 
-    %% 2. GITHUB: Flows Left-to-Right
     subgraph GitHub[GitHub Cloud]
-        direction LR
-        subgraph PadGH[" "]
-            style PadGH fill:none,stroke:none
-
-            GHRelease -->|Pushes| RemoteTag[Remote Tag & Release]
-            RemoteTag -->|Triggers| Action[GitHub Action: Publish]
-            Action -->|Runs| SubmitScript[scripts/submit-cws.ts]
-        end
+        Release -->|Triggers| Action[GitHub Action: Publish]
+        Action -->|Runs| Submit[scripts/submit-cws.ts]
     end
 
-    %% 3. CWS: Flows Left-to-Right
     subgraph CWS[Chrome Web Store]
-        direction LR
-        subgraph PadCWS[" "]
-            style PadCWS fill:none,stroke:none
-
-            SubmitScript -->|Bundles| Store[Store Item]
-            SubmitScript -->|Calls| Gemini2[Gemini API]
-            Gemini2 -->|Merges| Desc[Store Description]
-            SubmitScript -->|Updates| Listing[Store Listing]
-        end
+        Submit -->|Uploads| Bundle[Extension Bundle]
+        Submit -->|Updates| Desc[AI Store Description]
     end
-
-    %% Connect the two subgraphs
-    PostVersion -->|Runs| GHRelease[gh release create]
 ```
