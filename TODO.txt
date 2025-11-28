@@ -8,90 +8,90 @@
 
 
 ## DELEGATED
-[] CI: Where does release.yml fit in. Is this needed? Would this have been better than genai release notes.
 
 ## DOING
 
 ## DONE
-
-[x] CLEANUP: Add architecture diagrams to build and release processes.
-[x] CI: Explore using a Github workflow on demand to push new versions, ensuring tests are passing and hermetic build.
-[x] CI: write tests for generate-changelog.ts
-[x] CI: Update documentation for new versioning and release process
-[x] CI: CWS submission pipeline: in addition to uploading a new binary, use this Conditional Logic: If this is a Minor/Major update (x.x.0), replace the "New in..." section of the Store Description. If this is a Patch update (x.x.1), append the new fixes to the existing "New in..." section so we don't hide the main features of the recent major release.
-[x] BUG: release.yml does not appear to be working. analyze if it is conflicting with the release script. Prepare a summary of the problem. (Summary: It was conflicting/redundant with the local postversion script. Deleted.)
-[x] CI: Artifact Generation - The generated zip file should be named url-redirector-v{version}.zip
-[x] CI: AI Changelogs: Use the Google Gemini API to read the commit history between the last tag and current tag, and generate "User Facing" release notes (minimalist style) and "Technical Highlights". Write this to metadata/recent_updates.txt
-[x] CI: Github Release: In the npm release script, extend it to upload the .zip and prepend metadata/recent_updates.txt as a bulleted list to the release notes on github.
-[x] CI: Use vitest and playwright for unit and e2e tests, respectively. Add coverage for both.
-[x] CI: Write tests for untested scripts in /scripts and put them in /test/scripts
-[x] CI: Create a script that uses the CWS API to submit a new version. This should support a "dry run" for testing. Write tests for the script. It should also push a tagged commit with the version number matching the npm and manifest version that has been bumped. Please do not actually version up the extension while testing.
-[x] CI: release minor version 1.2.0 with the latest changes.
-[x] FEATURE: Create extension docs homepage on github pages: https://jordanblakey.github.io/url-redirector/. Enable github issues, link as contact. Need privacy policy. Need verification meta tag.
-[x] CI: Create a service account for CWS API access.
-[x]: migrate from a listener-based approach to declarativeNetRequest (DNR) to improve performance and remove the tabs permission (to avoid the "Read History" warning).
-[x] CI: Push initial version through Chrome Web Store review process
-[x] FEATURE: Favicon caching mechanism (why? Browser caching...)
 [x] BUG: "Active Rules" is a bit misleading with new pause/resume feature. "Redirection Rules"? "Rules"?
 [x] BUG: adding a rule to popup should immediately redirect tabs currently on the source url. Write test.
-[x] BUG: Find an unidentified bug, and fix it. Found localStorage race condition.
 [x] BUG: alt layout for coverage report? Hides the pass/fail status and you have to scroll up.
+[x] BUG: Find an unidentified bug, and fix it. Found localStorage race condition.
 [x] BUG: long urls are truncated. Especially in the popup.
 [x] BUG: persist badge for 10 seconds
-[x] BUG: Rule validation: must be url, not empty, not duplicate, urls not the same. Write tests.
 [x] BUG: Prevent the entry of rules where a rule with the same source url exists
+[x] BUG: release.yml does not appear to be working. analyze if it is conflicting with the release script. Prepare a summary of the problem. (Summary: It was conflicting/redundant with the local postversion script. Deleted.)
 [x] BUG: resuming should immediately redirect tabs currently on the source url. Write test.
+[x] BUG: Rule validation: must be url, not empty, not duplicate, urls not the same. Write tests.
 [x] BUG: Tab order should skip the copy buttons altogether, in the source and target url fields
 [x] BUG: types.js should not be in dist
 [x] BUG: Unpausing a rule on the popup page no longer immediately redirects.
 [x] BUG: Use flash messages instead of alerts.
 [x] BUG: when new rules are added, reloads should redirect tabs currently on the source url.
 [x] BUG: why are CSS files in the coverage report?
+[x] CHORE: Add architecture diagrams to build and release processes.
+[x] CHORE: bundles should go in a gitignored build/ top level directory.
+[x] CHORE: combine CSS for popup and options pages if feasible.
+[x] CHORE: evaluate the use of 'any' in the codebase. Replace with appropriate types where desirable.
+[x] CHORE: look at all comments in the codebase to make sure they make sense, and are needed.
+[x] CHORE: Refactor duplicated logic in the src folder. Clean old comments, dead code. Particularly in ui.ts. popup.ts. background.ts and options.ts
+[x] CHORE: Remove any css that isn't referenced anywhere. Remove redundant rules. Add section comments grouping related rules. Nest where possible.
+[x] CHORE: reorg to assets/ folder
+[x] CHORE: there are too many top level test directories. playwright-report, test-results, test.
+[x] CHORE: understand the purpose of sourcemaps in dist/ and remove them if not needed. What's the value?
+[x] CHORE: unify tsconfig
+[x] CHORE: Update readme based on recent changes
 [x] CI: add github action to publish new version to chrome web store
 [x] CI: add github actions to run tests on PR
 [x] CI: add script to run tests suites (Playwright)
+[x] CI: AI Changelogs: Use the Google Gemini API to read the commit history between the last tag and current tag, and generate "User Facing" release notes (minimalist style) and "Technical Highlights". Write this to metadata/recent_updates.txt
+[x] CI: Artifact Generation - The generated zip file should be named url-redirector-v{version}.zip
+[x] CI: Create a script that uses the CWS API to submit a new version. This should support a "dry run" for testing. Write tests for the script. It should also push a tagged commit with the version number matching the npm and manifest version that has been bumped. Please do not actually version up the extension while testing.
+[x] CI: Create a service account for CWS API access.
 [x] CI: create a versioning strategy for the extension
+[x] CI: CWS submission pipeline: in addition to uploading a new binary, use this Conditional Logic: If this is a Minor/Major update (x.x.0), replace the "New in..." section of the Store Description. If this is a Patch update (x.x.1), append the new fixes to the existing "New in..." section so we don't hide the main features of the recent major release.
 [x] CI: Explore replacing all chrome API mocks with https://github.com/acvetkov/sinon-chrome. Good idea?
+[x] CI: Explore using a Github workflow on demand to push new versions, ensuring tests are passing and hermetic build.
+[x] CI: Github Release: In the npm release script, extend it to upload the .zip and prepend metadata/recent_updates.txt as a bulleted list to the release notes on github.
+[x] CI: Push initial version through Chrome Web Store review process
+[x] CI: release minor version 1.2.0 with the latest changes.
 [x] CI: run tests on precommit hook
 [x] CI: understand the different coverage categories. improve branch coverage if needed.
+[x] CI: Use vitest and playwright for unit and e2e tests, respectively. Add coverage for both.
+[x] CI: Where does release.yml fit in. Is this needed? Would this have been better than genai release notes. It is used to organize the full list of commits.
 [x] CI: Write instructions for Chrome Web Store reviewer to test the extension.
-[x] CLEANUP: bundles should go in a gitignored build/ top level directory.
-[x] CLEANUP: Check all the documentation in the project is accurate and well written.
-[x] CLEANUP: combine CSS for popup and options pages if feasible.
-[x] CLEANUP: evaluate the use of 'any' in the codebase. Replace with appropriate types where desirable.
-[x] CLEANUP: look at all comments in the codebase to make sure they make sense, and are needed.
-[x] CLEANUP: Refactor duplicated logic in the src folder. Clean old comments, dead code. Particularly in ui.ts. popup.ts. background.ts and options.ts
-[x] CLEANUP: Remove any css that isn't referenced anywhere. Remove redundant rules. Add section comments grouping related rules. Nest where possible.
-[x] CLEANUP: reorg to assets/ folder
-[x] CLEANUP: there are too many top level test directories. playwright-report, test-results, test.
-[x] CLEANUP: understand the purpose of sourcemaps in dist/ and remove them if not needed. What's the value?
-[x] CLEANUP: unify tsconfig
-[x] CLEANUP: Update readme based on recent changes
+[x] CI: write tests for generate-changelog.ts
+[x] CI: Write tests for untested scripts in /scripts and put them in /test/scripts
+[x] DOCS: Check all the documentation in the project is accurate and well written.
+[x] DOCS: Create extension docs homepage on github pages: https://jordanblakey.github.io/url-redirector/. Enable github issues, link as contact. Need privacy policy. Need verification meta tag.
+[x] DOCS: Update documentation for new versioning and release process
+[x] DOCS: Update documentation to describe the testing system of unit, integration, and e2e tests, using playwright and vitest.
+[x] FEAT: Add a "demo" recording of the extension for the Chrome Web Store.
+[x] FEAT: Add a "use" button on hover to inputs that makes the placeholder the value.
 [x] FEAT: Add a test coverage report.
 [x] FEAT: add script to bundle extension (crx)
 [x] FEAT: add TS type annotations throughout the codebase. Create type defs and interfaces if needed.
 [x] FEAT: also expose the options page as a popup.
+[x] FEAT: Automated demo recording utility.
+[x] FEAT: Automated demo recording. Named recording. Migrate demos/ to top. Visible mouse actions.
 [x] FEAT: badge indicating a redirection event
+[x] FEAT: Convert the "Pause" button into a Temporary Snooze (e.g., 5-10 minutes)UI: Visual indicator that the rule is "Snoozed" (maybe a countdown or a different icon color) so the user knows it will come back.
 [x] FEAT: create a utility script to read dotenv from Secret Manager. Refactor check-cws-status to use it.
+[x] FEAT: Expand messages.ts to include more microcopy options.
 [x] FEAT: explore using TS for scripts/ and anywhere .js files are still used. Validate that it works.
+[x] FEAT: Favicon caching mechanism (why? Browser caching...)
 [x] FEAT: generate an appropriate icon for the extension.
+[x] FEAT: Implement "Thematic Matching" logic for placeholders (map specific source categories to relevant target categories, e.g., Video → Education vs. Social Scroll → Deep Reading) to replace pure randomization.
+[x] FEAT: Implement a new FEAT of your own imagining
+[x] FEAT: Include preset templates for common distracting sites paired with healthier alternatives. Hook into the psychology of why people use these sites and satisfy it in a different way. Bad habit? Replace with a good one.
+[x] FEAT: Microcopy ideas for rule counts. Randomized.
+[x] FEAT: migrate from a listener-based approach to declarativeNetRequest (DNR) to improve performance and remove the tabs permission (to avoid the "Read History" warning).
+[x] FEAT: Playwright tests to stop using mocked Chrome APIs and instead test the actual loaded extension
+[x] FEAT: Randomly select a top distracting site to populate source and wholesome site populate target placeholder text
 [x] FEAT: redirection count per rule
+[x] FEAT: Shuffle Mode after a source url is provided, if target input is empty, change the button text to "Add Shuffle Rule". Change it back to "Add Rule" when Target URL is provided. In the rule display, it should say :shuffle: shuffle. When the target URL is visited, a random URL is selected from list of recommended URLS.
 [x] FEAT: submit a rule on enter keypress
 [x] FEAT:convert to typescript
-[x] FEATURE: Add a "demo" recording of the extension for the Chrome Web Store.
-[x] FEATURE: Add a "use" button on hover to inputs that makes the placeholder the value.
-[x] FEATURE: Automated demo recording. Named recording. Migrate demos/ to top. Visible mouse actions.
-[x] FEATURE: Automated demo recording utility.
-[x] Feature: Convert the "Pause" button into a Temporary Snooze (e.g., 5-10 minutes)UI: Visual indicator that the rule is "Snoozed" (maybe a countdown or a different icon color) so the user knows it will come back.
-[x] FEATURE: Expand messages.ts to include more microcopy options.
-[x] Feature: Implement "Thematic Matching" logic for placeholders (map specific source categories to relevant target categories, e.g., Video → Education vs. Social Scroll → Deep Reading) to replace pure randomization.
-[x] FEATURE: Implement a new feature of your own imagining
-[x] FEATURE: Include preset templates for common distracting sites paired with healthier alternatives. Hook into the psychology of why people use these sites and satisfy it in a different way. Bad habit? Replace with a good one.
-[x] FEATURE: Microcopy ideas for rule counts. Randomized.
-[x] FEATURE: Playwright tests to stop using mocked Chrome APIs and instead test the actual loaded extension
-[x] FEATURE: Randomly select a top distracting site to populate source and wholesome site populate target placeholder text
-[x] FEATURE: Shuffle Mode after a source url is provided, if target input is empty, change the button text to "Add Shuffle Rule". Change it back to "Add Rule" when Target URL is provided. In the rule display, it should say :shuffle: shuffle. When the target URL is visited, a random URL is selected from list of recommended URLS.
-[x] STYLE: make the rule display one line like source -> target
 [x] UX: Alpha sort rules by source url.
 [x] UX: Buttons a bit small on Popup. Fitts' Law.
+[x] UX: make the rule display one line like source -> target
 [x] UX: Move input examples from labels into placeholder text. Cleaner and more standard.

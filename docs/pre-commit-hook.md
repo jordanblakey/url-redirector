@@ -11,6 +11,7 @@ This project uses [husky](https://typicode.github.io/husky/) to manage Git hooks
 ### Installation
 
 To ensure the hooks are set up, simply run:
+
 ```bash
 npm install
 ```
@@ -20,6 +21,7 @@ This will configure Git to use the hooks defined in the `.husky/` directory.
 ## How It Works
 
 The hook:
+
 1.  Checks if you are committing changes.
 2.  Runs `npm test` (which executes Playwright tests).
 3.  **Pass**: If tests pass, the commit proceeds.

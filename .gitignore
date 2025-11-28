@@ -18,6 +18,8 @@ test/artifacts
 .cache
 dist
 build
+.monocart_report
 
 # Environment configuration
 .env
+

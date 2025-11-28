@@ -7,17 +7,14 @@
     "test": "test"
   },
   "scripts": {
+    "//------ Lifecycle & Build ------": "",
+    "prepare": "husky",
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit --project tsconfig.eslint.json",
+    "format": "prettier --write .",
     "build": "ts-node scripts/build.ts",
     "bundle": "ts-node scripts/bundle.ts",
-    "version": "npm run changelog && npm run update-manifest && git add manifest.json metadata/recent_updates.txt",
-    "changelog": "ts-node scripts/generate-changelog.ts",
-    "update-manifest": "jq --arg v $npm_package_version '.version = $v' manifest.json > tmp.json && mv tmp.json manifest.json",
-    "postversion": "gh release create v$npm_package_version build/url-redirector-v$npm_package_version.zip --notes-file metadata/recent_updates.txt",
-    "cws:setup-auth": "ts-node scripts/setup-cws-auth.ts",
-    "cws:check-status": "ts-node scripts/check-cws-status.ts",
-    "cws:submit": "ts-node scripts/submit-cws.ts",
-    "record:automation": "npm run build && ./demos/record-demo.sh",
-    "record:demo": "npm run build && ./demos/record-demo.sh --interactive",
+    "//------ Testing ------": "",
     "test:install": "playwright install --with-deps chromium",
     "test": "npm run build && npm run test:unit && npm run test:integration && npm run test:e2e",
     "test:unit": "vitest run test/unit",
@@ -26,7 +23,20 @@
     "test:e2e-ui": "playwright test --ui",
     "test:coverage": "npm run test:coverage-vitest && npm run test:coverage-e2e",
     "test:coverage-vitest": "COVERAGE=1 vitest run test/unit test/integration --coverage",
-    "test:coverage-e2e": "COVERAGE=1 playwright test"
+    "test:coverage-e2e": "COVERAGE=1 playwright test",
+    "//------ Releasing ------": "",
+    "version": "npm run changelog && npm run update-manifest && git add manifest.json metadata/recent_updates.txt",
+    "changelog": "ts-node scripts/generate-changelog.ts",
+    "update-manifest": "jq --arg v $npm_package_version '.version = $v' manifest.json > tmp.json && mv tmp.json manifest.json",
+    "postversion": "gh release create v$npm_package_version build/url-redirector-v$npm_package_version.zip --notes-file metadata/recent_updates.txt",
+    "cws:setup-auth": "ts-node scripts/setup-cws-auth.ts",
+    "cws:check-status": "ts-node scripts/check-cws-status.ts",
+    "cws:submit": "ts-node scripts/submit-cws.ts",
+    "//------ Utilities ------": "",
+    "record:automation": "npm run build && ./demos/record-demo.sh",
+    "record:demo": "npm run build && ./demos/record-demo.sh --interactive",
+    "jules:list": "npx jules",
+    "jules:delegate": "cat TODO-JULES.md | xargs -I {} npx jules new \"{}\""
   },
   "keywords": [],
   "author": "",
@@ -34,9 +44,21 @@
     "@google-cloud/secret-manager": "^6.1.1",
     "dotenv": "^17.0.0"
   },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write",
+      "vitest related --run"
+    ]
+  },
+  "prettier": {
+    "singleQuote": true,
+    "printWidth": 100
+  },
   "devDependencies": {
     "@babel/core": "^7.28.5",
     "@babel/preset-typescript": "^7.28.5",
+    "@eslint/js": "^9.39.1",
     "@google/generative-ai": "^0.24.1",
     "@google/jules": "^0.1.40",
     "@playwright/test": "^1.56.1",
@@ -46,11 +68,18 @@
     "@types/node": "^24.10.1",
     "@vitest/coverage-v8": "^4.0.14",
     "adm-zip": "^0.5.16",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
     "fs-extra": "^11.3.2",
+    "globals": "^16.5.0",
+    "husky": "^9.1.7",
     "jsdom": "^27.2.0",
+    "lint-staged": "^16.2.7",
     "monocart-reporter": "^2.9.23",
+    "prettier": "^3.7.1",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
+    "typescript-eslint": "^8.48.0",
     "vitest": "^4.0.14"
   }
 }
