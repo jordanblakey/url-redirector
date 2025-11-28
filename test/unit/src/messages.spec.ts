@@ -16,8 +16,7 @@ describe('Message Logic', () => {
 
             const rawMessage = message.replace(/<span class="count-value">1<\/span>/, '{count}');
             // We can reconstruct what the singular form should be for each template
-            const possibleSingulars = MESSAGES.map(m =>
-                m.replace('{count}', '{count}')
+            const possibleSingulars = MESSAGES.map(m => m
                     .replace('{s}', '')
                     .replace('{es}', '')
                     .replace('{ies}', 'y')
@@ -33,8 +32,7 @@ describe('Message Logic', () => {
             expect(message).toContain('<span class="count-value">2</span>');
 
             const rawMessage = message.replace(/<span class="count-value">2<\/span>/, '{count}');
-            const possiblePlurals = MESSAGES.map(m =>
-                m.replace('{count}', '<span class="count-value">2</span>')
+            const possiblePlurals = MESSAGES.map(m => m
                     .replace('{s}', 's')
                     .replace('{es}', 'es')
                     .replace('{ies}', 'ies')
