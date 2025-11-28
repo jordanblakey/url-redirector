@@ -72,7 +72,7 @@ export function isValidUrl(string: string): boolean {
     try {
         // Check if it matches a basic domain pattern or full URL
         // Improved pattern to allow query parameters and fragments
-        const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?(\?.*)?(#.*)?$/;
+        const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/A-Za-z0-9_.-]*)*\/?(\?.*)?(#.*)?$/;
         if (urlPattern.test(string)) {
             return true;
         }
