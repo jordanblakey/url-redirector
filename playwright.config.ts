@@ -24,7 +24,7 @@ function createReporter() {
   const reporters: ReporterDescription[] = [];
   reporters.push(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ['html', { open: 'never' }] as [string, any],
+    ['html', { open: 'never', outputFolder: 'test/artifacts/playwright-report' }] as [string, any],
   );
   if (process.env.CI) {
     reporters.push(['github']);

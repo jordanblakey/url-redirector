@@ -1,4 +1,4 @@
-import { test, expect } from '../fixtures';
+import { test, expect, getServiceWorker } from '../fixtures';
 
 test.describe('URL Redirector Pause Functionality', () => {
   test.beforeEach(async ({ page, extensionId }) => {
@@ -6,41 +6,54 @@ test.describe('URL Redirector Pause Functionality', () => {
     await page.goto(`chrome-extension://${extensionId}/html/popup.html`);
   });
 
-  test('should toggle rule pause state', async ({ page }) => {
-    // Add a rule
-    await page.fill('#sourceUrl', 'pause-test.com');
-    await page.fill('#targetUrl', 'target.com');
+  test('should toggle rule pause state', async ({ page, httpServer, extensionId }) => {
+    const source = httpServer; // Use the actual server URL as source
+    const target = 'http://example.com';
+
+    await page.fill('#sourceUrl', source);
+    await page.fill('#targetUrl', target);
     await page.click('#addRuleBtn');
 
     // Verify rule exists and is active by default
     const ruleItem = page.locator('#rulesList .rule-item').first();
     await expect(ruleItem).not.toHaveClass(/paused/);
 
+    // Verify redirect works
+    await page.goto(source);
+    await expect(page).toHaveURL(/example\.com/);
+
+    // Go back to popup
+    await page.goto(`chrome-extension://${extensionId}/html/popup.html`);
+
     // Hover to reveal buttons
     await ruleItem.hover();
-
     const toggleBtn = ruleItem.locator('.toggle-btn');
-    await expect(toggleBtn).not.toHaveClass(/paused/);
 
     // Click pause
     await toggleBtn.click();
-
-    // Hover again
-    await ruleItem.hover();
+    await page.waitForTimeout(100); // Wait for background script to update rules
 
     // Verify rule is paused
     await expect(ruleItem).toHaveClass(/paused/);
-    await expect(toggleBtn).toHaveClass(/paused/);
+
+    // Verify redirect DOES NOT work
+    await page.goto(source);
+    await expect(page).toHaveURL(source); // Should stay on source
+
+    // Go back to popup
+    await page.goto(`chrome-extension://${extensionId}/html/popup.html`);
 
     // Click resume
-    await toggleBtn.click();
-
-    // Hover again
     await ruleItem.hover();
+    await toggleBtn.click();
+    await page.waitForTimeout(100); // Wait for background script to update rules
 
     // Verify rule is active again
     await expect(ruleItem).not.toHaveClass(/paused/);
-    await expect(toggleBtn).not.toHaveClass(/paused/);
+
+    // Verify redirect works again
+    await page.goto(source);
+    await expect(page).toHaveURL(/example\.com/);
   });
 
   test('should persist pause state after reload', async ({ page }) => {

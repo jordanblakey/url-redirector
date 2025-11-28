@@ -30,12 +30,17 @@ describe('background-logic.ts - Pure Functions', () => {
 
       const dnrRules = buildDNRRules(rules);
 
-      expect(dnrRules).toHaveLength(1);
-      expect(dnrRules[0].condition.urlFilter).toBe('||example.com');
-      expect(dnrRules[0]!.action!.redirect!.url).toBe(
-        'https://google.com/?url_redirector=example.com',
+      expect(dnrRules).toHaveLength(2);
+      expect(dnrRules[0].priority).toBe(2);
+      expect(dnrRules[0].condition.regexFilter).toContain('example\\.com');
+      expect(dnrRules[0]!.action!.redirect!.regexSubstitution).toContain(
+        'url_redirector=\\3,example.com',
       );
-      expect(dnrRules[0]!.priority).toBe(1);
+      expect(dnrRules[1].priority).toBe(1);
+      expect(dnrRules[1].condition.regexFilter).toContain('example\\.com');
+      expect(dnrRules[1]!.action!.redirect!.regexSubstitution).toContain(
+        'url_redirector=example.com',
+      );
     });
 
     test('should skip inactive rules', () => {
@@ -68,12 +73,17 @@ describe('background-logic.ts - Pure Functions', () => {
 
         const dnrRules = buildDNRRules(rules);
 
-        expect(dnrRules).toHaveLength(1);
-        expect(dnrRules[0].condition.urlFilter).toBe('||example.com');
-        expect(dnrRules[0]!.action!.redirect!.url).toBe(
-          'https://google.com/?url_redirector=example.com',
+        expect(dnrRules).toHaveLength(2);
+        expect(dnrRules[0].priority).toBe(2);
+        expect(dnrRules[0].condition.regexFilter).toContain('example\\.com');
+        expect(dnrRules[0]!.action!.redirect!.regexSubstitution).toContain(
+          'url_redirector=\\3,example.com',
         );
-        expect(dnrRules[0]!.priority).toBe(1);
+        expect(dnrRules[1].priority).toBe(1);
+        expect(dnrRules[1].condition.regexFilter).toContain('example\\.com');
+        expect(dnrRules[1]!.action!.redirect!.regexSubstitution).toContain(
+          'url_redirector=example.com',
+        );
       });
 
       test('should skip inactive rules', () => {
@@ -123,7 +133,7 @@ describe('background-logic.ts - Pure Functions', () => {
 
         const dnrRules = buildDNRRules(rules);
 
-        expect(dnrRules[0].condition.urlFilter).toBe('||example.com');
+        expect(dnrRules[0].condition.regexFilter).toContain('example\\.com');
       });
 
       test('should normalize source URL (strip www)', () => {
@@ -139,7 +149,7 @@ describe('background-logic.ts - Pure Functions', () => {
 
         const dnrRules = buildDNRRules(rules);
 
-        expect(dnrRules[0].condition.urlFilter).toBe('||example.com');
+        expect(dnrRules[0].condition.regexFilter).toContain('example\\.com');
       });
 
       test('should normalize source URL (strip both protocol and www)', () => {
@@ -155,7 +165,7 @@ describe('background-logic.ts - Pure Functions', () => {
 
         const dnrRules = buildDNRRules(rules);
 
-        expect(dnrRules[0].condition.urlFilter).toBe('||example.com');
+        expect(dnrRules[0].condition.regexFilter).toContain('example\\.com');
       });
 
       test('should add https protocol to target if missing', () => {
@@ -171,8 +181,8 @@ describe('background-logic.ts - Pure Functions', () => {
 
         const dnrRules = buildDNRRules(rules);
 
-        expect(dnrRules[0]!.action!.redirect!.url).toBe(
-          'https://google.com/?url_redirector=example.com',
+        expect(dnrRules[1]!.action!.redirect!.regexSubstitution).toBe(
+          'https://google.com?url_redirector=example.com',
         );
       });
 
@@ -189,8 +199,8 @@ describe('background-logic.ts - Pure Functions', () => {
 
         const dnrRules = buildDNRRules(rules);
 
-        expect(dnrRules[0]!.action!.redirect!.url).toBe(
-          'https://google.com/?url_redirector=example.com',
+        expect(dnrRules[1]!.action!.redirect!.regexSubstitution).toBe(
+          'https://google.com?url_redirector=example.com',
         );
       });
 
@@ -207,8 +217,8 @@ describe('background-logic.ts - Pure Functions', () => {
 
         const dnrRules = buildDNRRules(rules);
 
-        expect(dnrRules[0]!.action!.redirect!.url).toBe(
-          'http://google.com/?url_redirector=example.com',
+        expect(dnrRules[1]!.action!.redirect!.regexSubstitution).toBe(
+          'http://google.com?url_redirector=example.com',
         );
       });
 
@@ -225,9 +235,9 @@ describe('background-logic.ts - Pure Functions', () => {
 
         const dnrRules = buildDNRRules(rules);
 
-        expect(dnrRules).toHaveLength(1);
-        expect(dnrRules[0]!.action!.redirect!.url).not.toBe(':shuffle:');
-        expect(dnrRules[0]!.action!.redirect!.url).toBeTruthy();
+        expect(dnrRules).toHaveLength(2);
+        expect(dnrRules[0]!.action!.redirect!.regexSubstitution).not.toBe(':shuffle:');
+        expect(dnrRules[0]!.action!.redirect!.regexSubstitution).toBeTruthy();
       });
 
       test('should generate consistent rule IDs', () => {
@@ -267,7 +277,7 @@ describe('background-logic.ts - Pure Functions', () => {
 
         const dnrRules = buildDNRRules(rules);
 
-        expect(dnrRules).toHaveLength(2);
+        expect(dnrRules).toHaveLength(4);
       });
 
       test('should filter out inactive from mixed rules', () => {
@@ -290,8 +300,8 @@ describe('background-logic.ts - Pure Functions', () => {
 
         const dnrRules = buildDNRRules(rules);
 
-        expect(dnrRules).toHaveLength(1);
-        expect(dnrRules[0].condition.urlFilter).toBe('||example.com');
+        expect(dnrRules).toHaveLength(2);
+        expect(dnrRules[0].condition.regexFilter).toContain('example\\.com');
       });
     });
 
@@ -587,7 +597,7 @@ describe('background-logic.ts - Pure Functions', () => {
 
       const dnrRules = buildDNRRules(rules);
 
-      expect(dnrRules[0].condition.urlFilter).toBe('||example.com');
+      expect(dnrRules[0].condition.regexFilter).toContain('example\\.com');
     });
 
     test('should add https protocol to target if missing', () => {
@@ -603,8 +613,8 @@ describe('background-logic.ts - Pure Functions', () => {
 
       const dnrRules = buildDNRRules(rules);
 
-      expect(dnrRules[0]!.action!.redirect!.url).toBe(
-        'https://google.com/?url_redirector=example.com',
+      expect(dnrRules[1]!.action!.redirect!.regexSubstitution).toBe(
+        'https://google.com?url_redirector=example.com',
       );
     });
 
@@ -621,8 +631,8 @@ describe('background-logic.ts - Pure Functions', () => {
 
       const dnrRules = buildDNRRules(rules);
 
-      expect(dnrRules[0]!.action!.redirect!.url).toBe(
-        'https://google.com/?url_redirector=example.com',
+      expect(dnrRules[1]!.action!.redirect!.regexSubstitution).toBe(
+        'https://google.com?url_redirector=example.com',
       );
     });
 
@@ -639,8 +649,8 @@ describe('background-logic.ts - Pure Functions', () => {
 
       const dnrRules = buildDNRRules(rules);
 
-      expect(dnrRules[0]!.action!.redirect!.url).toBe(
-        'http://google.com/?url_redirector=example.com',
+      expect(dnrRules[1]!.action!.redirect!.regexSubstitution).toBe(
+        'http://google.com?url_redirector=example.com',
       );
     });
 
@@ -657,9 +667,9 @@ describe('background-logic.ts - Pure Functions', () => {
 
       const dnrRules = buildDNRRules(rules);
 
-      expect(dnrRules).toHaveLength(1);
-      expect(dnrRules[0]!.action!.redirect!.url).not.toBe(':shuffle:');
-      expect(dnrRules[0]!.action!.redirect!.url).toBeTruthy();
+      expect(dnrRules).toHaveLength(2);
+      expect(dnrRules[0]!.action!.redirect!.regexSubstitution).not.toBe(':shuffle:');
+      expect(dnrRules[0]!.action!.redirect!.regexSubstitution).toBeTruthy();
     });
 
     test('should generate consistent rule IDs', () => {
@@ -699,7 +709,7 @@ describe('background-logic.ts - Pure Functions', () => {
 
       const dnrRules = buildDNRRules(rules);
 
-      expect(dnrRules).toHaveLength(2);
+      expect(dnrRules).toHaveLength(4);
     });
 
     test('should filter out inactive from mixed rules', () => {
@@ -722,8 +732,8 @@ describe('background-logic.ts - Pure Functions', () => {
 
       const dnrRules = buildDNRRules(rules);
 
-      expect(dnrRules).toHaveLength(1);
-      expect(dnrRules[0].condition.urlFilter).toBe('||example.com');
+      expect(dnrRules).toHaveLength(2);
+      expect(dnrRules[0].condition.regexFilter).toContain('example\\.com');
     });
   });
 

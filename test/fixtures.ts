@@ -18,17 +18,19 @@ const userDataDirs: string[] = [];
 export async function getServiceWorker(context: BrowserContext): Promise<Worker> {
   let background: Worker | undefined = context.serviceWorkers()[0];
   if (!background) {
-    background = await Promise.race([
-      context.waitForEvent('serviceworker'),
-      new Promise<Worker>((resolve) => {
-        const interval = setInterval(() => {
-          if (context.serviceWorkers().length > 0) {
-            clearInterval(interval);
-            resolve(context.serviceWorkers()[0]);
-          }
-        }, 50);
-      }),
-    ]);
+    // Poll for the service worker
+    const startTime = Date.now();
+    const timeout = 10000; // 10 seconds
+    while (!background && Date.now() - startTime < timeout) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      background = context.serviceWorkers()[0];
+    }
+
+    if (!background) {
+      throw new Error(
+        `Service worker not found after ${timeout}ms. Available workers: ${context.serviceWorkers().length}`,
+      );
+    }
   }
   return background;
 }
