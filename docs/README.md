@@ -18,18 +18,17 @@ Overview of the build and bundle architecture.
 
 ---
 
-### [Build Tests](build-tests.md)
-Complete guide to the build validation test suite.
+### [Testing](testing.md)
+Complete guide to the testing architecture.
 
 **Topics covered:**
-- Running build validation tests (`npm run test:build`)
-- What gets tested (25 different aspects)
-- Troubleshooting build failures
+- Unit, integration, and E2E tests
+- Running the test suites
+- Build validation tests
 
 **When to read:**
-- Before modifying the build process
-- When tests fail in CI
-- When adding new files to the extension
+- To understand the project's testing strategy
+- Before writing new tests
 
 ---
 
