@@ -1,0 +1,45 @@
+name: Publish Web Extension
+
+on:
+  workflow_dispatch:
+    inputs:
+      extension_version:
+        description: 'The version of the extension to publish (e.g., 1.0.0)'
+        required: true
+        type: string
+      release_notes:
+        description: 'Release notes for this version'
+        required: false
+        type: string
+
+jobs:
+  publish_web_extension:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and Publish Extension
+        run: |
+          echo "Building extension for version ${{ github.event.inputs.extension_version }}"
+          # Replace with your actual build command
+          echo "Publishing extension with release notes: ${{ github.event.inputs.release_notes }}"
+          # Replace with your actual publish command, e.g., using 'npm publish' if it's an npm package
+
+      # Add more steps as needed, e.g., for release creation, deployment, etc.
+      # - name: Create GitHub Release
+      #   uses: actions/create-release@v1
+      #   with:
+      #     tag_name: v${{ github.event.inputs.extension_version }}
+      #     release_name: Release v${{ github.event.inputs.extension_version }}
+      #     body: ${{ github.event.inputs.release_notes }}
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

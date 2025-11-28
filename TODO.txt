@@ -9,6 +9,7 @@
 
 ## DELEGATED
 [] CI: Before versioning, check that a tag exists with the current version number. That is to say, if it doesnt the previous push failed, and we should not version up but push the current version to the store and create a tag and push that.
+
 [x] CI: Explore using a Github workflow on demand to push new versions, ensuring tests are passing and hermetic build.
 [] CI: Artifact Generation - The generated zip file should be named url-redirector-v{version}.zip
 [] CI: AI Changelogs: Use the Google Gemini API to read the commit history between the last tag and current tag, and generate "User Facing" release notes (minimalist style) and "Technical Highlights". Write this to metadata/recent_updates.txt
