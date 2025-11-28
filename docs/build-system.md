@@ -7,45 +7,45 @@ The URL Redirector extension uses a composed build system where the bundle proce
 ## Architecture
 
 ```mermaid
-%%{init: {"flowchart": {"nodeSpacing": 50, "rankSpacing": 10}} }%%
+%%{init: {'theme': 'neutral', 'flowchart': {'curve': 'monotoneY'}, "flowchart": {"nodeSpacing": 50, "rankSpacing": 10}} }%%
 graph LR
     subgraph Bundle["Bundle Process (npm run bundle)"]
         direction LR
-
-        %% 1. Outer Padding: Pushes the "Bundle Process" title up
-        subgraph Pad1[" "]
+        
+        %% 1. Outer Padding (Protects 'Bundle Process' title)
+        subgraph PadBundle[" "]
             direction LR
-            style Pad1 fill:none,stroke:none
-
-            StartBundle(Start Bundle) --> EnsureBuildDir[Ensure 'build/' exists]
-            EnsureBuildDir --> RunBuild[Run 'npm run build']
-
+            style PadBundle fill:none,stroke:none
+            
+            Start(Start Bundle) --> Prep[Ensure 'build/' exists]
+            Prep --> Run[Run 'npm run build']
+            
             %% 2. Inner Subgraph
             subgraph Build["Build Process (scripts/build.ts)"]
                 direction LR
-
-                %% 3. Inner Padding: Pushes the "Build Process" title up
-                subgraph Pad2[" "]
+                
+                %% 3. Inner Padding (Protects 'Build Process' title)
+                subgraph PadBuild[" "]
                     direction LR
-                    style Pad2 fill:none,stroke:none
-
-                    CleanDist[Clean 'dist/' directory]
-
+                    style PadBuild fill:none,stroke:none
+                    
+                    Clean[Clean 'dist/' directory]
+                    
                     %% Parallel Split
-                    CleanDist --> CompileTS[Compile TypeScript<br/>src/ -> dist/]
-                    CleanDist --> CopyAssets[Copy Assets<br/>assets/ -> dist/]
-
-                    %% Re-converge
-                    CompileTS --> ProcessManifest[Process Manifest<br/>Adjust paths & copy to dist/]
-                    CopyAssets --> ProcessManifest
+                    Clean --> Compile["Compile TypeScript<br/>(src/ → dist/)"]
+                    Clean --> Assets["Copy Assets<br/>(assets/ → dist/)"]
+                    
+                    %% Converge
+                    Compile --> Manifest["Process Manifest<br/>(Adjust paths & Copy)"]
+                    Assets --> Manifest
                 end
             end
-
-            RunBuild --> CleanDist
-            ProcessManifest --> VerifyDist[Verify 'dist/' content]
-            VerifyDist --> ReadVersion[Read Version from package.json]
-            ReadVersion --> ZipDist[Zip 'dist/' to 'build/url-redirector-vX.Y.Z.zip']
-            ZipDist --> EndBundle(End Bundle)
+            
+            %% Connecting the flows
+            Run --> Clean
+            Manifest -->|Verifies| Verify["Verify 'dist/' Content"]
+            Verify -->|Reads Version| Zip["Create Zip Bundle<br/>(build/url-redirector-vX.Y.Z.zip)"]
+            Zip --> End(End Bundle)
         end
     end
 ```
