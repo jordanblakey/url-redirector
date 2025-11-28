@@ -61,8 +61,7 @@ export async function build(options: BuildOptions = {}) {
       }
 
       if (manifest.content_scripts) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        manifest.content_scripts.forEach((script: any) => {
+        manifest.content_scripts.forEach((script: { js?: string[] }) => {
           if (script.js) {
             script.js = script.js.map((js: string) => js.replace('dist/', ''));
           }

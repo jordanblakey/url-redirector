@@ -1,4 +1,5 @@
 import { test, expect } from '../fixtures';
+import { Rule } from '../../src/types';
 
 test.describe('UI Components', () => {
   test.beforeEach(async ({ page, extensionId }) => {

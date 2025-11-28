@@ -2,7 +2,7 @@ import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi 
 import { setupAuth } from '../../../scripts/setup-cws-auth';
 
 describe('Setup CWS Auth Script', () => {
-  let mockLog: any;
+  let mockLog: (...args: any[]) => void;
   let logs: string[] = [];
 
   beforeEach(() => {

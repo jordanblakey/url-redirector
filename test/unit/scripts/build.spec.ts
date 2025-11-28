@@ -2,12 +2,15 @@ import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi 
 import { build } from '../../../scripts/build';
 import path from 'path';
 
+import { ExecSyncOptions } from 'child_process';
+import fs from 'fs-extra';
+
 describe('Build Script', () => {
   let mockExecSync: any;
-  let mockFs: any;
-  let mockLog: any;
-  let mockWarn: any;
-  let mockError: any;
+  let mockFs: typeof fs;
+  let mockLog: (...args: any[]) => void;
+  let mockWarn: (...args: any[]) => void;
+  let mockError: (...args: any[]) => void;
   let logs: string[] = [];
   let warns: string[] = [];
   let errors: string[] = [];
@@ -25,15 +28,16 @@ describe('Build Script', () => {
     mockWarn = (...args: any[]) => warns.push(args.join(' '));
     mockError = (...args: any[]) => errors.push(args.join(' '));
 
-    mockExecSync = (cmd: string, options: any) => {
+    mockExecSync = (cmd: string, options: ExecSyncOptions) => {
       executedCommands.push(cmd);
       return Buffer.from('');
     };
 
     mockFs = {
+      ...fs,
       emptyDirSync: (path: string) => fsOperations.push({ op: 'emptyDirSync', path }),
       existsSync: (path: string) => true,
-      readFileSync: (path: string) => {
+      readFileSync: (path: string, options: any) => {
         if (path.endsWith('manifest.json')) {
           return JSON.stringify({
             version: '1.0.0',
@@ -49,7 +53,7 @@ describe('Build Script', () => {
       copy: async (src: string, dest: string) => {
         fsOperations.push({ op: 'copy', src, dest });
       },
-    };
+    } as any;
   });
 
   test('should run build process correctly', async () => {

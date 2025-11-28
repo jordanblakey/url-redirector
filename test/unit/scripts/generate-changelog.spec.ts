@@ -1,12 +1,14 @@
 import { test, expect, describe, beforeEach, afterEach, vi } from 'vitest';
 import { generateChangelog } from '../../../scripts/generate-changelog';
+import fs from 'fs-extra';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 describe('generateChangelog', () => {
   let mockExecSync: any;
   let mockFs: any;
   let mockGenAI: any;
   let mockLoadSecrets: any;
-  let mockLog: any;
+  let mockLog: (...args: any[]) => void;
   let mockWarn: any;
   let mockError: any;
   let mockExit: any;

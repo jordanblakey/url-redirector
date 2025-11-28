@@ -4,8 +4,8 @@ import { runCheckStatus } from '../../../scripts/check-cws-status';
 describe('Check CWS Status Script', () => {
   let mockLoadSecrets: any;
   let mockFetch: any;
-  let mockLog: any;
-  let mockDir: any;
+  let mockLog: (...args: any[]) => void;
+  let mockDir: (obj: any) => void;
   let mockError: any;
   let logs: string[] = [];
   let dirs: any[] = [];
@@ -90,7 +90,7 @@ describe('Check CWS Status Script', () => {
     process.exit = ((code?: number) => {
       exitCode = code;
       throw new Error('Process Exited');
-    }) as any;
+    }) as (code?: number) => never;
 
     try {
       await runCheckStatus({

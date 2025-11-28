@@ -1,11 +1,14 @@
 import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
 import { bundle } from '../../../scripts/bundle';
+import { ExecSyncOptions } from 'child_process';
+import fs from 'fs-extra';
+import AdmZip from 'adm-zip';
 
 describe('Bundle Script', () => {
   let mockExecSync: any;
-  let mockFs: any;
+  let mockFs: Partial<typeof fs>;
   let mockAdmZip: any;
-  let mockLog: any;
+  let mockLog: (...args: any[]) => void;
   let mockError: any;
   let logs: string[] = [];
   let errors: string[] = [];
@@ -23,17 +26,17 @@ describe('Bundle Script', () => {
     mockLog = (...args: any[]) => logs.push(args.join(' '));
     mockError = (...args: any[]) => errors.push(args.join(' '));
 
-    mockExecSync = (cmd: string, options: any) => {
+    mockExecSync = (cmd: string, options: ExecSyncOptions) => {
       executedCommands.push(cmd);
       return Buffer.from('');
     };
 
     mockFs = {
-      ensureDirSync: (path: string) => fsOperations.push({ op: 'ensureDirSync', path }),
-      existsSync: (path: string) => true,
-      readdirSync: (path: string) => ['file1', 'file2'],
-      statSync: (path: string) => ({ size: 1024 }),
-      readJsonSync: (path: string) => ({ version: '1.0.0' }),
+      ensureDirSync: (path: any) => fsOperations.push({ op: 'ensureDirSync', path }),
+      existsSync: (path: any) => true,
+      readdirSync: (path: any) => ['file1', 'file2'] as any,
+      statSync: (path: any) => ({ size: 1024 }) as any,
+      readJsonSync: (path: any) => ({ version: '1.0.0' }),
     };
 
     mockAdmZip = class {
@@ -50,7 +53,7 @@ describe('Bundle Script', () => {
     await bundle({
       deps: {
         execSync: mockExecSync,
-        fs: mockFs,
+        fs: mockFs as any,
         AdmZip: mockAdmZip,
         log: mockLog,
         error: mockError,
@@ -87,7 +90,7 @@ describe('Bundle Script', () => {
       await bundle({
         deps: {
           execSync: mockExecSync,
-          fs: mockFs,
+          fs: mockFs as any,
           AdmZip: mockAdmZip,
           log: mockLog,
           error: mockError,

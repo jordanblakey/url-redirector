@@ -1,4 +1,5 @@
 import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
+import { Rule } from '../../../src/types';
 import {
   getFaviconUrl,
   shouldShowFavicon,
@@ -49,18 +50,18 @@ describe('ui-logic.ts - Pure Functions', () => {
 
   describe('formatPauseButtonText', () => {
     test('should return "Pause" for active rule', () => {
-      const rule = { id: 1, source: 'a', target: 'b', active: true, count: 0 };
+      const rule: Rule = { id: 1, source: 'a', target: 'b', active: true, count: 0 };
       expect(formatPauseButtonText(rule)).toBe('Pause');
     });
 
     test('should return "Play" for inactive rule', () => {
-      const rule = { id: 1, source: 'a', target: 'b', active: false, count: 0 };
+      const rule: Rule = { id: 1, source: 'a', target: 'b', active: false, count: 0 };
       expect(formatPauseButtonText(rule)).toBe('Play');
     });
 
     test('should show remaining seconds for paused rule (< 60s)', () => {
       const futureTime = Date.now() + 30 * 1000; // 30 seconds
-      const rule = {
+      const rule: Rule = {
         id: 1,
         source: 'a',
         target: 'b',
@@ -74,7 +75,7 @@ describe('ui-logic.ts - Pure Functions', () => {
 
     test('should show remaining minutes for paused rule (> 60s)', () => {
       const futureTime = Date.now() + 120 * 1000; // 2 minutes
-      const rule = {
+      const rule: Rule = {
         id: 1,
         source: 'a',
         target: 'b',
@@ -87,24 +88,10 @@ describe('ui-logic.ts - Pure Functions', () => {
     });
   });
 
-  describe('formatRemainingTime', () => {
-    test('should format seconds correctly', () => {
-      const pausedUntil = Date.now() + 45 * 1000;
-      const text = formatRemainingTime(pausedUntil);
-      expect(text).toMatch(/Paused \(\d+s\)/);
-    });
-
-    test('should format minutes correctly', () => {
-      const pausedUntil = Date.now() + 180 * 1000; // 3 minutes
-      const text = formatRemainingTime(pausedUntil);
-      expect(text).toMatch(/Paused \(3m\)/);
-    });
-  });
-
   describe('isRulePaused', () => {
     test('should return true for paused rule', () => {
       const futureTime = Date.now() + 100000;
-      const rule = {
+      const rule: Rule = {
         id: 1,
         source: 'a',
         target: 'b',
@@ -116,13 +103,13 @@ describe('ui-logic.ts - Pure Functions', () => {
     });
 
     test('should return false for active rule', () => {
-      const rule = { id: 1, source: 'a', target: 'b', active: true, count: 0 };
+      const rule: Rule = { id: 1, source: 'a', target: 'b', active: true, count: 0 };
       expect(isRulePaused(rule)).toBe(false);
     });
 
     test('should return false for expired pause', () => {
       const pastTime = Date.now() - 100000;
-      const rule = {
+      const rule: Rule = {
         id: 1,
         source: 'a',
         target: 'b',
@@ -136,7 +123,7 @@ describe('ui-logic.ts - Pure Functions', () => {
 
   describe('shouldDisplayAsPaused', () => {
     test('should return true for inactive rule', () => {
-      const rule = { id: 1, source: 'a', target: 'b', active: false, count: 0 };
+      const rule: Rule = { id: 1, source: 'a', target: 'b', active: false, count: 0 };
       expect(shouldDisplayAsPaused(rule)).toBe(true);
     });
 

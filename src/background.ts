@@ -1,4 +1,4 @@
-import { Rule } from './types';
+import { Rule, RedirectMessage } from './types';
 import { buildDNRRules, findActivelyChangedRules, findMatchingTabs } from './background-logic.js';
 import { normalizeUrl } from './utils.js';
 import { getRandomMessage } from './messages.js';
@@ -14,39 +14,32 @@ chrome.runtime.onStartup.addListener(async () => {
 });
 
 // Listen for redirect messages from content script
-chrome.runtime.onMessage.addListener(async (request, _sender, _sendResponse) => {
-  if (request.type === 'REDIRECT_DETECTED' && request.source) {
-    const activeRules = await storage.getRules();
-    const source = request.source;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+chrome.runtime.onMessage.addListener(
+  async (message: RedirectMessage, _sender, _sendResponse: (response?: any) => void) => {
+    if (message.type === 'REDIRECT_DETECTED' && message.source) {
+      const activeRules = await storage.getRules();
+      const source = message.source;
 
-    for (const rule of activeRules) {
-      // Normalize both to ensure they match
-      if (source === normalizeUrl(rule.source)) {
-        if (rule.target === ':shuffle:') {
-          console.log('Shuffle rule hit, re-rolling target...');
-          // Catch errors to avoid crashing if rate limited
-          updateDynamicRules().catch((e) => console.error('Failed to update shuffle rule:', e));
+      for (const rule of activeRules) {
+        // Normalize both to ensure they match
+        if (source === normalizeUrl(rule.source)) {
+          if (rule.target === ':shuffle:') {
+            console.log('Shuffle rule hit, re-rolling target...');
+            // Catch errors to avoid crashing if rate limited
+            updateDynamicRules().catch((e: unknown) =>
+              console.error('Failed to update shuffle rule:', e),
+            );
+          }
+          const countMessage = getRandomMessage(rule.count + 1);
+          await storage.incrementCount(rule.id, 1, countMessage);
+          showBadge(rule.count + 1);
+          break;
         }
-        const countMessage = getRandomMessage(rule.count + 1);
-        await storage.incrementCount(rule.id, 1, countMessage);
-        showBadge(rule.count + 1);
-        break;
       }
     }
-  }
-});
-
-// Keep onUpdated for debugging or fallback, but the message is primary now.
-// Actually, let's remove the conflicting logic to avoid double counting if both fire.
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, _tab) => {
-  // Only logging for now
-  if (changeInfo.status === 'loading' && changeInfo.url) {
-    const url = new URL(changeInfo.url);
-    if (url.searchParams.has('url_redirector')) {
-      // console.log("Background saw url_redirector param via onUpdated");
-    }
-  }
-});
+  },
+);
 
 // Listen for rule changes
 chrome.storage.onChanged.addListener(async (changes, areaName) => {
@@ -133,12 +126,12 @@ export function showBadge(count?: number) {
           if (typeof chrome !== 'undefined' && chrome.action && chrome.action.setBadgeText) {
             chrome.action.setBadgeText({ text: '' });
           }
-        } catch (_e) {
+        } catch (_e: unknown) {
           // Silently fail
         }
       }, 10000);
     }
-  } catch (_e) {
+  } catch (_e: unknown) {
     // Silently fail
   }
 }

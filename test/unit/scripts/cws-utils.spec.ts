@@ -70,8 +70,8 @@ describe('cws-utils', () => {
   describe('uploadExtension', () => {
     test('should upload file on success', async () => {
       // Mock fs.createReadStream
-      const mockStream = { pipe: vi.fn() };
-      vi.mocked(fs.createReadStream).mockReturnValue(mockStream as any);
+      const mockStream = { pipe: vi.fn() } as unknown as fs.ReadStream;
+      vi.mocked(fs.createReadStream).mockReturnValue(mockStream);
 
       fetchMock.mockResolvedValue({
         ok: true,
