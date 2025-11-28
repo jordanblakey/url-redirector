@@ -14,9 +14,8 @@ chrome.runtime.onStartup.addListener(async () => {
 });
 
 // Listen for redirect messages from content script
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 chrome.runtime.onMessage.addListener(
-  async (message: RedirectMessage, _sender, _sendResponse: (response?: any) => void) => {
+  async (message: RedirectMessage, _sender, _sendResponse: (response?: unknown) => void) => {
     if (message.type === 'REDIRECT_DETECTED' && message.source) {
       const activeRules = await storage.getRules();
       const source = message.source;
