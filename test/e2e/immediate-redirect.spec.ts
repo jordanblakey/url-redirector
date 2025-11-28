@@ -6,7 +6,13 @@ test.describe('Immediate Redirect on Rule Change', () => {
 
         // Open a tab to the source URL
         const page = await context.newPage();
-        await page.goto('https://example.com');
+
+        // Mock the source page to avoid network issues
+        await page.route('https://example.com/', async route => {
+            await route.fulfill({ status: 200, body: 'Source Page' });
+        });
+
+        await page.goto('https://example.com/');
 
         // Add rule
         await worker.evaluate(async () => {
@@ -43,7 +49,13 @@ test.describe('Immediate Redirect on Rule Change', () => {
 
         // Open a tab to the source URL
         const page = await context.newPage();
-        await page.goto('https://example.org');
+
+        // Mock the source page
+        await page.route('https://example.org/', async route => {
+            await route.fulfill({ status: 200, body: 'Source Page' });
+        });
+
+        await page.goto('https://example.org/');
 
         // Ensure it stays on source (not redirected)
         await expect(page).toHaveURL(/example\.org/);
@@ -82,7 +94,13 @@ test.describe('Immediate Redirect on Rule Change', () => {
 
         // Open a tab to the source URL
         const page = await context.newPage();
-        await page.goto('https://example.net');
+
+        // Mock the source page
+        await page.route('https://example.net/', async route => {
+            await route.fulfill({ status: 200, body: 'Source Page' });
+        });
+
+        await page.goto('https://example.net/');
 
         // Ensure it stays on source
         await expect(page).toHaveURL(/example\.net/);
@@ -120,7 +138,13 @@ test.describe('Immediate Redirect on Rule Change', () => {
 
         // Open a NEW tab to the source URL
         const page = await context.newPage();
-        await page.goto('https://example.edu');
+
+        // Mock the source page
+        await page.route('https://example.edu/', async route => {
+            await route.fulfill({ status: 200, body: 'Source Page' });
+        });
+
+        await page.goto('https://example.edu/');
 
         // Verify redirect
         await expect(page).toHaveURL(/google\.com/);

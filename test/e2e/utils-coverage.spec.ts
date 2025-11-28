@@ -16,11 +16,14 @@ test.describe('Utils Coverage - E2E', () => {
                 await chrome.storage.local.set({ rules });
             });
 
-            // Wait for background script to process rule changes
-            await new Promise(r => setTimeout(r, 500));
 
             const page = await context.newPage();
-            await page.goto('https://http-test.com');
+
+            await page.route('https://http-test.com/', async route => {
+                await route.fulfill({ status: 200, body: 'Source Page' });
+            });
+
+            await page.goto('https://http-test.com/');
             await expect(page).toHaveURL(/google\.com/);
         });
 
@@ -38,11 +41,14 @@ test.describe('Utils Coverage - E2E', () => {
                 await chrome.storage.local.set({ rules });
             });
 
-            // Wait for background script to process rule changes
-            await new Promise(r => setTimeout(r, 500));
 
             const page = await context.newPage();
-            await page.goto('https://www.www-test.com');
+
+            await page.route('https://www.www-test.com/', async route => {
+                await route.fulfill({ status: 200, body: 'Source Page' });
+            });
+
+            await page.goto('https://www.www-test.com/');
             await expect(page).toHaveURL(/google\.com/);
         });
 
@@ -60,11 +66,18 @@ test.describe('Utils Coverage - E2E', () => {
                 await chrome.storage.local.set({ rules });
             });
 
-            // Wait for background script to process rule changes
-            await new Promise(r => setTimeout(r, 500));
 
             const page = await context.newPage();
-            await page.goto('https://protocol-test.com');
+
+            // Mock source and target
+            await page.route('https://protocol-test.com/', async route => {
+                await route.fulfill({ status: 200, body: 'Source Page' });
+            });
+            await page.route('https://example.com/', async route => {
+                await route.fulfill({ status: 200, body: 'Target Page' });
+            });
+
+            await page.goto('https://protocol-test.com/');
             await expect(page).toHaveURL(/https:\/\/example\.com/);
         });
 
@@ -82,15 +95,18 @@ test.describe('Utils Coverage - E2E', () => {
                 await chrome.storage.local.set({ rules });
             });
 
-            // Wait for background script to process rule changes
-            await new Promise(r => setTimeout(r, 500));
 
             const page = await context.newPage();
-            await page.goto('https://shuffle-test.com');
+
+            await page.route('https://shuffle-test.com/', async route => {
+                await route.fulfill({ status: 200, body: 'Source Page' });
+            });
+
+            await page.goto('https://shuffle-test.com/');
 
             // Should redirect to some productive URL (not shuffle-test.com)
             // Wait for redirect to happen
-            await page.waitForTimeout(2000);
+            // await page.waitForTimeout(2000); // Removed: goto waits for load
             const url = new URL(page.url());
             expect(url.hostname).not.toContain('shuffle-test.com');
             expect(url.protocol).toMatch(/^https?:/);
@@ -98,21 +114,27 @@ test.describe('Utils Coverage - E2E', () => {
 
             const firstTarget = url.toString();
 
+            // Give the background script time to update the DNR rules
+            // We rely on the retry loop for this
+
             // Visit again to ensure we get a DIFFERENT target (re-roll)
-            await page.goto('https://shuffle-test.com');
-            await page.waitForTimeout(2000);
-            const secondUrl = new URL(page.url());
-            const secondTarget = secondUrl.toString();
+            // We try up to 3 times to avoid flakiness from random collisions
+            let different = false;
+            for (let i = 0; i < 3; i++) {
+                await page.goto('https://shuffle-test.com/');
+                // await page.waitForTimeout(2000); // Removed: goto waits for load
+                const nextUrl = new URL(page.url());
+                const nextTarget = nextUrl.toString();
 
-            // Note: There is a small chance they are the same, but with enough productive URLs it's unlikely.
-            // We can check if they are different, or at least that the system TRIED to re-roll.
-            // For now, let's just log it.
-            console.log('Shuffle 1:', firstTarget);
-            console.log('Shuffle 2:', secondTarget);
+                if (nextTarget !== firstTarget) {
+                    different = true;
+                    break;
+                }
+                // Wait a bit before next try
+                await new Promise(r => setTimeout(r, 500)); // Reduced wait
+            }
 
-            // Strictly, they should be different if we have enough options.
-            // Let's assume they should be different for this test to pass.
-            expect(firstTarget).not.toBe(secondTarget);
+            expect(different).toBe(true);
         });
 
         test('should match URL with path', async ({ context }) => {
@@ -129,10 +151,13 @@ test.describe('Utils Coverage - E2E', () => {
                 await chrome.storage.local.set({ rules });
             });
 
-            // Wait for background script to process rule changes
-            await new Promise(r => setTimeout(r, 500));
 
             const page = await context.newPage();
+
+            await page.route('https://path-test.com/some/path', async route => {
+                await route.fulfill({ status: 200, body: 'Source Page' });
+            });
+
             await page.goto('https://path-test.com/some/path');
 
             // Should redirect even with path

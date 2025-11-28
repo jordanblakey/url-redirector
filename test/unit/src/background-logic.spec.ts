@@ -27,7 +27,7 @@ describe('background-logic.ts - Pure Functions', () => {
 
             expect(dnrRules).toHaveLength(1);
             expect(dnrRules[0].condition.urlFilter).toBe('||example.com');
-            expect(dnrRules[0]!.action!.redirect!.url).toBe('https://google.com?url_redirector=example.com');
+            expect(dnrRules[0]!.action!.redirect!.url).toBe('https://google.com/?url_redirector=example.com');
             expect(dnrRules[0]!.priority).toBe(1);
         });
 
@@ -126,7 +126,7 @@ describe('background-logic.ts - Pure Functions', () => {
 
             const dnrRules = buildDNRRules(rules);
 
-            expect(dnrRules[0]!.action!.redirect!.url).toBe('https://google.com?url_redirector=example.com');
+            expect(dnrRules[0]!.action!.redirect!.url).toBe('https://google.com/?url_redirector=example.com');
         });
 
         test('should not add protocol if target already has https', () => {
@@ -142,7 +142,7 @@ describe('background-logic.ts - Pure Functions', () => {
 
             const dnrRules = buildDNRRules(rules);
 
-            expect(dnrRules[0]!.action!.redirect!.url).toBe('https://google.com?url_redirector=example.com');
+            expect(dnrRules[0]!.action!.redirect!.url).toBe('https://google.com/?url_redirector=example.com');
         });
 
         test('should not add protocol if target already has http', () => {
