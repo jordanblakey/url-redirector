@@ -36,18 +36,6 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   }
 });
 
-// Keep onUpdated for debugging or fallback, but the message is primary now.
-// Actually, let's remove the conflicting logic to avoid double counting if both fire.
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-  // Only logging for now
-  if (changeInfo.status === "loading" && changeInfo.url) {
-    const url = new URL(changeInfo.url);
-    if (url.searchParams.has("url_redirector")) {
-      // console.log("Background saw url_redirector param via onUpdated");
-    }
-  }
-});
-
 // Listen for rule changes
 chrome.storage.onChanged.addListener(async (changes, areaName) => {
   if (areaName === "local" && changes.rules) {
