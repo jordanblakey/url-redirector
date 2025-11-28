@@ -1,9 +1,11 @@
-* migrated to `declarativeNetRequest` API (removed `webNavigation`/`tabs` permissions)
-* added shuffle mode feature
-* added temporary snooze/pause functionality
-* added "use placeholder" buttons for quick input
-* added redirect count badge
-* implemented flash messages for validation
-* sorted rules alphabetically by source URL
-* fixed redirect loop on 404s
-* various UI/UX improvements and bug fixes
+## User Facing
+*   Introduced "Shuffle Mode" for redirect rules.
+*   Added "Snooze" functionality to temporarily disable rules.
+*   Improved handling to prevent redirect loops.
+*   Resolved various UI and general bug fixes.
+
+## Technical Highlights
+*   **Major Test Infrastructure Overhaul:** Migrated to Vitest, significantly expanded unit and Playwright E2E test coverage, and optimized slow tests to prevent flakiness.
+*   **CI/CD Enhancements:** Improved workflow files, added GitHub annotations, refined test reporting, and implemented dynamic zip naming for build artifacts.
+*   **Core Logic Refactoring:** Abstracted background and UI logic for improved testability and removed legacy server mocks.
+*   **Deployment and Tooling:** Added a CWS (Chrome Web Store) submission script and updated development dependencies.

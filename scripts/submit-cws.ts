@@ -4,10 +4,10 @@ import { loadGcpSecrets } from './load-dotenv-from-gcp';
 import { execSync as realExecSync } from 'child_process';
 import fs from 'fs-extra';
 import path from 'path';
+import { getAccessToken, uploadExtension, publishExtension, updateStoreListing } from './cws-utils';
 
 // --- Configuration ---
 const EXTENSION_ID_DEFAULT = 'jhkoaofpbohfmolalpieheaeppdaminl';
-const PUBLISHER_ID_DEFAULT = 'c173d09b-31cf-48ff-bd4b-270d57317183';
 
 // --- Interfaces ---
 export interface SubmitCwsOptions {
@@ -21,71 +21,6 @@ export interface SubmitCwsOptions {
         loadGcpSecrets?: typeof loadGcpSecrets;
         fs?: typeof fs;
     };
-}
-
-// --- Helper Functions ---
-async function getAccessToken(clientId: string, clientSecret: string, refreshToken: string, fetchFn: typeof fetch) {
-    const response = await fetchFn('https://oauth2.googleapis.com/token', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-            client_id: clientId,
-            client_secret: clientSecret,
-            refresh_token: refreshToken,
-            grant_type: 'refresh_token',
-        }),
-    });
-
-    if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`Failed to get access token: ${response.status} ${text}`);
-    }
-    return (await response.json()).access_token;
-}
-
-async function uploadExtension(accessToken: string, extensionId: string, zipPath: string, fetchFn: typeof fetch, fsFn: typeof fs) {
-    const uploadUrl = `https://www.googleapis.com/upload/chromewebstore/v1.1/items/${extensionId}`;
-    const zipStream = fsFn.createReadStream(zipPath);
-
-    // @ts-ignore
-    const response = await fetchFn(uploadUrl, {
-        method: 'PUT',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'x-goog-api-version': '2',
-        },
-        // @ts-ignore
-        body: zipStream,
-        duplex: 'half'
-    });
-
-    if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`Failed to upload extension: ${response.status} ${text}`);
-    }
-
-    const data = await response.json();
-    return data;
-}
-
-async function publishExtension(accessToken: string, extensionId: string, fetchFn: typeof fetch) {
-    const publishUrl = `https://www.googleapis.com/chromewebstore/v1.1/items/${extensionId}/publish`;
-
-    const response = await fetchFn(publishUrl, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'x-goog-api-version': '2',
-        },
-    });
-
-    if (!response.ok) {
-        const text = await response.text();
-        throw new Error(`Failed to publish extension: ${response.status} ${text}`);
-    }
-
-    const data = await response.json();
-    return data;
 }
 
 // --- Main Logic ---
@@ -121,15 +56,25 @@ export async function submitCws(options: SubmitCwsOptions) {
     log('📦 Bundling extension...');
     execSync('npm run bundle', { stdio: 'inherit' });
     const zipPath = path.resolve(__dirname, '../build/extension.zip');
+    
+    // Resolve actual zip path if versioned (for now assuming 'extension.zip' is symlinked or copied by bundle, 
+    // BUT bundle.ts creates url-redirector-vX.Y.Z.zip. 
+    // We need to find the zip file.)
+    
+    // Quick fix: Find the only zip in build/
+    const buildDir = path.resolve(__dirname, '../build');
+    const files = fsFn.readdirSync(buildDir);
+    const actualZipName = files.find(f => f.endsWith('.zip'));
+    const actualZipPath = actualZipName ? path.join(buildDir, actualZipName) : zipPath;
 
-    if (!fsFn.existsSync(zipPath)) {
-        throw new Error(`Bundle failed: ${zipPath} not found.`);
+    if (!fsFn.existsSync(actualZipPath)) {
+        throw new Error(`Bundle failed: ${actualZipPath} not found.`);
     }
 
     // 3. Upload & Publish (or Dry Run)
     if (dryRun) {
         log('🛑 [DRY RUN] Skipping Upload and Publish.');
-        log(`   Would upload: ${zipPath}`);
+        log(`   Would upload: ${actualZipPath}`);
         log(`   To Extension ID: ${EXTENSION_ID}`);
         log('ℹ️  Run with --submit to actually publish.');
     } else {
@@ -137,15 +82,30 @@ export async function submitCws(options: SubmitCwsOptions) {
         const accessToken = await getAccessToken(CLIENT_ID!, CLIENT_SECRET!, REFRESH_TOKEN!, fetchFn);
 
         log('⬆️ Uploading to Chrome Web Store...');
-        const uploadResult = await uploadExtension(accessToken, EXTENSION_ID, zipPath, fetchFn, fsFn);
+        const uploadResult = await uploadExtension(accessToken, EXTENSION_ID, actualZipPath, fetchFn, fsFn);
         log('✅ Upload successful:', uploadResult);
 
         log('🚀 Publishing to Chrome Web Store...');
         const publishResult = await publishExtension(accessToken, EXTENSION_ID, fetchFn);
         log('✅ Publish successful:', publishResult);
+
+        // 4. Update Store Listing
+        const descriptionPath = path.resolve(__dirname, '../metadata/cws_description.txt');
+        const promoPath = path.resolve(__dirname, '../metadata/cws_promotional_text.txt');
+
+        if (fsFn.existsSync(descriptionPath) && fsFn.existsSync(promoPath)) {
+            log('📝 Updating Store Listing...');
+            const description = fsFn.readFileSync(descriptionPath, 'utf8');
+            const promotionalText = fsFn.readFileSync(promoPath, 'utf8');
+            
+            await updateStoreListing(accessToken, EXTENSION_ID, description, promotionalText, fetchFn);
+            log('✅ Store Listing updated.');
+        } else {
+            warn('⚠️ Metadata files not found (cws_description.txt / cws_promotional_text.txt). Skipping listing update.');
+        }
     }
 
-    // 4. Git Tag & Push
+    // 5. Git Tag & Push
     const manifestPath = path.resolve(__dirname, '../manifest.json');
     const manifest = fsFn.readJsonSync(manifestPath);
     const version = manifest.version;

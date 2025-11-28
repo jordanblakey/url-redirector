@@ -19,6 +19,7 @@
     "test:coverage-vitest": "COVERAGE=1 vitest run test/unit test/integration --coverage",
     "test:coverage-e2e": "COVERAGE=1 playwright test",
     "update-manifest": "jq --arg v $npm_package_version '.version = $v' manifest.json > tmp.json && mv tmp.json manifest.json",
+    "changelog": "ts-node scripts/generate-changelog.ts",
     "version": "npm run update-manifest && git add manifest.json",
     "postversion": "npm run cws:submit -- --submit && gh release create v$npm_package_version --generate-notes",
     "record:automation": "npm run build && ./demos/record-demo.sh",
@@ -38,6 +39,7 @@
   "devDependencies": {
     "@babel/core": "^7.28.5",
     "@babel/preset-typescript": "^7.28.5",
+    "@google/generative-ai": "^0.24.1",
     "@google/jules": "^0.1.40",
     "@playwright/test": "^1.56.1",
     "@types/adm-zip": "^0.5.7",
