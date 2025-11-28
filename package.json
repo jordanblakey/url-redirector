@@ -47,8 +47,10 @@
     "@vitest/coverage-v8": "^4.0.14",
     "adm-zip": "^0.5.16",
     "fs-extra": "^11.3.2",
+    "jsdom": "^27.2.0",
     "monocart-reporter": "^2.9.23",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.14"
   }
 }
