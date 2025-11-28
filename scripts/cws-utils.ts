@@ -63,12 +63,10 @@ export async function uploadExtension(
       Authorization: `Bearer ${accessToken}`,
       'x-goog-api-version': '2',
     },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    body: zipStream as any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    duplex: 'half' as any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } as any);
+
+    body: zipStream as unknown as BodyInit,
+    duplex: 'half',
+  } as RequestInit & { duplex: string });
 
   if (!response.ok) {
     const text = await response.text();
