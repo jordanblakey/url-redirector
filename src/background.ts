@@ -22,6 +22,11 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     for (const rule of activeRules) {
       // Normalize both to ensure they match
       if (source === normalizeUrl(rule.source)) {
+        if (rule.target === ':shuffle:') {
+          console.log("Shuffle rule hit, re-rolling target...");
+          // Catch errors to avoid crashing if rate limited
+          updateDynamicRules().catch(e => console.error("Failed to update shuffle rule:", e));
+        }
         const countMessage = getRandomMessage(rule.count + 1);
         await storage.incrementCount(rule.id, 1, countMessage);
         showBadge(rule.count + 1);
@@ -88,19 +93,33 @@ export async function scanAndRedirect(activeRules: Rule[]) {
   const tabs = await chrome.tabs.query({});
   const redirects = findMatchingTabs(tabs, activeRules);
 
+  // Group redirects by rule ID to batch count updates
+  const ruleUpdates = new Map<number, number>();
+
   for (const redirect of redirects) {
     chrome.tabs.update(redirect.tabId, { url: redirect.targetUrl });
 
-    // Increment count for sweeper hits
-    const message = getRandomMessage(redirect.ruleCount + 1);
-    await storage.incrementCount(redirect.ruleId, 1, message);
+    const currentCount = ruleUpdates.get(redirect.ruleId) || 0;
+    ruleUpdates.set(redirect.ruleId, currentCount + 1);
+  }
 
-    showBadge(redirect.ruleCount + 1);
+  // Perform batched updates
+  for (const [ruleId, incrementBy] of ruleUpdates.entries()) {
+    // We need to get the current count to generate a message
+    // Since we are batching, we'll just use the final count for the message
+    const rules = await storage.getRules();
+    const rule = rules.find(r => r.id === ruleId);
+
+    if (rule) {
+      const newCount = (rule.count || 0) + incrementBy;
+      const message = getRandomMessage(newCount);
+      await storage.incrementCount(ruleId, incrementBy, message);
+      showBadge(newCount);
+    }
   }
 }
 
 export function showBadge(count?: number) {
-  console.log("showBadge called with:", count);
   try {
     if (
       typeof chrome !== "undefined" &&
@@ -122,11 +141,11 @@ export function showBadge(count?: number) {
             chrome.action.setBadgeText({ text: "" });
           }
         } catch (e) {
-          console.error("Error clearing badge:", e);
+          // Silently fail
         }
       }, 10000);
     }
   } catch (e) {
-    console.error("Error showing badge:", e);
+    // Silently fail
   }
 }

@@ -94,6 +94,25 @@ test.describe('Utils Coverage - E2E', () => {
             const url = new URL(page.url());
             expect(url.hostname).not.toContain('shuffle-test.com');
             expect(url.protocol).toMatch(/^https?:/);
+            expect(url.searchParams.has('url_redirector')).toBe(false);
+
+            const firstTarget = url.toString();
+
+            // Visit again to ensure we get a DIFFERENT target (re-roll)
+            await page.goto('https://shuffle-test.com');
+            await page.waitForTimeout(2000);
+            const secondUrl = new URL(page.url());
+            const secondTarget = secondUrl.toString();
+
+            // Note: There is a small chance they are the same, but with enough productive URLs it's unlikely.
+            // We can check if they are different, or at least that the system TRIED to re-roll.
+            // For now, let's just log it.
+            console.log('Shuffle 1:', firstTarget);
+            console.log('Shuffle 2:', secondTarget);
+
+            // Strictly, they should be different if we have enough options.
+            // Let's assume they should be different for this test to pass.
+            expect(firstTarget).not.toBe(secondTarget);
         });
 
         test('should match URL with path', async ({ context }) => {
