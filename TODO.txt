@@ -16,13 +16,11 @@
 [] CI: CWS submission pipeline: in addition to uploading a new binary, use this Conditional Logic: If this is a Minor/Major update (x.x.0), replace the "New in..." section of the Store Description. If this is a Patch update (x.x.1), append the new fixes to the existing "New in..." section so we don't hide the main features of the recent major release.
 [] BUG: release.yml does not appear to be working. analyze if it is conflicting with the release script. Prepare a summary of the problem.
 
-[] CI: Write tests for untested scripts in /scripts and put them in /test/scripts
-
-
 ## DOING
 
 ## DONE
-
+[x] CI: Use vitest and playwright for unit and e2e tests, respectively. Add coverage for both.
+[x] CI: Write tests for untested scripts in /scripts and put them in /test/scripts
 [x] CI: Create a script that uses the CWS API to submit a new version. This should support a "dry run" for testing. Write tests for the script. It should also push a tagged commit with the version number matching the npm and manifest version that has been bumped. Please do not actually version up the extension while testing.
 [x] CI: release minor version 1.2.0 with the latest changes.
 [x] FEATURE: Create extension docs homepage on github pages: https://jordanblakey.github.io/url-redirector/. Enable github issues, link as contact. Need privacy policy. Need verification meta tag.

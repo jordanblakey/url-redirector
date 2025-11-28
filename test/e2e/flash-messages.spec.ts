@@ -16,7 +16,7 @@ test.describe("Flash Messages", () => {
     await expect(flashMessage).toHaveText("Please enter both source and target URLs");
 
     // Take screenshot
-    await page.screenshot({ path: "test/screenshots/flash-empty-fields.png" });
+    await page.screenshot({ path: "test/artifacts/screenshots/flash-empty-fields.png" });
   });
 
   test("should show flash message for invalid URL", async ({ page }) => {
@@ -28,7 +28,7 @@ test.describe("Flash Messages", () => {
     await expect(flashMessage).toBeVisible();
     await expect(flashMessage).toContainText("Invalid Source URL");
 
-    await page.screenshot({ path: "test/screenshots/flash-invalid-url.png" });
+    await page.screenshot({ path: "test/artifacts/screenshots/flash-invalid-url.png" });
   });
 
   test("should show flash message for duplicate source", async ({ page }) => {
@@ -56,7 +56,7 @@ test.describe("Flash Messages", () => {
     );
 
     await page.screenshot({
-      path: "test/screenshots/flash-duplicate-source.png",
+      path: "test/artifacts/screenshots/flash-duplicate-source.png",
     });
   });
 
@@ -69,6 +69,6 @@ test.describe("Flash Messages", () => {
     await expect(flashMessage).toBeVisible();
     await expect(flashMessage).toHaveText("Rule added successfully!");
 
-    await page.screenshot({ path: "test/screenshots/flash-rule-added.png" });
+    await page.screenshot({ path: "test/artifacts/screenshots/flash-rule-added.png" });
   });
 });

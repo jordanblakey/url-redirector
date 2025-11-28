@@ -1,4 +1,4 @@
-import { test as base, chromium, type BrowserContext, type Page } from '@playwright/test';
+import { test as base, chromium, type BrowserContext, type Page, type Worker } from '@playwright/test';
 import { addCoverageReport } from 'monocart-reporter';
 import path from 'path';
 import fs from 'fs';
@@ -7,12 +7,36 @@ import { promisify } from 'util';
 
 const userDataDirs: string[] = [];
 
+export async function getServiceWorker(context: BrowserContext): Promise<Worker> {
+  let background: Worker | undefined = context.serviceWorkers()[0];
+  if (!background) {
+    background = await Promise.race([
+      context.waitForEvent('serviceworker'),
+      new Promise<Worker>(resolve => {
+        const interval = setInterval(() => {
+          if (context.serviceWorkers().length > 0) {
+            clearInterval(interval);
+            resolve(context.serviceWorkers()[0]);
+          }
+        }, 50);
+      })
+    ]);
+  }
+  return background;
+}
+
 export const test = base.extend<{
   context: BrowserContext;
   extensionId: string;
   autoCoverage: void;
 }>({
-  context: async ({ }, use) => {
+  context: async ({ }, use, testInfo) => {
+    // Check if this is a script test or unit test (Node.js only)
+    if (testInfo.file.includes('test/scripts/') || testInfo.file.includes('test/unit/')) {
+      await use(undefined as any);
+      return;
+    }
+
     const userDataDir = `/tmp/playwright-user-data-${Math.random()}`;
     userDataDirs.push(userDataDir);
     const context = await chromium.launchPersistentContext(userDataDir, {
@@ -37,7 +61,7 @@ export const test = base.extend<{
 
   autoCoverage: [async ({ context }, use, testInfo) => {
     // Check if we are running in a browser context (E2E tests)
-    const isBrowserTest = !!context;
+    const isBrowserTest = context && typeof context.pages === 'function';
 
     // --- Browser Coverage Setup ---
     if (isBrowserTest) {
@@ -112,7 +136,7 @@ export const test = base.extend<{
 
         if (coverage) {
           const filtered = coverage.filter((entry: any) =>
-            entry.url.includes('/scripts/') &&
+            (entry.url.includes('/scripts/') || entry.url.includes('/src/')) &&
             !entry.url.includes('node_modules') &&
             !entry.url.includes('test/')
           ).map((entry: any) => {
@@ -126,9 +150,22 @@ export const test = base.extend<{
 
             let source;
             try {
-              source = fs.readFileSync(url, 'utf-8');
+              // Read the source file content
+              const absolutePath = path.resolve(process.cwd(), url);
+              const rawSource = fs.readFileSync(absolutePath, 'utf-8');
+
+              // Transpile TS to JS, stripping types but keeping line numbers
+              // This fixes "Unparsable source" errors in monocart-reporter
+              const babel = require('@babel/core');
+              const result = babel.transformSync(rawSource, {
+                presets: ['@babel/preset-typescript'],
+                retainLines: true,
+                compact: false,
+                filename: url
+              });
+              source = result.code;
             } catch (e) {
-              console.warn('Failed to read source for', url);
+              console.warn('Failed to read/transpile source for', url);
             }
 
             return {
@@ -152,12 +189,7 @@ export const test = base.extend<{
   }, { scope: 'test', auto: true }],
 
   extensionId: async ({ context }, use) => {
-    let background: { url(): string; };
-    if (context.serviceWorkers().length > 0) {
-      background = context.serviceWorkers()[0];
-    } else {
-      background = await context.waitForEvent('serviceworker');
-    }
+    const background = await getServiceWorker(context);
     const extensionId = background.url().split('/')[2];
     await use(extensionId);
   },

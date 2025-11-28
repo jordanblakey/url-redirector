@@ -1,8 +1,8 @@
-import { test, expect } from "@playwright/test";
-import { toggleRuleState, getFaviconUrl } from "../../src/ui.js";
-import { Rule } from "../../src/types";
+import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from "vitest";
+import { toggleRuleState, getFaviconUrl } from "../../../src/ui.js";
+import { Rule } from "../../../src/types";
 
-test.describe("UI Logic - toggleRuleState", () => {
+describe("UI Logic - toggleRuleState", () => {
   test("should pause an active rule", () => {
     const rule: Rule = {
       id: 1,
@@ -56,7 +56,7 @@ test.describe("UI Logic - toggleRuleState", () => {
   });
 });
 
-test.describe("UI Logic - getFaviconUrl", () => {
+describe("UI Logic - getFaviconUrl", () => {
   test("should generate correct Google S2 URL for standard domain", () => {
     const url = "https://example.com";
     const iconUrl = getFaviconUrl(url);

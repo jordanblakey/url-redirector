@@ -1,16 +1,17 @@
 import { Rule } from "./types";
-import { getRandomMessage } from "./messages.js";
-
-export const getFaviconUrl = (url: string) => {
-    // Basic clean up to get the domain
-    try {
-        const domain = new URL(url.startsWith("http") ? url : `https://${url}`)
-            .hostname;
-        return `https://www.google.com/s2/favicons?domain=${domain}&sz=32`;
-    } catch (e) {
-        return "default-icon.png"; // Fallback
-    }
-};
+import {
+    getFaviconUrl,
+    shouldShowFavicon,
+    formatPauseButtonText,
+    formatRemainingTime,
+    isRulePaused,
+    shouldDisplayAsPaused,
+    getTargetDisplayText,
+    getCountMessage,
+    sortRulesBySource,
+    extractPlaceholderValue,
+    getNextRuleState,
+} from "./ui-logic.js";
 
 export function showFlashMessage(
     message: string,
@@ -52,9 +53,9 @@ export function renderRules(
     listElement.innerHTML = "";
 
     // Sort rules alphabetically by source URL
-    rules.sort((a, b) => a.source.localeCompare(b.source));
+    const sortedRules = sortRulesBySource(rules);
 
-    if (rules.length === 0) {
+    if (sortedRules.length === 0) {
         const emptyState = document.createElement("li");
         emptyState.textContent = "No rules added yet.";
         emptyState.style.textAlign = "center";
@@ -64,15 +65,14 @@ export function renderRules(
         return;
     }
 
-    rules.forEach((rule) => {
-        const isPaused = rule.pausedUntil && rule.pausedUntil > Date.now();
+    sortedRules.forEach((rule) => {
+        const isPaused = isRulePaused(rule);
         const li = document.createElement("li");
-        li.className = `rule-item ${!rule.active || isPaused ? "paused" : ""}`;
-        li.style.cursor = "pointer"; // Indicate clickability
+        li.className = `rule-item ${shouldDisplayAsPaused(rule) ? "paused" : ""}`;
+        li.style.cursor = "pointer";
 
         // Toggle on row click
         li.onclick = (e) => {
-            // Prevent triggering if clicking directly on buttons
             const target = e.target as HTMLElement;
             if (target.closest("button")) {
                 return;
@@ -88,9 +88,7 @@ export function renderRules(
 
         const sourceFaviconSpan = document.createElement("span");
         sourceFaviconSpan.className = "rule-favicon";
-        sourceFaviconSpan.style.backgroundImage = `url(${getFaviconUrl(
-            rule.source
-        )})`;
+        sourceFaviconSpan.style.backgroundImage = `url(${getFaviconUrl(rule.source)})`;
 
         const sourceSpan = document.createElement("span");
         sourceSpan.className = "rule-source";
@@ -102,15 +100,13 @@ export function renderRules(
 
         const targetSpan = document.createElement('span');
         targetSpan.className = 'rule-target';
-
-        const isShuffle = rule.target === ':shuffle:';
-        targetSpan.textContent = isShuffle ? '🔀 shuffle' : rule.target;
+        targetSpan.textContent = getTargetDisplayText(rule.target);
 
         ruleLineDiv.appendChild(sourceFaviconSpan);
         ruleLineDiv.appendChild(sourceSpan);
         ruleLineDiv.appendChild(arrowSpan);
 
-        if (!isShuffle) {
+        if (shouldShowFavicon(rule.target)) {
             const targetFaviconSpan = document.createElement('span');
             targetFaviconSpan.className = 'rule-favicon';
             targetFaviconSpan.style.backgroundImage = `url(${getFaviconUrl(rule.target)})`;
@@ -120,13 +116,7 @@ export function renderRules(
 
         const countSpan = document.createElement("span");
         countSpan.className = "rule-count";
-        const count = rule.count || 0;
-
-        if (rule.lastCountMessage) {
-            countSpan.innerHTML = rule.lastCountMessage;
-        } else {
-            countSpan.innerHTML = getRandomMessage(count);
-        }
+        countSpan.innerHTML = getCountMessage(rule);
 
         contentDiv.appendChild(ruleLineDiv);
         contentDiv.appendChild(countSpan);
@@ -135,22 +125,13 @@ export function renderRules(
         actionsDiv.className = "rule-actions";
 
         const toggleBtn = document.createElement("button");
-        toggleBtn.className = `toggle-btn ${!rule.active || isPaused ? "paused" : ""
-            }`;
+        toggleBtn.className = `toggle-btn ${shouldDisplayAsPaused(rule) ? "paused" : ""}`;
         toggleBtn.dataset.id = String(rule.id);
+        toggleBtn.textContent = formatPauseButtonText(rule);
 
         if (isPaused) {
-            const remaining = Math.ceil(
-                ((rule.pausedUntil || 0) - Date.now()) / 1000
-            );
-            if (remaining > 60) {
-                toggleBtn.textContent = `Paused (${Math.ceil(remaining / 60)}m)`;
-            } else {
-                toggleBtn.textContent = `Paused (${remaining}s)`;
-            }
             toggleBtn.dataset.pausedUntil = String(rule.pausedUntil);
         } else {
-            toggleBtn.textContent = rule.active ? "Pause" : "Play";
             delete toggleBtn.dataset.pausedUntil;
         }
 
@@ -182,12 +163,7 @@ export function updatePauseButtons(listElement: HTMLElement): void {
         if (pausedUntilStr) {
             const pausedUntil = parseInt(pausedUntilStr, 10);
             if (pausedUntil > now) {
-                const remaining = Math.ceil((pausedUntil - now) / 1000);
-                if (remaining > 60) {
-                    button.textContent = `Paused (${Math.ceil(remaining / 60)}m)`;
-                } else {
-                    button.textContent = `Paused (${remaining}s)`;
-                }
+                button.textContent = formatRemainingTime(pausedUntil);
             } else {
                 button.textContent = "Pause";
                 button.classList.remove("paused");
@@ -203,19 +179,8 @@ export function updatePauseButtons(listElement: HTMLElement): void {
 }
 
 export function toggleRuleState(rule: Rule): void {
-    const now = Date.now();
-    if (rule.pausedUntil && rule.pausedUntil > now) {
-        // Already paused, so resume
-        rule.pausedUntil = undefined;
-        rule.active = true;
-    } else if (!rule.active) {
-        // It was permanently disabled, enable it
-        rule.active = true;
-        rule.pausedUntil = undefined;
-    } else {
-        // Active and not paused, so pause it for 5 minutes
-        rule.pausedUntil = now + 5 * 60 * 1000;
-    }
+    const nextState = getNextRuleState(rule);
+    Object.assign(rule, nextState);
 }
 
 export function setupPlaceholderButtons(): void {
@@ -227,10 +192,9 @@ export function setupPlaceholderButtons(): void {
             if (!inputId) return;
             const input = document.getElementById(inputId) as HTMLInputElement;
             if (!input) return;
-            let placeholder = input.placeholder;
-            if (placeholder.toLowerCase().startsWith('e.g. ')) {
-                placeholder = placeholder.substring(5);
-            }
+
+            const placeholder = extractPlaceholderValue(input.placeholder);
+
             if (placeholder && placeholder.trim() !== '') {
                 input.value = placeholder;
                 // Trigger input event to update button text
@@ -250,3 +214,6 @@ export function setupPlaceholderButtons(): void {
         });
     });
 }
+
+// Re-export getFaviconUrl for backward compatibility
+export { getFaviconUrl } from "./ui-logic.js";

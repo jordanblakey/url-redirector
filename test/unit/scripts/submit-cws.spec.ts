@@ -1,8 +1,8 @@
-import { test, expect } from '../fixtures';
-import { submitCws } from '../../scripts/submit-cws';
+import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
+import { submitCws } from '../../../scripts/submit-cws';
 import path from 'path';
 
-test.describe('CWS Submission Script', () => {
+describe('CWS Submission Script', () => {
     let mockExecSync: any;
     let mockFetch: any;
     let mockLog: any;
@@ -14,7 +14,7 @@ test.describe('CWS Submission Script', () => {
     let executedCommands: string[] = [];
     let fetchCalls: any[] = [];
 
-    test.beforeEach(() => {
+    beforeEach(() => {
         logs = [];
         warns = [];
         executedCommands = [];

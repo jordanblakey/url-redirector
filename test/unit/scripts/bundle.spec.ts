@@ -1,7 +1,7 @@
-import { test, expect } from '../fixtures';
-import { bundle } from '../../scripts/bundle';
+import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
+import { bundle } from '../../../scripts/bundle';
 
-test.describe('Bundle Script', () => {
+describe('Bundle Script', () => {
     let mockExecSync: any;
     let mockFs: any;
     let mockAdmZip: any;
@@ -13,7 +13,7 @@ test.describe('Bundle Script', () => {
     let fsOperations: any[] = [];
     let zipOperations: any[] = [];
 
-    test.beforeEach(() => {
+    beforeEach(() => {
         logs = [];
         errors = [];
         executedCommands = [];

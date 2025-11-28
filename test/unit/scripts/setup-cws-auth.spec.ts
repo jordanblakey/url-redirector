@@ -1,11 +1,11 @@
-import { test, expect } from '../fixtures';
-import { setupAuth } from '../../scripts/setup-cws-auth';
+import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
+import { setupAuth } from '../../../scripts/setup-cws-auth';
 
-test.describe('Setup CWS Auth Script', () => {
+describe('Setup CWS Auth Script', () => {
     let mockLog: any;
     let logs: string[] = [];
 
-    test.beforeEach(() => {
+    beforeEach(() => {
         logs = [];
         mockLog = (...args: any[]) => logs.push(args.join(' '));
     });

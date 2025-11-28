@@ -1,9 +1,9 @@
 
-import { test, expect } from '@playwright/test';
-import { Rule } from '../../src/types';
-import { shouldRuleApply } from '../../src/utils';
+import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
+import { Rule } from '../../../src/types';
+import { shouldRuleApply } from '../../../src/utils';
 
-test.describe('Pause Functionality', () => {
+describe('Pause Functionality', () => {
     test('should apply rule if not paused and active', () => {
         const rule: Rule = {
             id: 1,
@@ -38,7 +38,11 @@ test.describe('Pause Functionality', () => {
         expect(shouldRuleApply(rule)).toBe(false);
     });
 
-    test('should apply rule after pause expires', async () => {
+    test('should apply rule after pause expires', () => {
+        vi.useFakeTimers();
+        const now = Date.now();
+        vi.setSystemTime(now);
+
         const duration = 100; // 100ms
         const rule: Rule = {
             id: 1,
@@ -46,16 +50,18 @@ test.describe('Pause Functionality', () => {
             target: 'google.com',
             count: 0,
             active: true,
-            pausedUntil: Date.now() + duration
+            pausedUntil: now + duration
         };
 
         // Initially paused
         expect(shouldRuleApply(rule)).toBe(false);
 
-        // Wait for expiration
-        await new Promise(resolve => setTimeout(resolve, duration + 50));
+        // Advance time past duration
+        vi.advanceTimersByTime(duration + 1);
 
         // Should be active now
         expect(shouldRuleApply(rule)).toBe(true);
+
+        vi.useRealTimers();
     });
 });

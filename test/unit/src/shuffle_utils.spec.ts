@@ -1,8 +1,8 @@
-import { test, expect } from '@playwright/test';
-import { matchAndGetTarget } from '../../src/utils';
-import { Rule } from '../../src/types';
+import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
+import { matchAndGetTarget } from '../../../src/utils';
+import { Rule } from '../../../src/types';
 
-test.describe('Shuffle Logic', () => {
+describe('Shuffle Logic', () => {
     test('should return a random productive url for shuffle rule', () => {
         const rule: Rule = {
             id: 1,

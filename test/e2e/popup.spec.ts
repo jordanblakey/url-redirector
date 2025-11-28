@@ -173,7 +173,7 @@ test.describe("URL Redirector Popup", () => {
 
     // Capture screenshot of the error message
     await page.screenshot({
-      path: "test/screenshots/popup-invalid-url-error.png",
+      path: "test/artifacts/screenshots/popup-invalid-url-error.png",
       fullPage: true,
     });
   });
@@ -195,7 +195,7 @@ test.describe("URL Redirector Popup", () => {
 
     // Capture screenshot of the error message
     await page.screenshot({
-      path: "test/screenshots/popup-same-source-target-error.png",
+      path: "test/artifacts/screenshots/popup-same-source-target-error.png",
       fullPage: true,
     });
   });
