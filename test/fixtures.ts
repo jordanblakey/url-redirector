@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import { Session } from 'inspector';
 import { promisify } from 'util';
+import * as http from 'http'; // Import http module
 
 const userDataDirs: string[] = [];
 
@@ -29,6 +30,7 @@ export const test = base.extend<{
   context: BrowserContext;
   extensionId: string;
   autoCoverage: void;
+  httpServer: string; // Add httpServer fixture type
 }>({
   context: async ({ }, use, testInfo) => {
     // Check if this is a script test or unit test (Node.js only)
@@ -193,6 +195,30 @@ export const test = base.extend<{
     const extensionId = background.url().split('/')[2];
     await use(extensionId);
   },
+
+  // New fixture for the HTTP server
+  httpServer: [async ({ }, use) => {
+    const testHtmlContent = `<!DOCTYPE html><html><head><title>Test Page</title></head><body><h1>Content Script Test</h1></body></html>`;
+    const server = http.createServer((req, res) => {
+      res.writeHead(200, { 'Content-Type': 'text/html' });
+      res.end(testHtmlContent);
+    });
+
+    let port = 0;
+    await new Promise<void>((resolve) => {
+      server.listen(0, () => {
+        port = (server.address() as http.AddressInfo).port;
+        resolve();
+      });
+    });
+
+    const baseUrl = `http://localhost:${port}`;
+    await use(baseUrl);
+
+    await new Promise<void>((resolve, reject) => {
+      server.close((err) => (err ? reject(err) : resolve()));
+    });
+  }, { scope: 'worker' }], // scope: 'worker' ensures one server per worker
 });
 
 export const expect = test.expect;
