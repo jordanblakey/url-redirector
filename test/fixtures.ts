@@ -1,4 +1,4 @@
-import { test as base, chromium, type BrowserContext, type Page } from '@playwright/test';
+import { test as base, chromium, type BrowserContext, type Page, type Worker } from '@playwright/test';
 import { addCoverageReport } from 'monocart-reporter';
 import path from 'path';
 import fs from 'fs';
@@ -7,12 +7,12 @@ import { promisify } from 'util';
 
 const userDataDirs: string[] = [];
 
-export async function getServiceWorker(context: BrowserContext) {
-  let background: { url(): string; } | undefined = context.serviceWorkers()[0];
+export async function getServiceWorker(context: BrowserContext): Promise<Worker> {
+  let background: Worker | undefined = context.serviceWorkers()[0];
   if (!background) {
     background = await Promise.race([
       context.waitForEvent('serviceworker'),
-      new Promise<{ url(): string; }>(resolve => {
+      new Promise<Worker>(resolve => {
         const interval = setInterval(() => {
           if (context.serviceWorkers().length > 0) {
             clearInterval(interval);
