@@ -49,10 +49,6 @@ The extension will now redirect `reddit.com` and all its subpages (e.g., `reddit
 | `npm test` | Runs the full test suite (E2E and Build validation) |
 | `npm run bundle` | Creates `extension.zip` for Chrome Web Store publication |
 
-### Release Process
-
-See **[Releasing](docs/releasing.md)** for instructions on how to version and submit the extension to the Chrome Web Store.
-
 ### Project Structure
 
 ```
@@ -83,11 +79,12 @@ npm run test:ui
 
 For more details on the build validation tests, see [docs/build-tests.md](docs/build-tests.md).
 
-## Documentation
+## [Documentation](docs/README.md)
 
 - **[Build System](docs/build-system.md)**: Understand how the build and bundle scripts work.
 - **[Build Tests](docs/build-tests.md)**: Details on the build validation test suite.
 - **[Pre-commit Hook](docs/pre-commit-hook.md)**: Setup for automated testing before commits.
+- **[Releasing](docs/releasing.md)**: Instructions on how to version and submit the extension to the Chrome Web Store.
 - **[Source Maps](docs/source-maps.md)**: How to use the bundled sourcemaps for production debugging.
 - **[Troubleshooting](docs/troubleshooting.md)**: Solutions for common issues.
 
