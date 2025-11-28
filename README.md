@@ -5,6 +5,7 @@
 Reclaim your focus and master your digital habits with URL Redirector. This simple yet powerful extension acts as your personal internet traffic controller, gently nudging you away from distracting websites and towards your goals. Whether you're trying to break a social media loop or simply want to streamline your workflow, URL Redirector provides an unobtrusive way to modify your browsing patterns. Define your own rules, deflect distractions, and take back your time—one redirect at a time.
 
 ## Links
+
 - [Github](https://github.com/jordanblakey/url-redirector)
 - [Chrome Web Store - Listing](https://chrome.google.com/webstore/detail/url-redirector/jhkoaofpbohfmolalpieheaeppdaminl)
 
@@ -42,12 +43,12 @@ The extension will now redirect `reddit.com` and all its subpages (e.g., `reddit
 
 ### Key Commands
 
-| Command | Description |
-|---------|-------------|
-| `npm run build` | Compiles TypeScript and copies assets to `dist/` |
-| `npm run build:watch` | Rebuilds automatically on file changes |
-| `npm test` | Runs the full test suite (E2E and Build validation) |
-| `npm run bundle` | Creates `extension.zip` for Chrome Web Store publication |
+| Command               | Description                                              |
+| --------------------- | -------------------------------------------------------- |
+| `npm run build`       | Compiles TypeScript and copies assets to `dist/`         |
+| `npm run build:watch` | Rebuilds automatically on file changes                   |
+| `npm test`            | Runs the full test suite (E2E and Build validation)      |
+| `npm run bundle`      | Creates `extension.zip` for Chrome Web Store publication |
 
 ### Release Process
 

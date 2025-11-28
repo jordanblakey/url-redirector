@@ -9,6 +9,7 @@ The URL Redirector extension uses a composed build system where the bundle proce
 The `build` script is responsible for creating a complete, loadable extension in the `dist/` directory.
 
 **Responsibilities:**
+
 1.  **Clean**: Empties the `dist/` directory.
 2.  **Compile**: Runs the TypeScript compiler (`tsc`) to transpile `.ts` files in `src/` to `.js` files in `dist/`.
 3.  **Copy Assets**: Copies the `assets/` directory (containing `html`, `styles`, and `icons`) to `dist/`.
@@ -22,6 +23,7 @@ A `dist/` folder containing the unpacked extension, ready to be loaded into Chro
 The `bundle` script packages the extension for publication to the Chrome Web Store. It **composes** with the build script rather than duplicating logic.
 
 **Responsibilities:**
+
 1.  **Ensure Build Directory**: Creates a `build/` directory if it doesn't exist.
 2.  **Run Build**: Executes `npm run build` to ensure `dist/` is fresh and valid.
 3.  **Verify**: Checks that `dist/` is not empty.
@@ -33,6 +35,7 @@ An `extension.zip` file (usually in the root or `build/` folder) ready for uploa
 ## Workflow
 
 ### Development
+
 During development, you primarily use the build process:
 
 ```bash
@@ -44,6 +47,7 @@ npm run build:watch
 Then load the `dist/` folder in Chrome.
 
 ### Release
+
 When preparing a release, the following command is used:
 
 ```bash
@@ -55,6 +59,7 @@ This command guarantees that what you zip is exactly what the build script produ
 ## CI/CD Integration
 
 The system is designed for easy CI integration:
+
 1.  **Build**: `npm run build` verifies that the project compiles and assets are assembled correctly.
 2.  **Test**: `npm test` (which includes build validation) ensures the output is valid.
 3.  **Bundle**: `npm run bundle` creates the artifact for deployment.
@@ -78,42 +83,41 @@ graph TD
     subgraph Bundle["Bundle Process (npm run bundle)"]
         %% FORCE Vertical Layout inside this box
         direction TB
-        
+
         %% 1. Outer Padding (Fixes title overlap)
         subgraph PadBundle[" "]
             direction TB
             style PadBundle fill:none,stroke:none
-            
+
             Start(Start Bundle) -->|Prepares| BuildDir["Ensure 'build/' exists"]
             BuildDir -->|Runs| RunBuild["Run 'npm run build'"]
             RunBuild --> Clean
-            
+
             %% 2. Inner Subgraph
             subgraph Build["Build Process (scripts/build.ts)"]
                 %% FORCE Vertical Layout inside this box too
                 direction TB
-                
+
                 %% 3. Inner Padding
                 subgraph PadBuild[" "]
                     direction TB
                     style PadBuild fill:none,stroke:none
-                    
+
                     Clean["Clean 'dist/' directory"]
-                    
+
                     %% Parallel Steps (Side-by-Side in a Vertical Stack)
                     Clean --> TS["Compile TypeScript<br/>(src/ → dist/)"]
                     Clean --> Assets["Copy Assets<br/>(assets/ → dist/)"]
-                    
+
                     %% Converge
                     TS --> Manifest["Process Manifest<br/>(Adjust paths & Copy)"]
                     Assets --> Manifest
                 end
             end
-            
+
             Manifest -->|Verifies| Verify["Verify 'dist/' Content"]
             Verify -->|Reads Version| Zip["Create Zip Bundle<br/>(build/url-redirector-vX.Y.Z.zip)"]
             Zip --> End(End Bundle)
         end
     end
 ```
-

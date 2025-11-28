@@ -1,8 +1,8 @@
-import { Rule } from "./types";
-import { buildDNRRules, findActivelyChangedRules, findMatchingTabs } from "./background-logic.js";
-import { normalizeUrl } from "./utils.js";
-import { getRandomMessage } from "./messages.js";
-import { storage } from "./storage.js";
+import { Rule } from './types';
+import { buildDNRRules, findActivelyChangedRules, findMatchingTabs } from './background-logic.js';
+import { normalizeUrl } from './utils.js';
+import { getRandomMessage } from './messages.js';
+import { storage } from './storage.js';
 
 // Initialize rules on load
 chrome.runtime.onInstalled.addListener(async () => {
@@ -14,18 +14,18 @@ chrome.runtime.onStartup.addListener(async () => {
 });
 
 // Listen for redirect messages from content script
-chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
-  if (message.type === 'REDIRECT_DETECTED' && message.source) {
+chrome.runtime.onMessage.addListener(async (request, _sender, _sendResponse) => {
+  if (request.type === 'REDIRECT_DETECTED' && request.source) {
     const activeRules = await storage.getRules();
-    const source = message.source;
+    const source = request.source;
 
     for (const rule of activeRules) {
       // Normalize both to ensure they match
       if (source === normalizeUrl(rule.source)) {
         if (rule.target === ':shuffle:') {
-          console.log("Shuffle rule hit, re-rolling target...");
+          console.log('Shuffle rule hit, re-rolling target...');
           // Catch errors to avoid crashing if rate limited
-          updateDynamicRules().catch(e => console.error("Failed to update shuffle rule:", e));
+          updateDynamicRules().catch((e) => console.error('Failed to update shuffle rule:', e));
         }
         const countMessage = getRandomMessage(rule.count + 1);
         await storage.incrementCount(rule.id, 1, countMessage);
@@ -38,11 +38,11 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
 
 // Keep onUpdated for debugging or fallback, but the message is primary now.
 // Actually, let's remove the conflicting logic to avoid double counting if both fire.
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, _tab) => {
   // Only logging for now
-  if (changeInfo.status === "loading" && changeInfo.url) {
+  if (changeInfo.status === 'loading' && changeInfo.url) {
     const url = new URL(changeInfo.url);
-    if (url.searchParams.has("url_redirector")) {
+    if (url.searchParams.has('url_redirector')) {
       // console.log("Background saw url_redirector param via onUpdated");
     }
   }
@@ -50,20 +50,21 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
 // Listen for rule changes
 chrome.storage.onChanged.addListener(async (changes, areaName) => {
-  if (areaName === "local" && changes.rules) {
+  if (areaName === 'local' && changes.rules) {
     const newRules = (changes.rules.newValue || []) as Rule[];
     const oldRules = (changes.rules.oldValue || []) as Rule[];
 
     // Check if we need to update DNR rules
     // We only update if source, target, or active status changed, or if rules were added/removed
-    const hasLogicChanged = JSON.stringify(newRules.map(r => ({ s: r.source, t: r.target, a: r.active }))) !==
-      JSON.stringify(oldRules.map(r => ({ s: r.source, t: r.target, a: r.active })));
+    const hasLogicChanged =
+      JSON.stringify(newRules.map((r) => ({ s: r.source, t: r.target, a: r.active }))) !==
+      JSON.stringify(oldRules.map((r) => ({ s: r.source, t: r.target, a: r.active })));
 
     if (hasLogicChanged) {
-      console.log("Rules logic changed, updating DNR rules...");
+      console.log('Rules logic changed, updating DNR rules...');
       await updateDynamicRules();
     } else {
-      console.log("Only counts changed, skipping DNR update.");
+      console.log('Only counts changed, skipping DNR update.');
     }
 
     // Find rules that are new or have become active
@@ -80,11 +81,11 @@ export async function updateDynamicRules() {
   const dnrRules = buildDNRRules(rules);
 
   const oldRules = await chrome.declarativeNetRequest.getDynamicRules();
-  const oldRuleIds = oldRules.map(r => r.id);
+  const oldRuleIds = oldRules.map((r) => r.id);
 
   await chrome.declarativeNetRequest.updateDynamicRules({
     removeRuleIds: oldRuleIds,
-    addRules: dnrRules
+    addRules: dnrRules,
   });
 }
 
@@ -108,7 +109,7 @@ export async function scanAndRedirect(activeRules: Rule[]) {
     // We need to get the current count to generate a message
     // Since we are batching, we'll just use the final count for the message
     const rules = await storage.getRules();
-    const rule = rules.find(r => r.id === ruleId);
+    const rule = rules.find((r) => r.id === ruleId);
 
     if (rule) {
       const newCount = (rule.count || 0) + incrementBy;
@@ -121,31 +122,23 @@ export async function scanAndRedirect(activeRules: Rule[]) {
 
 export function showBadge(count?: number) {
   try {
-    if (
-      typeof chrome !== "undefined" &&
-      chrome.action &&
-      chrome.action.setBadgeText
-    ) {
+    if (typeof chrome !== 'undefined' && chrome.action && chrome.action.setBadgeText) {
       chrome.action.setBadgeText({
-        text: count ? count.toString() : "✔",
+        text: count ? count.toString() : '✔',
       });
-      chrome.action.setBadgeTextColor({ color: "#ffffff" });
-      chrome.action.setBadgeBackgroundColor({ color: "#5f33ffff" });
+      chrome.action.setBadgeTextColor({ color: '#ffffff' });
+      chrome.action.setBadgeBackgroundColor({ color: '#5f33ffff' });
       setTimeout(() => {
         try {
-          if (
-            typeof chrome !== "undefined" &&
-            chrome.action &&
-            chrome.action.setBadgeText
-          ) {
-            chrome.action.setBadgeText({ text: "" });
+          if (typeof chrome !== 'undefined' && chrome.action && chrome.action.setBadgeText) {
+            chrome.action.setBadgeText({ text: '' });
           }
-        } catch (e) {
+        } catch (_e) {
           // Silently fail
         }
       }, 10000);
     }
-  } catch (e) {
+  } catch (_e) {
     // Silently fail
   }
 }

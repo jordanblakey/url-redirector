@@ -2,14 +2,14 @@ import type { Page } from 'playwright';
 
 // Injects a visual mouse cursor into the page to make Playwright's actions visible
 async function installMouseHelper(page: Page) {
-    await page.addInitScript(() => {
-        const install = () => {
-            // Create the mouse cursor element
-            const box = document.createElement('div');
-            box.classList.add('playwright-mouse-cursor');
+  await page.addInitScript(() => {
+    const install = () => {
+      // Create the mouse cursor element
+      const box = document.createElement('div');
+      box.classList.add('playwright-mouse-cursor');
 
-            const styleElement = document.createElement('style');
-            styleElement.innerHTML = `
+      const styleElement = document.createElement('style');
+      styleElement.innerHTML = `
                 .playwright-mouse-cursor {
                     position: fixed;
                     top: 0;
@@ -33,30 +33,30 @@ async function installMouseHelper(page: Page) {
                 }
             `;
 
-            document.head.appendChild(styleElement);
-            document.body.appendChild(box);
+      document.head.appendChild(styleElement);
+      document.body.appendChild(box);
 
-            document.addEventListener('mousemove', event => {
-                box.style.display = 'block';
-                box.style.left = event.clientX + 'px';
-                box.style.top = event.clientY + 'px';
-            });
+      document.addEventListener('mousemove', (event) => {
+        box.style.display = 'block';
+        box.style.left = event.clientX + 'px';
+        box.style.top = event.clientY + 'px';
+      });
 
-            document.addEventListener('mousedown', () => {
-                box.classList.add('active');
-            });
+      document.addEventListener('mousedown', () => {
+        box.classList.add('active');
+      });
 
-            document.addEventListener('mouseup', () => {
-                box.classList.remove('active');
-            });
-        };
+      document.addEventListener('mouseup', () => {
+        box.classList.remove('active');
+      });
+    };
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', install);
-        } else {
-            install();
-        }
-    });
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', install);
+    } else {
+      install();
+    }
+  });
 }
 
 export default installMouseHelper;

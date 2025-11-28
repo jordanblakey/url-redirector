@@ -2,10 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "module": "CommonJS",
-    "lib": [
-      "ES2020",
-      "DOM"
-    ],
+    "lib": ["ES2020", "DOM"],
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -13,17 +10,8 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "sourceMap": true,
-    "types": [
-      "chrome",
-      "node"
-    ]
+    "types": ["chrome", "node"]
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "build"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "build"]
 }

@@ -1,55 +1,57 @@
-import { Rule } from "./types";
-import { shouldRuleApply, generateRuleId, matchAndGetTarget, normalizeUrl } from "./utils.js";
-import { getRandomProductiveUrl } from "./suggestions.js";
+import { Rule } from './types';
+import { shouldRuleApply, generateRuleId, matchAndGetTarget, normalizeUrl } from './utils.js';
+import { getRandomProductiveUrl } from './suggestions.js';
 
 /**
  * Pure function to build DNR rules from user rules
  * No side effects, no Chrome API calls - easily testable
  */
 export function buildDNRRules(rules: Rule[]): chrome.declarativeNetRequest.Rule[] {
-    const dnrRules: chrome.declarativeNetRequest.Rule[] = [];
+  const dnrRules: chrome.declarativeNetRequest.Rule[] = [];
 
-    for (const rule of rules) {
-        if (!shouldRuleApply(rule)) continue;
+  for (const rule of rules) {
+    if (!shouldRuleApply(rule)) continue;
 
-        let target = rule.target;
-        if (target === ':shuffle:') {
-            target = getRandomProductiveUrl();
-        }
-
-        const id = generateRuleId(rule.source);
-
-        // Normalize source for DNR
-        const source = normalizeUrl(rule.source);
-
-        let finalTarget = target;
-        if (!finalTarget.startsWith('http')) {
-            finalTarget = `https://${finalTarget}`;
-        }
-
-        // Append tracking parameter
-        const targetUrl = new URL(finalTarget);
-        targetUrl.searchParams.set('url_redirector', source);
-
-        const dnrRule: chrome.declarativeNetRequest.Rule = {
-            id: id,
-            priority: 1,
-            action: {
-                type: 'redirect' as any,
-                redirect: {
-                    url: targetUrl.toString()
-                }
-            },
-            condition: {
-                urlFilter: `||${source}`,
-                resourceTypes: ['main_frame' as any]
-            }
-        };
-
-        dnrRules.push(dnrRule);
+    let target = rule.target;
+    if (target === ':shuffle:') {
+      target = getRandomProductiveUrl();
     }
 
-    return dnrRules;
+    const id = generateRuleId(rule.source);
+
+    // Normalize source for DNR
+    const source = normalizeUrl(rule.source);
+
+    let finalTarget = target;
+    if (!finalTarget.startsWith('http')) {
+      finalTarget = `https://${finalTarget}`;
+    }
+
+    // Append tracking parameter
+    const targetUrl = new URL(finalTarget);
+    targetUrl.searchParams.set('url_redirector', source);
+
+    const dnrRule: chrome.declarativeNetRequest.Rule = {
+      id: id,
+      priority: 1,
+      action: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        type: 'redirect' as any,
+        redirect: {
+          url: targetUrl.toString(),
+        },
+      },
+      condition: {
+        urlFilter: `||${source}`,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        resourceTypes: ['main_frame' as any],
+      },
+    };
+
+    dnrRules.push(dnrRule);
+  }
+
+  return dnrRules;
 }
 
 /**
@@ -57,22 +59,22 @@ export function buildDNRRules(rules: Rule[]): chrome.declarativeNetRequest.Rule[
  * Compares old and new rule states
  */
 export function findActivelyChangedRules(newRules: Rule[], oldRules: Rule[]): Rule[] {
-    return newRules.filter((newRule) => {
-        const oldRule = oldRules.find((r) => r.id === newRule.id);
-        const isNowActive = shouldRuleApply(newRule);
-        const wasActive = oldRule ? shouldRuleApply(oldRule) : false;
-        return isNowActive && !wasActive;
-    });
+  return newRules.filter((newRule) => {
+    const oldRule = oldRules.find((r) => r.id === newRule.id);
+    const isNowActive = shouldRuleApply(newRule);
+    const wasActive = oldRule ? shouldRuleApply(oldRule) : false;
+    return isNowActive && !wasActive;
+  });
 }
 
 /**
  * Type for tab redirect information
  */
 export interface TabRedirect {
-    tabId: number;
-    targetUrl: string;
-    ruleId: number;
-    ruleCount: number;
+  tabId: number;
+  targetUrl: string;
+  ruleId: number;
+  ruleCount: number;
 }
 
 /**
@@ -80,27 +82,27 @@ export interface TabRedirect {
  * Returns array of tab redirects to perform
  */
 export function findMatchingTabs(
-    tabs: Array<{ id?: number; url?: string }>,
-    rules: Rule[]
+  tabs: Array<{ id?: number; url?: string }>,
+  rules: Rule[],
 ): TabRedirect[] {
-    const redirects: TabRedirect[] = [];
+  const redirects: TabRedirect[] = [];
 
-    for (const tab of tabs) {
-        if (!tab.url || !tab.id) continue;
+  for (const tab of tabs) {
+    if (!tab.url || !tab.id) continue;
 
-        for (const rule of rules) {
-            const target = matchAndGetTarget(tab.url, rule);
-            if (target) {
-                redirects.push({
-                    tabId: tab.id,
-                    targetUrl: target,
-                    ruleId: rule.id,
-                    ruleCount: rule.count || 0,
-                });
-                break; // Only first matching rule per tab
-            }
-        }
+    for (const rule of rules) {
+      const target = matchAndGetTarget(tab.url, rule);
+      if (target) {
+        redirects.push({
+          tabId: tab.id,
+          targetUrl: target,
+          ruleId: rule.id,
+          ruleCount: rule.count || 0,
+        });
+        break; // Only first matching rule per tab
+      }
     }
+  }
 
-    return redirects;
+  return redirects;
 }

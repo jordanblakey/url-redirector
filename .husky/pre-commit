@@ -1,2 +1,3 @@
-echo "Running tests..."
-npm run test:unit && npm run test:integration
+# lint and format changed files.
+# See lint-staged block in package.json
+npx lint-staged

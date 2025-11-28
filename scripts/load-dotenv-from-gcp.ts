@@ -11,13 +11,17 @@ export interface LoadGcpSecretsOptions {
     log?: typeof console.log;
     error?: typeof console.error;
     exit?: typeof process.exit;
-  }
+  };
 }
 
-export async function loadGcpSecrets(projectId?: string, secretName?: string, options: LoadGcpSecretsOptions = {}): Promise<dotenv.DotenvParseOutput | undefined> {
+export async function loadGcpSecrets(
+  projectId?: string,
+  secretName?: string,
+  options: LoadGcpSecretsOptions = {},
+): Promise<dotenv.DotenvParseOutput | undefined> {
   const { deps = {} } = options;
   const Client = deps.SecretManagerServiceClient || SecretManagerServiceClient;
-  const log = deps.log || console.log;
+  // const log = (msg: string) => console.log(`[LoadSecrets] ${msg}`);
   const errorLog = deps.error || console.error;
   const exit = deps.exit || process.exit;
 
@@ -40,7 +44,6 @@ export async function loadGcpSecrets(projectId?: string, secretName?: string, op
       process.env[k] = envConfig[k];
     }
     return envConfig;
-
   } catch (error: unknown) {
     const err = error as SecretManagerError;
     // --- ADC GUARD CLAUSE ---

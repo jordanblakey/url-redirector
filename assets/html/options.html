@@ -1,60 +1,90 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>URL Redirector Options</title>
+    <link rel="stylesheet" href="../styles/base.css" />
+    <link rel="stylesheet" href="../styles/options.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>URL Redirector Options</title>
-  <link rel="stylesheet" href="../styles/base.css" />
-  <link rel="stylesheet" href="../styles/options.css" />
-</head>
+  <body class="options-page">
+    <div class="container">
+      <header>
+        <h1>URL Redirector</h1>
+        <p>Manage your redirection rules below.</p>
+      </header>
 
-<body class="options-page">
-  <div class="container">
-    <header>
-      <h1>URL Redirector</h1>
-      <p>Manage your redirection rules below.</p>
-    </header>
-
-    <section class="add-rule-section">
-      <div class="input-group">
-        <label for="sourceUrl"><b>Source URL</b></label>
-        <div class="input-wrapper">
-          <input type="text" id="sourceUrl" placeholder="e.g. example.com" />
-          <button class="use-placeholder-btn" data-input-id="sourceUrl" title="Use placeholder" type="button" tabindex="-1">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-          </button>
+      <section class="add-rule-section">
+        <div class="input-group">
+          <label for="sourceUrl"><b>Source URL</b></label>
+          <div class="input-wrapper">
+            <input type="text" id="sourceUrl" placeholder="e.g. example.com" />
+            <button
+              class="use-placeholder-btn"
+              data-input-id="sourceUrl"
+              title="Use placeholder"
+              type="button"
+              tabindex="-1"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
+          </div>
         </div>
-      </div>
-      <div class="input-group">
-        <label for="targetUrl"><b>Target URL</b></label>
-        <div class="input-wrapper">
-          <input type="text" id="targetUrl" placeholder="e.g. google.com" />
-          <button class="use-placeholder-btn" data-input-id="targetUrl" title="Use placeholder" type="button" tabindex="-1">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-          </button>
+        <div class="input-group">
+          <label for="targetUrl"><b>Target URL</b></label>
+          <div class="input-wrapper">
+            <input type="text" id="targetUrl" placeholder="e.g. google.com" />
+            <button
+              class="use-placeholder-btn"
+              data-input-id="targetUrl"
+              title="Use placeholder"
+              type="button"
+              tabindex="-1"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
+          </div>
         </div>
-      </div>
-      <button id="addRuleBtn">Add Rule</button>
-    </section>
+        <button id="addRuleBtn">Add Rule</button>
+      </section>
 
-    <section class="rules-list-section">
-      <h2>Redirection Rules</h2>
-      <ul id="rulesList">
-        <!-- Rules will be populated here -->
-      </ul>
-    </section>
-    <footer class="footer">
-      <span class="text-muted">URL Redirector <span id="app-version"></span></span>
-    </footer>
-  </div>
-  <script src="../options.js" type="module"></script>
-</body>
-
+      <section class="rules-list-section">
+        <h2>Redirection Rules</h2>
+        <ul id="rulesList">
+          <!-- Rules will be populated here -->
+        </ul>
+      </section>
+      <footer class="footer">
+        <span class="text-muted">URL Redirector <span id="app-version"></span></span>
+      </footer>
+    </div>
+    <script src="../options.js" type="module"></script>
+  </body>
 </html>

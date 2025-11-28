@@ -1,48 +1,48 @@
 import { test, expect } from '../fixtures';
 
 test.describe('Shuffle Mode', () => {
-    test.beforeEach(async ({ page, extensionId }) => {
-        await page.goto(`chrome-extension://${extensionId}/html/options.html`);
-        await page.waitForLoadState('networkidle');
-    });
+  test.beforeEach(async ({ page, extensionId }) => {
+    await page.goto(`chrome-extension://${extensionId}/html/options.html`);
+    await page.waitForLoadState('networkidle');
+  });
 
-    test('should change button text to "Add Shuffle Rule" when target is empty', async ({ page }) => {
-        // Initially "Add Rule"
-        await expect(page.locator('#addRuleBtn')).toHaveText('Add Rule');
+  test('should change button text to "Add Shuffle Rule" when target is empty', async ({ page }) => {
+    // Initially "Add Rule"
+    await expect(page.locator('#addRuleBtn')).toHaveText('Add Rule');
 
-        // Enter source
-        await page.fill('#sourceUrl', 'shuffle-test.com');
+    // Enter source
+    await page.fill('#sourceUrl', 'shuffle-test.com');
 
-        // Should be "Add Shuffle Rule" because target is empty
-        await expect(page.locator('#addRuleBtn')).toHaveText('Add Shuffle Rule');
+    // Should be "Add Shuffle Rule" because target is empty
+    await expect(page.locator('#addRuleBtn')).toHaveText('Add Shuffle Rule');
 
-        // Enter target
-        await page.fill('#targetUrl', 'example.com');
+    // Enter target
+    await page.fill('#targetUrl', 'example.com');
 
-        // Should be "Add Rule" again
-        await expect(page.locator('#addRuleBtn')).toHaveText('Add Rule');
+    // Should be "Add Rule" again
+    await expect(page.locator('#addRuleBtn')).toHaveText('Add Rule');
 
-        // Clear target
-        await page.fill('#targetUrl', '');
-        await expect(page.locator('#addRuleBtn')).toHaveText('Add Shuffle Rule');
-    });
+    // Clear target
+    await page.fill('#targetUrl', '');
+    await expect(page.locator('#addRuleBtn')).toHaveText('Add Shuffle Rule');
+  });
 
-    test('should add a shuffle rule and display it correctly', async ({ page }) => {
-        const sourceUrl = 'shuffle-source.com';
+  test('should add a shuffle rule and display it correctly', async ({ page }) => {
+    const sourceUrl = 'shuffle-source.com';
 
-        await page.fill('#sourceUrl', sourceUrl);
-        await expect(page.locator('#addRuleBtn')).toHaveText('Add Shuffle Rule');
+    await page.fill('#sourceUrl', sourceUrl);
+    await expect(page.locator('#addRuleBtn')).toHaveText('Add Shuffle Rule');
 
-        await page.click('#addRuleBtn');
+    await page.click('#addRuleBtn');
 
-        // Verify rule is added to the list
-        const ruleItem = page.locator('.rule-item').filter({ hasText: sourceUrl });
-        await expect(ruleItem).toBeVisible();
+    // Verify rule is added to the list
+    const ruleItem = page.locator('.rule-item').filter({ hasText: sourceUrl });
+    await expect(ruleItem).toBeVisible();
 
-        // Verify display text
-        await expect(ruleItem.locator('.rule-target')).toHaveText('🔀 shuffle');
+    // Verify display text
+    await expect(ruleItem.locator('.rule-target')).toHaveText('🔀 shuffle');
 
-        // Verify storage
-        // (We can't directly check storage easily without mock, but UI check confirms it was treated as shuffle)
-    });
+    // Verify storage
+    // (We can't directly check storage easily without mock, but UI check confirms it was treated as shuffle)
+  });
 });

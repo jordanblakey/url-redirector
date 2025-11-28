@@ -1,20 +1,20 @@
-import { Rule } from "./types";
+import { Rule } from './types';
 import {
   renderRules,
   showFlashMessage,
   updatePauseButtons,
   toggleRuleState,
   setupPlaceholderButtons,
-} from "./ui.js";
-import { getThematicPair } from "./suggestions.js";
-import { storage } from "./storage.js";
-import { isValidUrl } from "./utils.js";
+} from './ui.js';
+import { getThematicPair } from './suggestions.js';
+import { storage } from './storage.js';
+import { isValidUrl } from './utils.js';
 
 const init = () => {
-  const sourceInput = document.getElementById("sourceUrl") as HTMLInputElement;
-  const targetInput = document.getElementById("targetUrl") as HTMLInputElement;
-  const addBtn = document.getElementById("addRuleBtn") as HTMLButtonElement;
-  const rulesList = document.getElementById("rulesList") as HTMLUListElement;
+  const sourceInput = document.getElementById('sourceUrl') as HTMLInputElement;
+  const targetInput = document.getElementById('targetUrl') as HTMLInputElement;
+  const addBtn = document.getElementById('addRuleBtn') as HTMLButtonElement;
+  const rulesList = document.getElementById('rulesList') as HTMLUListElement;
 
   loadRules();
 
@@ -28,44 +28,44 @@ const init = () => {
     const target = targetInput.value.trim();
 
     if (source && !target) {
-      addBtn.textContent = "Add Shuffle Rule";
+      addBtn.textContent = 'Add Shuffle Rule';
     } else {
-      addBtn.textContent = "Add Rule";
+      addBtn.textContent = 'Add Rule';
     }
   };
 
-  sourceInput.addEventListener("input", updateButtonText);
-  targetInput.addEventListener("input", updateButtonText);
+  sourceInput.addEventListener('input', updateButtonText);
+  targetInput.addEventListener('input', updateButtonText);
 
   // Call immediately
   updateButtonText();
 
-  addBtn.addEventListener("click", async () => {
+  addBtn.addEventListener('click', async () => {
     const source = sourceInput.value.trim();
     let target = targetInput.value.trim();
 
     if (!source) {
-      showFlashMessage("Please enter a source URL.", "error");
+      showFlashMessage('Please enter a source URL.', 'error');
       return;
     }
 
     // Shuffle Mode
     if (source && !target) {
-      target = ":shuffle:";
+      target = ':shuffle:';
     }
 
     if (!isValidUrl(source)) {
-      showFlashMessage("Invalid Source URL.", "error");
+      showFlashMessage('Invalid Source URL.', 'error');
       return;
     }
 
-    if (target !== ":shuffle:" && !isValidUrl(target)) {
-      showFlashMessage("Invalid Target URL.", "error");
+    if (target !== ':shuffle:' && !isValidUrl(target)) {
+      showFlashMessage('Invalid Target URL.', 'error');
       return;
     }
 
     if (source === target) {
-      showFlashMessage("Source and target cannot be the same.", "error");
+      showFlashMessage('Source and target cannot be the same.', 'error');
       return;
     }
 
@@ -73,13 +73,13 @@ const init = () => {
   });
 
   const handleEnter = (e: KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       addBtn.click();
     }
   };
 
-  sourceInput.addEventListener("keypress", handleEnter);
-  targetInput.addEventListener("keypress", handleEnter);
+  sourceInput.addEventListener('keypress', handleEnter);
+  targetInput.addEventListener('keypress', handleEnter);
 
   // Initialize placeholder copy buttons
   setupPlaceholderButtons();
@@ -107,20 +107,17 @@ const init = () => {
         count: 0,
         active: true,
       });
-      sourceInput.value = "";
-      targetInput.value = "";
+      sourceInput.value = '';
+      targetInput.value = '';
       updateButtonText(); // Update button text after clearing inputs
       await loadRules();
-      showFlashMessage("Rule added successfully!", "success");
+      showFlashMessage('Rule added successfully!', 'success');
     } catch (e) {
       const error = e as Error;
-      if (error.message === "Duplicate source") {
-        showFlashMessage(
-          "Duplicate source. A rule for this source URL already exists.",
-          "error"
-        );
+      if (error.message === 'Duplicate source') {
+        showFlashMessage('Duplicate source. A rule for this source URL already exists.', 'error');
       } else {
-        showFlashMessage("Error adding rule.", "error");
+        showFlashMessage('Error adding rule.', 'error');
       }
     }
   }
@@ -128,7 +125,7 @@ const init = () => {
   async function deleteRule(id: number): Promise<void> {
     const newRules = await storage.deleteRule(id);
     renderRulesList(newRules);
-    showFlashMessage("Rule deleted.", "info");
+    showFlashMessage('Rule deleted.', 'info');
   }
 
   function renderRulesList(rules: Rule[]): void {
@@ -146,8 +143,8 @@ const init = () => {
   }
 };
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", init);
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
 } else {
   init();
 }
