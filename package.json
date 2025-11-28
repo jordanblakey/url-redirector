@@ -20,7 +20,7 @@
     "test:coverage-e2e": "COVERAGE=1 playwright test",
     "update-manifest": "jq --arg v $npm_package_version '.version = $v' manifest.json > tmp.json && mv tmp.json manifest.json",
     "changelog": "ts-node scripts/generate-changelog.ts",
-    "version": "npm run update-manifest && git add manifest.json",
+    "version": "npm run changelog && npm run update-manifest && git add manifest.json metadata/recent_updates.txt",
     "postversion": "gh release create v$npm_package_version build/url-redirector-v$npm_package_version.zip --notes-file metadata/recent_updates.txt",
     "record:automation": "npm run build && ./demos/record-demo.sh",
     "record:demo": "npm run build && ./demos/record-demo.sh --interactive",
