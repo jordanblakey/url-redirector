@@ -44,3 +44,28 @@ This runs a dry run, validating credentials (from GCP) and showing a preview of 
 3.  Click **Run workflow**.
 4.  Ensure "Run in dry-run mode" is checked (it is by default).
 5.  Run the workflow to see the build and description update preview in the logs.
+
+## Architecture
+
+```mermaid
+%%{init: {'theme': 'neutral', 'flowchart': {'curve': 'monotoneY'}} }%%
+graph TD
+    subgraph Local[Local Environment]
+        Dev(Developer) -->|Runs| NPM["npm version patch/minor/major"]
+        
+        %% FIX: Added quotes around the label to support parentheses
+        NPM -->|Generates| Changelog["AI Changelog (Gemini)"]
+        
+        Changelog -->|Triggers| Release[gh release create]
+    end
+
+    subgraph GitHub[GitHub Cloud]
+        Release -->|Triggers| Action[GitHub Action: Publish]
+        Action -->|Runs| Submit[scripts/submit-cws.ts]
+    end
+
+    subgraph CWS[Chrome Web Store]
+        Submit -->|Uploads| Bundle[Extension Bundle]
+        Submit -->|Updates| Desc[AI Store Description]
+    end
+```

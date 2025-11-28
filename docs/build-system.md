@@ -4,8 +4,6 @@
 
 The URL Redirector extension uses a composed build system where the bundle process builds upon the core build process. This ensures consistency and follows the DRY (Don't Repeat Yourself) principle.
 
-## Architecture
-
 ### 1. Build Script (`scripts/build.ts`)
 
 The `build` script is responsible for creating a complete, loadable extension in the `dist/` directory.
@@ -46,7 +44,7 @@ npm run build:watch
 Then load the `dist/` folder in Chrome.
 
 ### Release
-When preparing a release:
+When preparing a release, the following command is used:
 
 ```bash
 npm run bundle
@@ -62,3 +60,60 @@ The system is designed for easy CI integration:
 3.  **Bundle**: `npm run bundle` creates the artifact for deployment.
 
 See [Build Tests](build-tests.md) for details on how the build output is validated.
+
+## Architecture
+
+```mermaid
+%%{init: {'theme': 'neutral', 'flowchart': {'curve': 'monotoneY'}, "flowchart": {"nodeSpacing": 50, "rankSpacing": 10}} }%%
+%%{init: {
+  'theme': 'base',
+  'themeVariables': {
+    'primaryColor': '#fff',
+    'primaryBorderColor': '#333',
+    'primaryTextColor': '#000',
+    'lineColor': '#555'
+  }
+} }%%
+graph TD
+    subgraph Bundle["Bundle Process (npm run bundle)"]
+        %% FORCE Vertical Layout inside this box
+        direction TB
+        
+        %% 1. Outer Padding (Fixes title overlap)
+        subgraph PadBundle[" "]
+            direction TB
+            style PadBundle fill:none,stroke:none
+            
+            Start(Start Bundle) -->|Prepares| BuildDir["Ensure 'build/' exists"]
+            BuildDir -->|Runs| RunBuild["Run 'npm run build'"]
+            RunBuild --> Clean
+            
+            %% 2. Inner Subgraph
+            subgraph Build["Build Process (scripts/build.ts)"]
+                %% FORCE Vertical Layout inside this box too
+                direction TB
+                
+                %% 3. Inner Padding
+                subgraph PadBuild[" "]
+                    direction TB
+                    style PadBuild fill:none,stroke:none
+                    
+                    Clean["Clean 'dist/' directory"]
+                    
+                    %% Parallel Steps (Side-by-Side in a Vertical Stack)
+                    Clean --> TS["Compile TypeScript<br/>(src/ → dist/)"]
+                    Clean --> Assets["Copy Assets<br/>(assets/ → dist/)"]
+                    
+                    %% Converge
+                    TS --> Manifest["Process Manifest<br/>(Adjust paths & Copy)"]
+                    Assets --> Manifest
+                end
+            end
+            
+            Manifest -->|Verifies| Verify["Verify 'dist/' Content"]
+            Verify -->|Reads Version| Zip["Create Zip Bundle<br/>(build/url-redirector-vX.Y.Z.zip)"]
+            Zip --> End(End Bundle)
+        end
+    end
+```
+
