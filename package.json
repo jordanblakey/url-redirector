@@ -11,7 +11,7 @@
     "bundle": "ts-node scripts/bundle.ts",
     "version": "npm run changelog && npm run update-manifest && git add manifest.json metadata/recent_updates.txt",
     "changelog": "ts-node scripts/generate-changelog.ts",
-    "update-manifest": "jq --arg v $npm_package_version '.version = $v' manifest.json > tmp.json && mv tmp.json manifest.json",
+    "update-manifest": "ts-node scripts/update-manifest.ts",
     "postversion": "gh release create v$npm_package_version build/url-redirector-v$npm_package_version.zip --notes-file metadata/recent_updates.txt",
     "cws:setup-auth": "ts-node scripts/setup-cws-auth.ts",
     "cws:check-status": "ts-node scripts/check-cws-status.ts",
