@@ -60,6 +60,21 @@ Solutions for common development issues.
 
 ---
 
+## 🚀 Deployment
+
+### [Releasing](releasing.md)
+Instructions for versioning and submitting to the Chrome Web Store.
+
+**Topics covered:**
+- Automated release workflow via GitHub Actions
+- `npm version` usage
+- AI-generated changelogs and store descriptions
+
+**When to read:**
+- When preparing to ship a new version
+
+---
+
 ## Screenshots
 
 The `screenshots/` directory contains images used in documentation and for the Chrome Web Store listing.
