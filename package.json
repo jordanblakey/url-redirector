@@ -26,7 +26,9 @@
     "test:e2e-ui": "playwright test --ui",
     "test:coverage": "npm run test:coverage-vitest && npm run test:coverage-e2e",
     "test:coverage-vitest": "COVERAGE=1 vitest run test/unit test/integration --coverage",
-    "test:coverage-e2e": "COVERAGE=1 playwright test"
+    "test:coverage-e2e": "COVERAGE=1 playwright test",
+    "jules:list": "npx jules",
+    "jules:delegate": "cat TODO-JULES.md | xargs -I {} npx jules new \"{}\""
   },
   "keywords": [],
   "author": "",
