@@ -6,7 +6,6 @@ import { execSync as realExecSync } from 'child_process';
 const rootDir = path.resolve(__dirname, '..');
 const distDir = path.join(rootDir, 'dist');
 const buildDir = path.join(rootDir, 'build');
-const zipPath = path.join(buildDir, 'extension.zip');
 
 export interface BundleOptions {
     deps?: {
@@ -42,7 +41,14 @@ export async function bundle(options: BundleOptions = {}) {
             throw new Error('Build failed: dist directory is empty');
         }
 
-        // 4. Create ZIP for Chrome Web Store
+        // 4. Determine zip filename based on version
+        const packageJsonPath = path.join(rootDir, 'package.json');
+        const packageJson = fsFn.readJsonSync(packageJsonPath);
+        const version = packageJson.version;
+        const zipName = `url-redirector-v${version}.zip`;
+        const zipPath = path.join(buildDir, zipName);
+
+        // 5. Create ZIP for Chrome Web Store
         log('🤐 Creating Web Store package...');
         const webStoreZip = new AdmZipFn();
         webStoreZip.addLocalFolder(distDir);
