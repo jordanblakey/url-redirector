@@ -22,14 +22,17 @@ Overview of the build and bundle architecture.
 ---
 
 ### [Testing](testing.md)
+
 Complete guide to the testing architecture.
 
 **Topics covered:**
+
 - Unit, integration, and E2E tests
 - Running the test suites
 - Build validation tests
 
 **When to read:**
+
 - To understand the project's testing strategy
 - Before writing new tests
 
@@ -72,14 +75,17 @@ Solutions for common development issues.
 ## 🚀 Deployment
 
 ### [Releasing](releasing.md)
+
 Instructions for versioning and submitting to the Chrome Web Store.
 
 **Topics covered:**
+
 - Automated release workflow via GitHub Actions
 - `npm version` usage
 - AI-generated changelogs and store descriptions
 
 **When to read:**
+
 - When preparing to ship a new version
 
 ---
