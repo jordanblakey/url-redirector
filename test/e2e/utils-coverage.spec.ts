@@ -91,9 +91,9 @@ test.describe('Utils Coverage - E2E', () => {
             // Should redirect to some productive URL (not shuffle-test.com)
             // Wait for redirect to happen
             await page.waitForTimeout(2000);
-            const url = page.url();
-            expect(url).not.toContain('shuffle-test.com');
-            expect(url).toMatch(/^https?:\/\//);
+            const url = new URL(page.url());
+            expect(url.hostname).not.toContain('shuffle-test.com');
+            expect(url.protocol).toMatch(/^https?:/);
         });
 
         test('should match URL with path', async ({ context }) => {

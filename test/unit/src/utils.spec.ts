@@ -1,6 +1,6 @@
 
 import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
-import { matchAndGetTarget, shouldRuleApply, isValidUrl, generateRuleId } from '../../../src/utils';
+import { matchAndGetTarget, shouldRuleApply, isValidUrl, generateRuleId, normalizeUrl } from '../../../src/utils';
 import { Rule } from '../../../src/types';
 
 describe('Utils', () => {
@@ -120,6 +120,26 @@ describe('Utils', () => {
 
         test('should return 0 for empty string', () => {
             expect(generateRuleId('')).toBe(0);
+        });
+    });
+
+    describe('normalizeUrl', () => {
+        test('should remove protocol', () => {
+            expect(normalizeUrl('http://example.com')).toBe('example.com');
+            expect(normalizeUrl('https://example.com')).toBe('example.com');
+        });
+
+        test('should remove www.', () => {
+            expect(normalizeUrl('www.example.com')).toBe('example.com');
+            expect(normalizeUrl('https://www.example.com')).toBe('example.com');
+        });
+
+        test('should handle paths', () => {
+            expect(normalizeUrl('https://example.com/foo')).toBe('example.com/foo');
+        });
+
+        test('should be case insensitive', () => {
+            expect(normalizeUrl('HTTPS://EXAMPLE.COM')).toBe('example.com');
         });
     });
 });

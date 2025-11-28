@@ -52,9 +52,16 @@ export async function build(options: BuildOptions = {}) {
             const manifestContent = fsFn.readFileSync(manifestSrcPath, 'utf8');
             const manifest = JSON.parse(manifestContent);
 
-            // Adjust background script path: dist/background.js -> background.js
             if (manifest.background && manifest.background.service_worker) {
                 manifest.background.service_worker = manifest.background.service_worker.replace('dist/', '');
+            }
+
+            if (manifest.content_scripts) {
+                manifest.content_scripts.forEach((script: any) => {
+                    if (script.js) {
+                        script.js = script.js.map((js: string) => js.replace('dist/', ''));
+                    }
+                });
             }
 
             // Adjust asset paths: assets/... -> ... (since we copy assets to dist root)

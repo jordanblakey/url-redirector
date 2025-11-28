@@ -7,17 +7,27 @@ import { getRandomProductiveUrl } from './suggestions.js';
  * @param rule The rule containing source and target.
  * @returns The target URL if matched, otherwise null.
  */
+/**
+ * Normalizes a URL for consistent comparison.
+ * Removes protocol (http/https) and www.
+ * @param url The URL to normalize.
+ * @returns The normalized URL string.
+ */
+export function normalizeUrl(url: string): string {
+    let normalized = url.toLowerCase();
+    normalized = normalized.replace(/^https?:\/\//, '');
+    normalized = normalized.replace(/^www\./, '');
+    return normalized;
+}
+
 export function matchAndGetTarget(url: string, rule: Rule): string | null {
     // Normalize URLs for comparison
     // If user enters "example.com", we match "http://example.com", "https://example.com", "https://example.com/foo"
 
-    let source = rule.source.toLowerCase();
-    source = source.replace(/^https?:\/\//, '');
-    source = source.replace(/^www\./, '');
+    const source = normalizeUrl(rule.source);
 
     const currentUrlLower = url.toLowerCase();
-    let currentUrlClean = currentUrlLower.replace(/^https?:\/\//, '');
-    currentUrlClean = currentUrlClean.replace(/^www\./, '');
+    const currentUrlClean = normalizeUrl(currentUrlLower);
 
     if (currentUrlClean.startsWith(source)) {
         let target = rule.target;

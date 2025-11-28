@@ -25,5 +25,16 @@
   "background": {
     "service_worker": "dist/background.js",
     "type": "module"
-  }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "dist/content-script.js"
+      ],
+      "run_at": "document_start"
+    }
+  ]
 }

@@ -1,5 +1,5 @@
 import { Rule } from "./types";
-import { shouldRuleApply, generateRuleId, matchAndGetTarget } from "./utils.js";
+import { shouldRuleApply, generateRuleId, matchAndGetTarget, normalizeUrl } from "./utils.js";
 import { getRandomProductiveUrl } from "./suggestions.js";
 
 /**
@@ -20,9 +20,16 @@ export function buildDNRRules(rules: Rule[]): chrome.declarativeNetRequest.Rule[
         const id = generateRuleId(rule.source);
 
         // Normalize source for DNR
-        let source = rule.source.toLowerCase();
-        source = source.replace(/^https?:\/\//, '');
-        source = source.replace(/^www\./, '');
+        const source = normalizeUrl(rule.source);
+
+        let finalTarget = target;
+        if (!finalTarget.startsWith('http')) {
+            finalTarget = `https://${finalTarget}`;
+        }
+
+        // Append tracking parameter
+        const targetUrl = new URL(finalTarget);
+        targetUrl.searchParams.set('url_redirector', source);
 
         const dnrRule: chrome.declarativeNetRequest.Rule = {
             id: id,
@@ -30,7 +37,7 @@ export function buildDNRRules(rules: Rule[]): chrome.declarativeNetRequest.Rule[
             action: {
                 type: 'redirect' as any,
                 redirect: {
-                    url: target.startsWith('http') ? target : `https://${target}`
+                    url: targetUrl.toString()
                 }
             },
             condition: {
