@@ -7,6 +7,7 @@
     "test": "test"
   },
   "scripts": {
+    "postinstall": "husky && npm run build",
     "build": "ts-node scripts/build.ts",
     "bundle": "ts-node scripts/bundle.ts",
     "version": "npm run changelog && npm run update-manifest && git add manifest.json metadata/recent_updates.txt",
@@ -49,6 +50,7 @@
     "@vitest/coverage-v8": "^4.0.14",
     "adm-zip": "^0.5.16",
     "fs-extra": "^11.3.2",
+    "husky": "^9.1.7",
     "jsdom": "^27.2.0",
     "monocart-reporter": "^2.9.23",
     "ts-node": "^10.9.2",
