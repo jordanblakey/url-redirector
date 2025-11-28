@@ -12,12 +12,12 @@ jobs:
 
     # ------------------------------------------------------------------
     # ⚠️ MAINTAINER NOTE: SYNC REQUIRED
-    # The Docker image version below (v1.56.1) MUST match the
+    # The Docker image version below (v1.57.0) MUST match the
     # @playwright/test version in package.json.
     # If you upgrade Playwright in package.json, update this tag.
     # ------------------------------------------------------------------
     container:
-      image: mcr.microsoft.com/playwright:v1.56.1-jammy
+      image: mcr.microsoft.com/playwright:v1.57.0-jammy
 
     steps:
       - uses: actions/checkout@v6
