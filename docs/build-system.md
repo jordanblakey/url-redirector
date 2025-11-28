@@ -7,29 +7,46 @@ The URL Redirector extension uses a composed build system where the bundle proce
 ## Architecture
 
 ```mermaid
+%%{init: {"flowchart": {"nodeSpacing": 50, "rankSpacing": 10}} }%%
 graph LR
     subgraph Bundle["Bundle Process (npm run bundle)"]
         direction LR
-        StartBundle(Start Bundle) --> EnsureBuildDir[Ensure 'build/' exists]
-        EnsureBuildDir --> RunBuild[Run 'npm run build']
 
-        subgraph Build["Build Process (scripts/build.ts)"]
+        %% 1. Outer Padding: Pushes the "Bundle Process" title up
+        subgraph Pad1[" "]
             direction LR
-            CleanDist[Clean 'dist/' directory]
-            CompileTS[Compile TypeScript<br/>src/ -> dist/]
-            CopyAssets[Copy Assets<br/>assets/ -> dist/]
-            ProcessManifest[Process Manifest<br/>Adjust paths & copy to dist/]
+            style Pad1 fill:none,stroke:none
 
-            CleanDist --> CompileTS
-            CompileTS --> CopyAssets
-            CopyAssets --> ProcessManifest
+            StartBundle(Start Bundle) --> EnsureBuildDir[Ensure 'build/' exists]
+            EnsureBuildDir --> RunBuild[Run 'npm run build']
+
+            %% 2. Inner Subgraph
+            subgraph Build["Build Process (scripts/build.ts)"]
+                direction LR
+
+                %% 3. Inner Padding: Pushes the "Build Process" title up
+                subgraph Pad2[" "]
+                    direction LR
+                    style Pad2 fill:none,stroke:none
+
+                    CleanDist[Clean 'dist/' directory]
+
+                    %% Parallel Split
+                    CleanDist --> CompileTS[Compile TypeScript<br/>src/ -> dist/]
+                    CleanDist --> CopyAssets[Copy Assets<br/>assets/ -> dist/]
+
+                    %% Re-converge
+                    CompileTS --> ProcessManifest[Process Manifest<br/>Adjust paths & copy to dist/]
+                    CopyAssets --> ProcessManifest
+                end
+            end
+
+            RunBuild --> CleanDist
+            ProcessManifest --> VerifyDist[Verify 'dist/' content]
+            VerifyDist --> ReadVersion[Read Version from package.json]
+            ReadVersion --> ZipDist[Zip 'dist/' to 'build/url-redirector-vX.Y.Z.zip']
+            ZipDist --> EndBundle(End Bundle)
         end
-
-        RunBuild --> CleanDist
-        ProcessManifest --> VerifyDist[Verify 'dist/' content]
-        VerifyDist --> ReadVersion[Read Version from package.json]
-        ReadVersion --> ZipDist[Zip 'dist/' to 'build/url-redirector-vX.Y.Z.zip']
-        ZipDist --> EndBundle(End Bundle)
     end
 ```
 
