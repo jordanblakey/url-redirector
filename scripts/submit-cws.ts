@@ -220,7 +220,7 @@ export async function submitCws(options: SubmitCwsOptions) {
 
 async function getPreviousVersion(currentVersion: string, execSyncFn: typeof realExecSync): Promise<string | null> {
     try {
-        const output = execSync(`git describe --tags --abbrev=0 ${currentVersion}~1`, { encoding: 'utf-8', stdio: 'pipe' }).trim();
+        const output = execSyncFn(`git describe --tags --abbrev=0 ${currentVersion}~1`, { encoding: 'utf-8', stdio: 'pipe' }).trim();
         return output;
     } catch (e) {
         return null;

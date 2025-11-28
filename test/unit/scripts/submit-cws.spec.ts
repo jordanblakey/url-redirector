@@ -45,7 +45,8 @@ describe('CWS Submission Script', () => {
             existsSync: (path: string) => true,
             createReadStream: (path: string) => 'fake_stream',
             readJsonSync: (path: string) => ({ version: '1.0.0' }),
-            // Add other methods if needed, but these are the ones used
+            readdirSync: (path: string) => ['extension.zip'], // Mock build dir content
+            readFileSync: (path: string) => 'fake_content',
         };
 
         // Mock env vars

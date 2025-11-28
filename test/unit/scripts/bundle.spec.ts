@@ -33,6 +33,7 @@ describe('Bundle Script', () => {
             existsSync: (path: string) => true,
             readdirSync: (path: string) => ['file1', 'file2'],
             statSync: (path: string) => ({ size: 1024 }),
+            readJsonSync: (path: string) => ({ version: '1.0.0' }),
         };
 
         mockAdmZip = class {

@@ -10,9 +10,12 @@
 ## DELEGATED
     [ ] CI: Before versioning, check that a tag exists with the current version number. That is to say, if it doesnt the previous push failed, and we should not version up but push the current version to the store and create a tag and push that.
     [ ] CI: Explore using a Github workflow on demand to push new versions, ensuring tests are passing and hermetic build.
+    
+    [] CI: write tests for generate-changelog.ts
+    [] CI: Update documentation for new versioning and release process
+    [] CI: Where does release.yml fit in. Is this needed? Would this have been better than genai release notes.
     [x] CI: CWS submission pipeline: in addition to uploading a new binary, use this Conditional Logic: If this is a Minor/Major update (x.x.0), replace the "New in..." section of the Store Description. If this is a Patch update (x.x.1), append the new fixes to the existing "New in..." section so we don't hide the main features of the recent major release.
     [x] BUG: release.yml does not appear to be working. analyze if it is conflicting with the release script. Prepare a summary of the problem. (Summary: It was conflicting/redundant with the local postversion script. Deleted.)
-    [] CI: write tests for generate-changelog.ts 
     [x] CI: Artifact Generation - The generated zip file should be named url-redirector-v{version}.zip
     [x] CI: AI Changelogs: Use the Google Gemini API to read the commit history between the last tag and current tag, and generate "User Facing" release notes (minimalist style) and "Technical Highlights". Write this to metadata/recent_updates.txt
     [x] CI: Github Release: In the npm release script, extend it to upload the .zip and prepend metadata/recent_updates.txt as a bulleted list to the release notes on github.

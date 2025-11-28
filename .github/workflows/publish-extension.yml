@@ -36,6 +36,12 @@ jobs:
           credentials_json: ${{ secrets.GCP_SA_KEY }}
 
       - name: Submit to CWS
+        env:
+          CWS_EXTENSION_ID: ${{ secrets.CWS_EXTENSION_ID }}
+          CWS_CLIENT_ID: ${{ secrets.CWS_CLIENT_ID }}
+          CWS_CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET }}
+          CWS_REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           if [[ "${{ github.event_name }}" == "release" || "${{ inputs.dry_run }}" == "false" ]]; then
             echo "🚀 Submitting to Chrome Web Store..."
