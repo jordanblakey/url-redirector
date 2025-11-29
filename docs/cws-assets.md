@@ -26,7 +26,7 @@ Extension popups are sandboxed in small containers. To get a clean capture, you 
 1. Right-click your extension icon and select **Inspect Popup**.
 2. In the DevTools Console, run:
    ```javascript
-   window.location.href
+   window.location.href;
    ```
 3. Copy the URL (e.g., `chrome-extension://[ID]/popup.html`) and paste it into a standard browser tab.
 
@@ -87,12 +87,12 @@ Figma and other web-based design tools often cannot import raw PDFs accurately. 
 
 ### Comparison
 
-| Feature | Method 1 (Super-Raster) | Method 2 (True Vector) |
-| :--- | :--- | :--- |
-| **Resolution** | High (Raster) | Infinite (Vector) |
-| **Editability** | None (Static Image) | Full (Text/Colors editable) |
-| **Accuracy** | 100% (Rendered by Chrome) | 95% (Some complex shadows may vary) |
-| **Speed** | Fast (< 30s) | Moderate (Requires CLI) |
+| Feature         | Method 1 (Super-Raster)   | Method 2 (True Vector)              |
+| :-------------- | :------------------------ | :---------------------------------- |
+| **Resolution**  | High (Raster)             | Infinite (Vector)                   |
+| **Editability** | None (Static Image)       | Full (Text/Colors editable)         |
+| **Accuracy**    | 100% (Rendered by Chrome) | 95% (Some complex shadows may vary) |
+| **Speed**       | Fast (< 30s)              | Moderate (Requires CLI)             |
 
 ---
 
