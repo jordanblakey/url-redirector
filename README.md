@@ -86,8 +86,9 @@ For more details on the build validation tests, see [docs/build-tests.md](docs/b
 - **[Build Tests](docs/build-tests.md)**: Details on the build validation test suite.
 - **[Pre-commit Hook](docs/pre-commit-hook.md)**: Setup for automated testing before commits.
 - **[Releasing](docs/releasing.md)**: Instructions on how to version and submit the extension to the Chrome Web Store.
-- **[Source Maps](docs/source-maps.md)**: How to use the bundled sourcemaps for production debugging.
-- **[Troubleshooting](docs/troubleshooting.md)**: Solutions for common issues.
+- [Source Maps](docs/source-maps.md): How to use the bundled sourcemaps for production debugging.
+- [Store Assets](docs/cws-assets.md): How to generate high-fidelity assets for the Chrome Web Store.
+- [Troubleshooting](docs/troubleshooting.md): Solutions for common issues.
 
 ## Contributing
 

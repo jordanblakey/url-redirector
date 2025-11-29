@@ -49,6 +49,9 @@
       "eslint --fix",
       "prettier --write",
       "vitest related --run"
+    ],
+    "*.{html,css,md}": [
+      "prettier --write"
     ]
   },
   "prettier": {
