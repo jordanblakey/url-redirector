@@ -39,31 +39,13 @@ export function buildDNRRules(rules: Rule[]): chrome.declarativeNetRequest.Rule[
     // Matches if url_redirector exists in the source URL
     // Appends current source to the existing chain
     const preserveRule: chrome.declarativeNetRequest.Rule = {
-      id: id, // Use same ID? No, IDs must be unique.
-      // We need a unique ID for the second rule.
-      // Let's use id for preserve, and id + 1000000 for start?
-      // Or just generate a different ID.
-      // But generateRuleId is deterministic based on source.
-      // We can't have two rules with same ID.
-      // Let's bitwise NOT for the second ID? Or just add a large offset.
-      // Max ID is not strictly limited but should be unique.
-      // Let's use id * 2 for preserve, id * 2 + 1 for start?
-      // But generateRuleId returns a hash.
-      // Let's modify generateRuleId or just append a suffix before hashing?
-      // But we can't change generateRuleId easily as it's used elsewhere.
-      // Let's just use id for Start (default) and id + 1 for Preserve?
-      // But collisions.
-      // Let's assume the hash space is large enough.
-      // Let's use `id` for Start (standard) and `id ^ 0xDEADBEEF` for Preserve?
-      // Let's keep it simple: `id` for Start, `id + 1` (if we can ensure spacing)
-      // Actually, `generateRuleId` returns a 32-bit integer.
-      // Let's just use `generateRuleId(source + '|preserve')` for the preserve rule.
+      id: id,
       priority: 2,
       action: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         type: 'redirect' as any,
         redirect: {
-          regexSubstitution: `${finalTarget}${separator}url_redirector=\\3,${source}`,
+          regexSubstitution: `${finalTarget}${separator}url_redirector=\\3,${id}`,
         },
       },
       condition: {
@@ -87,7 +69,7 @@ export function buildDNRRules(rules: Rule[]): chrome.declarativeNetRequest.Rule[
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         type: 'redirect' as any,
         redirect: {
-          regexSubstitution: `${finalTarget}${separator}url_redirector=${source}`,
+          regexSubstitution: `${finalTarget}${separator}url_redirector=${id}`,
         },
       },
       condition: {

@@ -1,8 +1,20 @@
 import { Rule } from './types';
 import { buildDNRRules, findActivelyChangedRules, findMatchingTabs } from './background-logic.js';
-import { normalizeUrl } from './utils.js';
+import { generateRuleId } from './utils.js';
 import { getRandomMessage } from './messages.js';
 import { storage } from './storage.js';
+
+let rulesMap: Map<number, Rule> | null = null;
+
+async function ensureRulesMap(rules?: Rule[]) {
+  if (rulesMap && !rules) return;
+
+  const currentRules = rules || (await storage.getRules());
+  rulesMap = new Map();
+  for (const rule of currentRules) {
+    rulesMap.set(generateRuleId(rule.source), rule);
+  }
+}
 
 // Initialize rules on load
 chrome.runtime.onInstalled.addListener(async () => {
@@ -22,25 +34,25 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     const source = url.searchParams.get('url_redirector');
 
     if (source) {
-      const activeRules = await storage.getRules();
-      const sources = source.split(',');
+      await ensureRulesMap();
+      const ids = source.split(',').map((s) => parseInt(s, 10));
 
-      for (const s of sources) {
-        for (const rule of activeRules) {
-          // Normalize both to ensure they match
-          if (s === normalizeUrl(rule.source)) {
-            if (rule.target === ':shuffle:') {
-              console.debug('Shuffle rule hit, re-rolling target...');
-              // Catch errors to avoid crashing if rate limited
-              updateDynamicRules().catch((e: unknown) =>
-                console.error('Failed to update shuffle rule:', e),
-              );
-            }
-            const countMessage = getRandomMessage(rule.count + 1);
-            await storage.incrementCount(rule.id, 1, countMessage);
-            showBadge(rule.count + 1);
-            break;
+      for (const id of ids) {
+        if (isNaN(id)) continue;
+
+        const rule = rulesMap?.get(id);
+        if (rule) {
+          if (rule.target === ':shuffle:') {
+            console.debug('Shuffle rule hit, re-rolling target...');
+            // Catch errors to avoid crashing if rate limited
+            updateDynamicRules().catch((e: unknown) =>
+              console.error('Failed to update shuffle rule:', e),
+            );
           }
+          const countMessage = getRandomMessage(rule.count + 1);
+          await storage.incrementCount(rule.id, 1, countMessage);
+          showBadge(rule.count + 1);
+          break;
         }
       }
     }
@@ -60,6 +72,9 @@ chrome.storage.onChanged.addListener(async (changes, areaName) => {
   if (areaName === 'local' && changes.rules) {
     const newRules = (changes.rules.newValue || []) as Rule[];
     const oldRules = (changes.rules.oldValue || []) as Rule[];
+
+    // Update cache
+    await ensureRulesMap(newRules);
 
     // Check if we need to update DNR rules
     // We only update if source, target, or active status changed, or if rules were added/removed
@@ -88,6 +103,7 @@ chrome.storage.onChanged.addListener(async (changes, areaName) => {
 });
 
 export async function updateDynamicRules(rules?: Rule[]) {
+  await ensureRulesMap(rules);
   if (!rules) {
     rules = await storage.getRules();
   }
