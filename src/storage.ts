@@ -1,18 +1,32 @@
 import { Rule, StorageResult } from './types';
 import { detectLoop } from './utils.js';
 
+const getStorage = (): Promise<chrome.storage.StorageArea> => {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get(null, () => {
+      if (chrome.runtime.lastError) {
+        resolve(chrome.storage.local);
+      } else {
+        resolve(chrome.storage.sync);
+      }
+    });
+  });
+};
+
 export const storage = {
-  getRules: (): Promise<Rule[]> => {
+  getRules: async (): Promise<Rule[]> => {
+    const storageArea = await getStorage();
     return new Promise((resolve) => {
-      chrome.storage.local.get(['rules'], (result: StorageResult) => {
+      storageArea.get(['rules'], (result: StorageResult) => {
         resolve(result.rules || []);
       });
     });
   },
 
-  saveRules: (rules: Rule[]): Promise<void> => {
+  saveRules: async (rules: Rule[]): Promise<void> => {
+    const storageArea = await getStorage();
     return new Promise((resolve) => {
-      chrome.storage.local.set({ rules }, () => {
+      storageArea.set({ rules }, () => {
         resolve();
       });
     });

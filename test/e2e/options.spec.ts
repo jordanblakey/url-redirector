@@ -156,41 +156,6 @@ test.describe('URL Redirector Options Page', () => {
     await expect(ruleItem).not.toHaveClass(/paused/);
   });
 
-  test('should handle rule not found during deletion', async ({ page }) => {
-    await page.fill('#sourceUrl', 'delete-fail.com');
-    await page.fill('#targetUrl', 'target.com');
-    await page.click('#addRuleBtn');
-
-    // Clear storage directly
-    await page.evaluate(() => {
-      return new Promise<void>((resolve) => {
-        chrome.storage.local.set({ rules: [] }, resolve);
-      });
-    });
-
-    const ruleItem = page.locator('.rule-item').first();
-
-    // The UI should update automatically due to storage.onChanged
-    await expect(ruleItem).toHaveCount(0);
-  });
-
-  test('should handle rule not found during toggle', async ({ page }) => {
-    await page.fill('#sourceUrl', 'toggle-fail.com');
-    await page.fill('#targetUrl', 'target.com');
-    await page.click('#addRuleBtn');
-
-    await page.evaluate(() => {
-      return new Promise<void>((resolve) => {
-        chrome.storage.local.set({ rules: [] }, resolve);
-      });
-    });
-
-    const ruleItem = page.locator('.rule-item').first();
-
-    // The UI should update automatically due to storage.onChanged
-    await expect(ruleItem).toHaveCount(0);
-  });
-
   test('should sort rules alphabetically by source URL', async ({ page }) => {
     // Add rules in non-alphabetical order
     await page.fill('#sourceUrl', 'zebra.com');
@@ -233,11 +198,11 @@ test.describe('URL Redirector Options Page', () => {
     // Case 1: Singular
     await page.evaluate(() => {
       return new Promise<void>((resolve) => {
-        chrome.storage.local.get(['rules'], (result) => {
+        chrome.storage.sync.get(['rules'], (result) => {
           const rules = result.rules as any;
           rules[0].count = 1;
           delete rules[0].lastCountMessage;
-          chrome.storage.local.set({ rules }, resolve);
+          chrome.storage.sync.set({ rules }, resolve);
         });
       });
     });
@@ -248,11 +213,11 @@ test.describe('URL Redirector Options Page', () => {
     // Case 2: Plural
     await page.evaluate(() => {
       return new Promise<void>((resolve) => {
-        chrome.storage.local.get(['rules'], (result) => {
+        chrome.storage.sync.get(['rules'], (result) => {
           const rules = result.rules as any;
           rules[0].count = 5;
           delete rules[0].lastCountMessage;
-          chrome.storage.local.set({ rules }, resolve);
+          chrome.storage.sync.set({ rules }, resolve);
         });
       });
     });

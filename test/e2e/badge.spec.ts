@@ -5,7 +5,7 @@ test.describe('Badge Functionality', () => {
     const worker = await getServiceWorker(context);
     await worker.evaluate(async () => {
       const rules = [{ source: 'example.org', target: 'google.com', active: false, count: 0 }];
-      await chrome.storage.local.set({ rules });
+      await chrome.storage.sync.set({ rules });
     });
 
     // Navigate to the source URL
@@ -29,7 +29,7 @@ test.describe('Badge Functionality', () => {
       const rules = [
         { source: 'badge-test.com', target: 'google.com', active: true, count: 0, id: 300 },
       ];
-      await chrome.storage.local.set({ rules });
+      await chrome.storage.sync.set({ rules });
     });
 
     // Mock network to avoid external dependencies
@@ -61,7 +61,7 @@ test.describe('Badge Functionality', () => {
       const rules = [
         { source: 'badge-increment.com', target: 'google.com', active: true, count: 0, id: 301 },
       ];
-      await chrome.storage.local.set({ rules });
+      await chrome.storage.sync.set({ rules });
     });
 
     // Mock network

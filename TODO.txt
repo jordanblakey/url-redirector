@@ -6,13 +6,12 @@
 
 ## DELEGATED
 [] FEATURE: Sync storage rules to other devices. Convert from localStorage to chrome.storage.sync, with chrome.storage.local as fallback.
-[] BUG: When the popup or options page is open, a redirect should immediately update the count as shown in the rule definition.
-[] BUG: prevent the creation of rules that would complete a redirect loop. Write tests.
-
 
 ## DOING
 
 ## DONE
+[x] BUG: prevent the creation of rules that would complete a redirect loop. Write tests.
+[x] BUG: When the popup or options page is open, a redirect should immediately update the count as shown in the rule definition.
 [x] BRAND: Create CWS assets
 [x] READ: https://developer.chrome.com/docs/webstore/discovery
 [x] READ: https://developer.chrome.com/docs/webstore/service-accounts

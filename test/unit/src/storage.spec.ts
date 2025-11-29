@@ -8,19 +8,40 @@ describe('Storage', () => {
   beforeAll(() => {
     // Mock global chrome object
     global.chrome = {
+      runtime: {
+        lastError: null,
+      },
       storage: {
-        local: {
-          get: (keys: string[], callback: (result: any) => void) => {
+        sync: {
+          get: vi.fn((keys: string[] | null, callback: (result: any) => void) => {
+            if (keys === null) {
+              // This is the check for sync availability
+              callback({});
+              return;
+            }
             const result: any = {};
             keys.forEach((key) => {
               result[key] = mockStorage[key];
             });
             callback(result);
-          },
-          set: (items: any, callback: () => void) => {
+          }),
+          set: vi.fn((items: any, callback: () => void) => {
             Object.assign(mockStorage, items);
             callback();
-          },
+          }),
+        },
+        local: {
+          get: vi.fn((keys: string[], callback: (result: any) => void) => {
+            const result: any = {};
+            keys.forEach((key) => {
+              result[key] = mockStorage[key];
+            });
+            callback(result);
+          }),
+          set: vi.fn((items: any, callback: () => void) => {
+            Object.assign(mockStorage, items);
+            callback();
+          }),
         },
       },
     } as any;

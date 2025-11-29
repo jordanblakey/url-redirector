@@ -50,7 +50,7 @@
       "prettier --write",
       "vitest related --run"
     ],
-    "*.{html,css,md}": [
+    "*.{html,css,md,json,yml,yaml}": [
       "prettier --write"
     ]
   },

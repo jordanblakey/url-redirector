@@ -14,19 +14,13 @@ test.describe('Immediate Redirect on Rule Change', () => {
 
     await page.goto('https://example.com/');
 
-    // Add rule
-    await worker.evaluate(async () => {
-      const rules = [
-        {
-          source: 'example.com',
-          target: 'google.com',
-          active: true,
-          count: 0,
-          id: 123,
-        },
-      ];
-      await chrome.storage.local.set({ rules });
-    });
+    // Go to popup and add a rule to trigger redirect
+    const popup = await context.newPage();
+    await popup.goto(`chrome-extension://${worker.url().split('/')[2]}/html/popup.html`);
+    await popup.fill('#sourceUrl', 'example.com');
+    await popup.fill('#targetUrl', 'google.com');
+    await popup.click('#addRuleBtn');
+    await popup.waitForTimeout(100); // Allow time for message to be processed
 
     // Verify redirect
     await expect(page).toHaveURL(/google\.com/);
@@ -50,7 +44,7 @@ test.describe('Immediate Redirect on Rule Change', () => {
           pausedUntil: timestamp + 100000, // Paused
         },
       ];
-      await chrome.storage.local.set({ rules });
+      await chrome.storage.sync.set({ rules });
     }, now);
 
     // Open a tab to the source URL
@@ -66,20 +60,13 @@ test.describe('Immediate Redirect on Rule Change', () => {
     // Ensure it stays on source (not redirected)
     await expect(page).toHaveURL(/example\.org/);
 
-    // Unpause the rule
-    await worker.evaluate(async () => {
-      const rules = [
-        {
-          source: 'example.org',
-          target: 'google.com',
-          active: true,
-          count: 0,
-          id: 124,
-          pausedUntil: undefined, // Unpaused
-        },
-      ];
-      await chrome.storage.local.set({ rules });
-    });
+    // Go to popup and unpause the rule
+    const popup = await context.newPage();
+    await popup.goto(`chrome-extension://${worker.url().split('/')[2]}/html/popup.html`);
+    const ruleItem = popup.locator('.rule-item').first();
+    await ruleItem.hover();
+    await ruleItem.locator('.toggle-btn').click();
+    await popup.waitForTimeout(100);
 
     // Verify redirect
     await expect(page).toHaveURL(/google\.com/);
@@ -99,7 +86,7 @@ test.describe('Immediate Redirect on Rule Change', () => {
           id: 125,
         },
       ];
-      await chrome.storage.local.set({ rules });
+      await chrome.storage.sync.set({ rules });
     });
 
     // Open a tab to the source URL
@@ -115,19 +102,13 @@ test.describe('Immediate Redirect on Rule Change', () => {
     // Ensure it stays on source
     await expect(page).toHaveURL(/example\.net/);
 
-    // Resume the rule
-    await worker.evaluate(async () => {
-      const rules = [
-        {
-          source: 'example.net',
-          target: 'google.com',
-          active: true,
-          count: 0,
-          id: 125,
-        },
-      ];
-      await chrome.storage.local.set({ rules });
-    });
+    // Go to popup and resume the rule
+    const popup = await context.newPage();
+    await popup.goto(`chrome-extension://${worker.url().split('/')[2]}/html/popup.html`);
+    const ruleItem = popup.locator('.rule-item').first();
+    await ruleItem.hover();
+    await ruleItem.locator('.toggle-btn').click();
+    await popup.waitForTimeout(100);
 
     // Verify redirect
     await expect(page).toHaveURL(/google\.com/);
@@ -136,19 +117,13 @@ test.describe('Immediate Redirect on Rule Change', () => {
   test('should redirect new tabs using DNR rules', async ({ context }) => {
     const worker = await getServiceWorker(context);
 
-    // Add rule
-    await worker.evaluate(async () => {
-      const rules = [
-        {
-          source: 'example.edu',
-          target: 'google.com',
-          active: true,
-          count: 0,
-          id: 126,
-        },
-      ];
-      await chrome.storage.local.set({ rules });
-    });
+    // Go to popup and add a rule to trigger redirect
+    const popup = await context.newPage();
+    await popup.goto(`chrome-extension://${worker.url().split('/')[2]}/html/popup.html`);
+    await popup.fill('#sourceUrl', 'example.edu');
+    await popup.fill('#targetUrl', 'google.com');
+    await popup.click('#addRuleBtn');
+    await popup.waitForTimeout(100); // Allow time for message to be processed
 
     // Open a NEW tab to the source URL
     const page = await context.newPage();

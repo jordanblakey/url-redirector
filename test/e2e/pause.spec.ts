@@ -31,9 +31,6 @@ test.describe('URL Redirector Pause Functionality', () => {
 
     // Click pause
     await toggleBtn.click();
-    await page.waitForTimeout(100); // Wait for background script to update rules
-
-    // Verify rule is paused
     await expect(ruleItem).toHaveClass(/paused/);
 
     // Verify redirect DOES NOT work
@@ -46,7 +43,7 @@ test.describe('URL Redirector Pause Functionality', () => {
     // Click resume
     await ruleItem.hover();
     await toggleBtn.click();
-    await page.waitForTimeout(100); // Wait for background script to update rules
+    await expect(ruleItem).not.toHaveClass(/paused/);
 
     // Verify rule is active again
     await expect(ruleItem).not.toHaveClass(/paused/);

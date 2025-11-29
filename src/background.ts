@@ -67,9 +67,22 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   }
 });
 
+// Listen for messages from popup or options page
+chrome.runtime.onMessage.addListener(async (message) => {
+  if (message.type === 'RULES_UPDATED') {
+    console.debug('Rules updated, re-evaluating DNR rules...');
+    const rules = await storage.getRules();
+    await updateDynamicRules(rules);
+    const activeRules = rules.filter((r) => r.active);
+    if (activeRules.length > 0) {
+      await scanAndRedirect(activeRules);
+    }
+  }
+});
+
 // Listen for rule changes
 chrome.storage.onChanged.addListener(async (changes, areaName) => {
-  if (areaName === 'local' && changes.rules) {
+  if (areaName === 'sync' && changes.rules) {
     const newRules = (changes.rules.newValue || []) as Rule[];
     const oldRules = (changes.rules.oldValue || []) as Rule[];
 

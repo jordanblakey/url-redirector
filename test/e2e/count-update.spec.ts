@@ -16,7 +16,7 @@ test.describe('Rule Count Updates', () => {
           id: 999,
         },
       ];
-      await chrome.storage.local.set({ rules });
+      await chrome.storage.sync.set({ rules });
     });
 
     // Open a tab to the source URL
@@ -30,7 +30,7 @@ test.describe('Rule Count Updates', () => {
     await expect
       .poll(async () => {
         return await worker.evaluate(async () => {
-          const { rules } = (await chrome.storage.local.get('rules')) as { rules: any[] };
+          const { rules } = (await chrome.storage.sync.get('rules')) as { rules: any[] };
           return rules.find((r: any) => r.id === 999)?.count;
         });
       })
@@ -51,7 +51,7 @@ test.describe('Rule Count Updates', () => {
           id: 1000,
         },
       ];
-      await chrome.storage.local.set({ rules });
+      await chrome.storage.sync.set({ rules });
     });
 
     // Open a tab to the source URL with different casing/protocol
@@ -65,7 +65,7 @@ test.describe('Rule Count Updates', () => {
     await expect
       .poll(async () => {
         return await worker.evaluate(async () => {
-          const { rules } = (await chrome.storage.local.get('rules')) as { rules: any[] };
+          const { rules } = (await chrome.storage.sync.get('rules')) as { rules: any[] };
           return rules.find((r: any) => r.id === 1000)?.count;
         });
       })

@@ -27,6 +27,5 @@
       "js": ["dist/content-script.js"],
       "run_at": "document_start"
     }
-  ],
-  "license": "MIT"
+  ]
 }
