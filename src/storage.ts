@@ -1,4 +1,5 @@
 import { Rule, StorageResult } from './types';
+import { detectLoop } from './utils.js';
 
 export const storage = {
   getRules: (): Promise<Rule[]> => {
@@ -22,6 +23,9 @@ export const storage = {
     if (rules.some((r) => r.source === rule.source)) {
       throw new Error('Duplicate source');
     }
+    if (detectLoop(rule.source, rule.target, rules)) {
+      throw new Error('Redirect loop detected');
+    }
     rules.push(rule);
     await storage.saveRules(rules);
   },
@@ -29,6 +33,14 @@ export const storage = {
   updateRule: async (updatedRule: Rule): Promise<void> => {
     const rules = await storage.getRules();
     const index = rules.findIndex((r) => r.id === updatedRule.id);
+
+    // Filter out the rule being updated to avoid checking against its old self
+    const otherRules = rules.filter((r) => r.id !== updatedRule.id);
+
+    if (detectLoop(updatedRule.source, updatedRule.target, otherRules)) {
+      throw new Error('Redirect loop detected');
+    }
+
     if (index !== -1) {
       rules[index] = updatedRule;
       await storage.saveRules(rules);

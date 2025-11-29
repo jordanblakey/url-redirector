@@ -116,6 +116,8 @@ const init = () => {
       const error = e as Error;
       if (error.message === 'Duplicate source') {
         showFlashMessage('Duplicate source. A rule for this source URL already exists.', 'error');
+      } else if (error.message === 'Redirect loop detected') {
+        showFlashMessage('Are you mad?! This rule would create an infinite loop!', 'error');
       } else {
         showFlashMessage('Error adding rule.', 'error');
       }
