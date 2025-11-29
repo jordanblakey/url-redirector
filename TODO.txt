@@ -1,6 +1,10 @@
+## IDEAS I DON'T LIKE, YET
+[] FEATURE: Users can edit the pool of shuffle urls in the options page.
+
 ## TODO
 [] BRAND: Update 1.2.0 release notes on CWS once it is approved
 [] BRAND: Create CWS assets
+[] BUG: When the popup or options page is open, a redirect should immediately update the count as shown in the rule definition.
 
 ## DELEGATED
 
