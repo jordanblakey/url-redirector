@@ -72,6 +72,12 @@ const init = () => {
     await addRule(source, target);
   });
 
+  chrome.storage.onChanged.addListener((changes, _areaName) => {
+    if (changes.rules) {
+      loadRules();
+    }
+  });
+
   const handleEnter = (e: KeyboardEvent) => {
     if (e.key === 'Enter') {
       addBtn.click();
@@ -93,11 +99,8 @@ const init = () => {
     targetInput.placeholder = `e.g. ${target}`;
   }
 
-  let loadGen = 0;
   async function loadRules(): Promise<void> {
-    const gen = ++loadGen;
     const rules = await storage.getRules();
-    if (gen !== loadGen) return;
     renderRulesList(rules);
   }
 

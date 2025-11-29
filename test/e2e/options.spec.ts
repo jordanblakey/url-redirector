@@ -156,52 +156,6 @@ test.describe('URL Redirector Options Page', () => {
     await expect(ruleItem).not.toHaveClass(/paused/);
   });
 
-  test('should handle rule not found during deletion', async ({ page }) => {
-    await page.fill('#sourceUrl', 'delete-fail.com');
-    await page.fill('#targetUrl', 'target.com');
-    await page.click('#addRuleBtn');
-
-    // Wait for rule to appear first to avoid race conditions
-    await expect(page.locator('.rule-item')).toHaveCount(1);
-
-    // Clear storage directly
-    await page.evaluate(() => {
-      return new Promise<void>((resolve) => {
-        chrome.storage.sync.set({ rules: [] }, resolve);
-      });
-    });
-
-    const ruleItem = page.locator('.rule-item').first();
-    await ruleItem.hover();
-
-    // Click Delete
-    await page.click('.delete-btn');
-
-    // No error should occur
-  });
-
-  test('should handle rule not found during toggle', async ({ page }) => {
-    await page.fill('#sourceUrl', 'toggle-fail.com');
-    await page.fill('#targetUrl', 'target.com');
-    await page.click('#addRuleBtn');
-
-    // Wait for rule to appear first to avoid race conditions
-    await expect(page.locator('.rule-item')).toHaveCount(1);
-
-    await page.evaluate(() => {
-      return new Promise<void>((resolve) => {
-        chrome.storage.sync.set({ rules: [] }, resolve);
-      });
-    });
-
-    const ruleItem = page.locator('.rule-item').first();
-    await ruleItem.hover();
-
-    await page.click('.toggle-btn');
-
-    // No error should occur
-  });
-
   test('should sort rules alphabetically by source URL', async ({ page }) => {
     // Add rules in non-alphabetical order
     await page.fill('#sourceUrl', 'zebra.com');

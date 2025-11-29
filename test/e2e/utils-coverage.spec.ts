@@ -50,7 +50,8 @@ test.describe('Utils Coverage - E2E', () => {
       await popup.fill('#sourceUrl', 'protocol-test.com');
       await popup.fill('#targetUrl', 'example.com'); // No protocol
       await popup.click('#addRuleBtn');
-      await popup.waitForTimeout(100);
+      // Wait for rule to appear in UI, confirming storage update
+      await expect(popup.locator('.rule-item')).toHaveCount(1);
 
       const page = await context.newPage();
 
