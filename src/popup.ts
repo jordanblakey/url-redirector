@@ -107,6 +107,7 @@ const init = () => {
         count: 0,
         active: true,
       });
+      chrome.runtime.sendMessage({ type: 'RULES_UPDATED' });
       sourceInput.value = '';
       targetInput.value = '';
       updateButtonText(); // Update button text after clearing inputs
@@ -124,6 +125,7 @@ const init = () => {
 
   async function deleteRule(id: number): Promise<void> {
     const newRules = await storage.deleteRule(id);
+    chrome.runtime.sendMessage({ type: 'RULES_UPDATED' });
     renderRulesList(newRules);
     showFlashMessage('Rule deleted.', 'info');
   }
@@ -138,6 +140,7 @@ const init = () => {
     if (rule) {
       toggleRuleState(rule);
       await storage.saveRules(rules);
+      chrome.runtime.sendMessage({ type: 'RULES_UPDATED' });
       renderRulesList(rules);
     }
   }

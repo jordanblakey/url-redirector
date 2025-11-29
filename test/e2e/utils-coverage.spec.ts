@@ -2,21 +2,14 @@ import { test, expect, getServiceWorker } from '../fixtures';
 
 test.describe('Utils Coverage - E2E', () => {
   test.describe('URL Matching and Redirection', () => {
-    test('should handle protocol normalization (http vs https)', async ({ context }) => {
-      const worker = await getServiceWorker(context);
-
-      await worker.evaluate(async () => {
-        const rules = [
-          {
-            source: 'http-test.com',
-            target: 'google.com',
-            active: true,
-            count: 0,
-            id: 200,
-          },
-        ];
-        await chrome.storage.local.set({ rules });
-      });
+    test('should handle protocol normalization (http vs https)', async ({ context, extensionId }) => {
+      // Go to popup and add a rule
+      const popup = await context.newPage();
+      await popup.goto(`chrome-extension://${extensionId}/html/popup.html`);
+      await popup.fill('#sourceUrl', 'http-test.com');
+      await popup.fill('#targetUrl', 'google.com');
+      await popup.click('#addRuleBtn');
+      await popup.waitForTimeout(100);
 
       const page = await context.newPage();
 
@@ -28,21 +21,14 @@ test.describe('Utils Coverage - E2E', () => {
       await expect(page).toHaveURL(/google\.com/);
     });
 
-    test('should handle www normalization', async ({ context }) => {
-      const worker = await getServiceWorker(context);
-
-      await worker.evaluate(async () => {
-        const rules = [
-          {
-            source: 'www-test.com',
-            target: 'google.com',
-            active: true,
-            count: 0,
-            id: 201,
-          },
-        ];
-        await chrome.storage.local.set({ rules });
-      });
+    test('should handle www normalization', async ({ context, extensionId }) => {
+      // Go to popup and add a rule
+      const popup = await context.newPage();
+      await popup.goto(`chrome-extension://${extensionId}/html/popup.html`);
+      await popup.fill('#sourceUrl', 'www-test.com');
+      await popup.fill('#targetUrl', 'google.com');
+      await popup.click('#addRuleBtn');
+      await popup.waitForTimeout(100);
 
       const page = await context.newPage();
 
@@ -54,21 +40,14 @@ test.describe('Utils Coverage - E2E', () => {
       await expect(page).toHaveURL(/google\.com/);
     });
 
-    test('should add https protocol to target if missing', async ({ context }) => {
-      const worker = await getServiceWorker(context);
-
-      await worker.evaluate(async () => {
-        const rules = [
-          {
-            source: 'protocol-test.com',
-            target: 'example.com', // No protocol
-            active: true,
-            count: 0,
-            id: 202,
-          },
-        ];
-        await chrome.storage.local.set({ rules });
-      });
+    test('should add https protocol to target if missing', async ({ context, extensionId }) => {
+      // Go to popup and add a rule
+      const popup = await context.newPage();
+      await popup.goto(`chrome-extension://${extensionId}/html/popup.html`);
+      await popup.fill('#sourceUrl', 'protocol-test.com');
+      await popup.fill('#targetUrl', 'example.com'); // No protocol
+      await popup.click('#addRuleBtn');
+      await popup.waitForTimeout(100);
 
       const page = await context.newPage();
 
@@ -84,21 +63,14 @@ test.describe('Utils Coverage - E2E', () => {
       await expect(page).toHaveURL(/https:\/\/example\.com/);
     });
 
-    test('should match URL with path', async ({ context }) => {
-      const worker = await getServiceWorker(context);
-
-      await worker.evaluate(async () => {
-        const rules = [
-          {
-            source: 'path-test.com',
-            target: 'google.com',
-            active: true,
-            count: 0,
-            id: 207,
-          },
-        ];
-        await chrome.storage.local.set({ rules });
-      });
+    test('should match URL with path', async ({ context, extensionId }) => {
+      // Go to popup and add a rule
+      const popup = await context.newPage();
+      await popup.goto(`chrome-extension://${extensionId}/html/popup.html`);
+      await popup.fill('#sourceUrl', 'path-test.com');
+      await popup.fill('#targetUrl', 'google.com');
+      await popup.click('#addRuleBtn');
+      await popup.waitForTimeout(100);
 
       const page = await context.newPage();
 
