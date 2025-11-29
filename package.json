@@ -36,7 +36,7 @@
     "record:automation": "npm run build && ./demos/record-demo.sh",
     "record:demo": "npm run build && ./demos/record-demo.sh --interactive",
     "jules:list": "npx jules",
-    "jules:delegate": "cat TODO-JULES.md | xargs -I {} npx jules new \"{}\""
+    "jules:delegate": "cat TODO-JULES.txt | xargs -I {} npx jules new \"{}\""
   },
   "keywords": [],
   "author": "",
@@ -84,5 +84,6 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.48.0",
     "vitest": "^4.0.14"
-  }
+  },
+  "license": "MIT"
 }
