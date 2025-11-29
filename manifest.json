@@ -3,8 +3,13 @@
   "name": "URL Redirector",
   "version": "1.2.0",
   "description": "Redirects URLs based on user-defined rules.",
-  "permissions": ["storage", "declarativeNetRequestWithHostAccess"],
-  "host_permissions": ["*://*/*"],
+  "permissions": [
+    "storage",
+    "declarativeNetRequestWithHostAccess"
+  ],
+  "host_permissions": [
+    "*://*/*"
+  ],
   "options_page": "assets/html/options.html",
   "icons": {
     "128": "assets/icons/icon-128.png"
@@ -23,10 +28,13 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["dist/content-script.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "dist/content-script.js"
+      ],
       "run_at": "document_start"
     }
-  ],
-  "license": "MIT"
+  ]
 }
