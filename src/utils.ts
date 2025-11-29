@@ -20,6 +20,62 @@ export function normalizeUrl(url: string): string {
     return normalized;
 }
 
+/**
+ * Detects if adding a rule would create a redirect loop.
+ * @param source The source URL of the new/updated rule.
+ * @param target The target URL of the new/updated rule.
+ * @param rules The list of existing rules to check against.
+ * @returns True if a loop is detected, false otherwise.
+ */
+export function detectLoop(source: string, target: string, rules: Rule[]): boolean {
+    const startNode = normalizeUrl(source);
+
+    // Direct self-loop check (A -> A)
+    // If the target (normalized) starts with the source, it's a direct loop
+    if (normalizeUrl(target).startsWith(startNode)) {
+         return true;
+    }
+
+    // BFS to find if we can reach back to startNode
+    const queue: string[] = [target];
+    const visitedTargets = new Set<string>();
+
+    // Safety break to prevent infinite processing in case of complex existing loops
+    let iterations = 0;
+    const MAX_ITERATIONS = 1000;
+
+    while (queue.length > 0 && iterations < MAX_ITERATIONS) {
+        iterations++;
+        const currentUrl = queue.shift()!;
+        const currentUrlClean = normalizeUrl(currentUrl);
+
+        if (visitedTargets.has(currentUrlClean)) continue;
+        visitedTargets.add(currentUrlClean);
+
+        for (const rule of rules) {
+             // Check if this rule applies to the current URL
+             const ruleSource = normalizeUrl(rule.source);
+             if (currentUrlClean.startsWith(ruleSource)) {
+                 const nextTarget = rule.target;
+
+                 // Shuffle targets are considered terminal/safe for now
+                 if (nextTarget === ':shuffle:') continue;
+
+                 const nextTargetClean = normalizeUrl(nextTarget);
+
+                 // Check if this leads back to the startNode (closing the loop)
+                 if (nextTargetClean.startsWith(startNode)) {
+                     return true;
+                 }
+
+                 queue.push(nextTarget);
+             }
+        }
+    }
+
+    return false;
+}
+
 export function matchAndGetTarget(url: string, rule: Rule): string | null {
     // Normalize URLs for comparison
     // If user enters "example.com", we match "http://example.com", "https://example.com", "https://example.com/foo"
