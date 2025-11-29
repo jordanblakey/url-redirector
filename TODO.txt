@@ -3,10 +3,12 @@
 
 ## TODO
 [] BRAND: Update 1.2.0 release notes and assets on CWS once it is approved
-[] BUG: When the popup or options page is open, a redirect should immediately update the count as shown in the rule definition.
-[] FEATURE: Sync storage rules to other devices
 
 ## DELEGATED
+[] FEATURE: Sync storage rules to other devices. Convert from localStorage to chrome.storage.sync, with chrome.storage.local as fallback.
+[] BUG: When the popup or options page is open, a redirect should immediately update the count as shown in the rule definition.
+[] BUG: prevent the creation of rules that would complete a redirect loop. Write tests.
+
 
 ## DOING
 

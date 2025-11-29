@@ -6,15 +6,15 @@ Reclaim your focus and master your digital habits with URL Redirector. This simp
 
 ## Links
 
-- [Github](https://github.com/jordanblakey/url-redirector)
 - [Chrome Web Store - Listing](https://chrome.google.com/webstore/detail/url-redirector/jhkoaofpbohfmolalpieheaeppdaminl)
 
-## Features
+## Core Features
 
 - **Universal Redirection**: Redirect any URL (and its subpages) to a target URL.
-- **Smart Handling**: Automatically handles `www` prefixes and protocol normalization.
-- **Persistent Storage**: Rules are saved locally and persist across browser sessions.
-- **Clean UI**: Modern, intuitive interface for managing your redirect rules.
+- **Shuffle Mode**: Randomize redirection targets (great for A/B testing or auditing).
+- **Snooze**: Temporarily pause specific rules without deleting them.
+- **Rules Sync**: Rules sync automatically across all your Chrome instances using `chrome.storage.sync`.
+- **Privacy First**: Built on the `declarativeNetRequest` API. This extension does not read your browsing history and cannot see the content of your pages.
 
 ## Installation (Local Development)
 
@@ -86,9 +86,9 @@ For more details on the build validation tests, see [docs/build-tests.md](docs/b
 - **[Build Tests](docs/build-tests.md)**: Details on the build validation test suite.
 - **[Pre-commit Hook](docs/pre-commit-hook.md)**: Setup for automated testing before commits.
 - **[Releasing](docs/releasing.md)**: Instructions on how to version and submit the extension to the Chrome Web Store.
-- [Source Maps](docs/source-maps.md): How to use the bundled sourcemaps for production debugging.
-- [Store Assets](docs/cws-assets.md): How to generate high-fidelity assets for the Chrome Web Store.
-- [Troubleshooting](docs/troubleshooting.md): Solutions for common issues.
+- **[Source Maps](docs/source-maps.md)**: How to use the bundled sourcemaps for production debugging.
+- **[Store Assets](docs/cws-assets.md)**: How to generate high-fidelity assets for the Chrome Web Store.
+- **[Troubleshooting](docs/troubleshooting.md)**: Solutions for common issues.
 
 ## Contributing
 
@@ -99,4 +99,4 @@ For more details on the build validation tests, see [docs/build-tests.md](docs/b
 
 ## License
 
-ISC
+MIT

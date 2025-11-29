@@ -1,1 +1,0 @@
-[] CI: Before versioning, check that the tag to version up to exists is greater than the latest remote tag. If not, fail and warn the user. 
