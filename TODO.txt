@@ -1,9 +1,3 @@
-## AMBITIOUS IDEAS
-[] FEATURE: Use Chrome AI to generate rules. A text input--if I say "I waste too much time on youtube", 
-it will generate a rule to redirect youtube to something more productive, but that pushes some of the same buttons psychologically.
-This will personalize the recommendations and provide endless novelty and variety. The input could be templated. 
-Or it could be an AI auto-suggestion that appears as the placeholder after your input.
-
 ## TODO
 [] BRAND: Update 1.2.0 release notes on CWS once it is approved
 [] BRAND: Create CWS assets

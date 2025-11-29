@@ -41,6 +41,32 @@ export async function bundle(options: BundleOptions = {}) {
       throw new Error('Build failed: dist directory is empty');
     }
 
+    // 3.5. Copy and rename release icons, then remove original release icons
+    log('🖼️ Preparing release icons...');
+    const icon128Src = path.join(distDir, 'icons/icon-release-128.png');
+    const icon128Dest = path.join(distDir, 'icons/icon-128.png');
+    const icon256Src = path.join(distDir, 'icons/icon-release-256.png');
+    const icon256Dest = path.join(distDir, 'icons/icon-256.png');
+
+    if (fsFn.existsSync(icon128Src)) {
+      fsFn.copySync(icon128Src, icon128Dest, { overwrite: true });
+      log(`   ✅ Copied ${path.basename(icon128Src)} to ${path.basename(icon128Dest)}`);
+      fsFn.removeSync(icon128Src);
+      log(`   🗑️ Removed ${path.basename(icon128Src)}`);
+    } else {
+      log(`   ⚠️ Warning: ${path.basename(icon128Src)} not found. Skipping.`);
+    }
+
+    if (fsFn.existsSync(icon256Src)) {
+      fsFn.copySync(icon256Src, icon256Dest, { overwrite: true });
+      log(`   ✅ Copied ${path.basename(icon256Src)} to ${path.basename(icon256Dest)}`);
+      fsFn.removeSync(icon256Src);
+      log(`   🗑️ Removed ${path.basename(icon256Src)}`);
+    } else {
+      log(`   ⚠️ Warning: ${path.basename(icon256Src)} not found. Skipping.`);
+    }
+    log('');
+
     // 4. Determine zip filename based on version
     const packageJsonPath = path.join(rootDir, 'package.json');
     const packageJson = fsFn.readJsonSync(packageJsonPath);

@@ -77,6 +77,12 @@ export const test = base.extend<
 
   autoCoverage: [
     async ({ context }, use, testInfo) => {
+      // Only run coverage if the COVERAGE environment variable is set
+      if (!process.env.COVERAGE) {
+        await use();
+        return;
+      }
+
       // Check if we are running in a browser context (E2E tests)
       const isBrowserTest = context && typeof context.pages === 'function';
 

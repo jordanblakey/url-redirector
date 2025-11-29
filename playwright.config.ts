@@ -35,7 +35,7 @@ function createReporter() {
         'monocart-reporter',
         {
           name: 'URL Redirector E2E Coverage Report',
-          outputFile: 'test/artifacts/coverage/index.html',
+          outputFile: 'test/artifacts/monocart-report.html',
           open: true,
           logging: 'warn',
           clear: false,
