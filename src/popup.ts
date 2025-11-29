@@ -93,8 +93,11 @@ const init = () => {
     targetInput.placeholder = `e.g. ${target}`;
   }
 
+  let loadGen = 0;
   async function loadRules(): Promise<void> {
+    const gen = ++loadGen;
     const rules = await storage.getRules();
+    if (gen !== loadGen) return;
     renderRulesList(rules);
   }
 

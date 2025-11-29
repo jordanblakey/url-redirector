@@ -161,6 +161,9 @@ test.describe('URL Redirector Options Page', () => {
     await page.fill('#targetUrl', 'target.com');
     await page.click('#addRuleBtn');
 
+    // Wait for rule to appear first to avoid race conditions
+    await expect(page.locator('.rule-item')).toHaveCount(1);
+
     // Clear storage directly
     await page.evaluate(() => {
       return new Promise<void>((resolve) => {
@@ -181,6 +184,9 @@ test.describe('URL Redirector Options Page', () => {
     await page.fill('#sourceUrl', 'toggle-fail.com');
     await page.fill('#targetUrl', 'target.com');
     await page.click('#addRuleBtn');
+
+    // Wait for rule to appear first to avoid race conditions
+    await expect(page.locator('.rule-item')).toHaveCount(1);
 
     await page.evaluate(() => {
       return new Promise<void>((resolve) => {
