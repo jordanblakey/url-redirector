@@ -5,6 +5,11 @@ import { getRandomMessage } from './messages.js';
 import { storage } from './storage.js';
 
 let rulesMap: Map<number, Rule> | null = null;
+const ALARM_NAME = 'flush_stats';
+const FLUSH_INTERVAL_MIN = 1 / 12; // 5 seconds (1/12 of a minute)
+
+// In-memory buffer for stats (Requirement: "increment a temp_buffer variable in memory")
+const temp_buffer = new Map<number, number>();
 
 async function ensureRulesMap(rules?: Rule[]) {
   if (rulesMap && !rules) return;
@@ -16,17 +21,47 @@ async function ensureRulesMap(rules?: Rule[]) {
   }
 }
 
-// Initialize rules on load
+// Initialize on load
 chrome.runtime.onInstalled.addListener(async () => {
   await updateDynamicRules();
+  chrome.alarms.create(ALARM_NAME, { periodInMinutes: FLUSH_INTERVAL_MIN });
 });
 
 chrome.runtime.onStartup.addListener(async () => {
   await updateDynamicRules();
+  chrome.alarms.create(ALARM_NAME, { periodInMinutes: FLUSH_INTERVAL_MIN });
+
+  // Crash Recovery: Check for unsynced stats
+  const unsynced = await storage.getUnsyncedDeltas();
+  if (unsynced.size > 0) {
+      console.log('Restoring unsynced stats from previous session', unsynced);
+      for (const [id, count] of unsynced) {
+          temp_buffer.set(id, (temp_buffer.get(id) || 0) + count);
+      }
+  }
 });
 
-// Listen for redirect messages from content script
-// Listen for redirect detected via URL param (works even if content script fails)
+// Alarm Listener: Flush Buffer
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+    if (alarm.name === ALARM_NAME) {
+        if (temp_buffer.size > 0) {
+            console.debug('Flushing stats buffer to sync...', temp_buffer);
+            try {
+                // "Critical: Perform a safe transaction... Only clear temp_buffer if... successful"
+                await storage.syncStats(temp_buffer);
+
+                // Success: Clear buffer and local backup
+                temp_buffer.clear();
+                await storage.saveUnsyncedDeltas(temp_buffer); // Clears local storage too
+            } catch (e) {
+                console.error('Failed to flush stats to sync:', e);
+                // Buffer remains for next attempt
+            }
+        }
+    }
+});
+
+// Listen for redirect messages / detections
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   // 1. Detect Redirect (Early) - for Badge & Count
   if (changeInfo.url && changeInfo.url.includes('url_redirector=')) {
@@ -44,13 +79,29 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
         if (rule) {
           if (rule.target === ':shuffle:') {
             console.debug('Shuffle rule hit, re-rolling target...');
-            // Catch errors to avoid crashing if rate limited
             updateDynamicRules().catch((e: unknown) =>
               console.error('Failed to update shuffle rule:', e),
             );
           }
-          const countMessage = getRandomMessage(rule.count + 1);
+
+          // --- BUFFERED SYNC LOGIC START ---
+
+          // 1. Increment temp_buffer (Memory)
+          const currentBuffer = temp_buffer.get(rule.id) || 0;
+          temp_buffer.set(rule.id, currentBuffer + 1);
+
+          // 2. Update Local Storage Immediately (for Snappy UI + Crash Recovery)
+          // incrementCount updates the rule's total in local storage
+          const countMessage = getRandomMessage(rule.count + 1); // Note: rule.count might be slightly stale if temp_buffer matches
+          // We pass 1 as increment. The UI will see the local update.
           await storage.incrementCount(rule.id, 1, countMessage);
+
+          // 3. Persist Buffer (Crash Recovery)
+          // We save the specific delta so we know what hasn't been synced
+          await storage.saveUnsyncedDeltas(temp_buffer);
+
+          // --- BUFFERED SYNC LOGIC END ---
+
           showBadge(rule.count + 1);
           break;
         }
@@ -58,8 +109,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     }
   }
 
-  // 2. Detect Failed Cleanup (Late) - for URL Cleanup
-  // If content script didn't run (e.g. error page), clean up here
+  // 2. Detect Failed Cleanup (Late)
   if (changeInfo.status === 'complete' && tab.url && tab.url.includes('url_redirector=')) {
     const url = new URL(tab.url);
     url.searchParams.delete('url_redirector');
@@ -86,11 +136,8 @@ chrome.storage.onChanged.addListener(async (changes, areaName) => {
     const newRules = (changes.rules.newValue || []) as Rule[];
     const oldRules = (changes.rules.oldValue || []) as Rule[];
 
-    // Update cache
     await ensureRulesMap(newRules);
 
-    // Check if we need to update DNR rules
-    // We only update if source, target, or active status changed, or if rules were added/removed
     const hasLogicChanged =
       JSON.stringify(
         newRules.map((r) => ({ s: r.source, t: r.target, a: r.active, p: r.pausedUntil })),
@@ -106,9 +153,7 @@ chrome.storage.onChanged.addListener(async (changes, areaName) => {
       console.debug('Only counts changed, skipping DNR update.');
     }
 
-    // Find rules that are new or have become active
     const activeRules = findActivelyChangedRules(newRules, oldRules);
-
     if (activeRules.length > 0) {
       await scanAndRedirect(activeRules);
     }
@@ -132,33 +177,34 @@ export async function updateDynamicRules(rules?: Rule[]) {
 }
 
 export async function scanAndRedirect(activeRules: Rule[]) {
-  // The Sweeper: Redirect currently open tabs
   const tabs = await chrome.tabs.query({});
   const redirects = findMatchingTabs(tabs, activeRules);
-
-  // Group redirects by rule ID to batch count updates
   const ruleUpdates = new Map<number, number>();
 
   for (const redirect of redirects) {
     chrome.tabs.update(redirect.tabId, { url: redirect.targetUrl });
-
     const currentCount = ruleUpdates.get(redirect.ruleId) || 0;
     ruleUpdates.set(redirect.ruleId, currentCount + 1);
   }
 
-  // Perform batched updates
   for (const [ruleId, incrementBy] of ruleUpdates.entries()) {
-    // We need to get the current count to generate a message
-    // Since we are batching, we'll just use the final count for the message
+    // Buffer Logic for Batch Redirection
+
+    // 1. Update Memory Buffer
+    const currentBuffer = temp_buffer.get(ruleId) || 0;
+    temp_buffer.set(ruleId, currentBuffer + incrementBy);
+
+    // 2. Update Local
     const rules = await storage.getRules();
     const rule = rules.find((r) => r.id === ruleId);
-
     if (rule) {
-      const newCount = (rule.count || 0) + incrementBy;
-      const message = getRandomMessage(newCount);
-      await storage.incrementCount(ruleId, incrementBy, message);
-      showBadge(newCount);
+        const message = getRandomMessage((rule.count || 0) + incrementBy);
+        await storage.incrementCount(ruleId, incrementBy, message);
+        showBadge((rule.count || 0) + incrementBy);
     }
+
+    // 3. Persist Buffer
+    await storage.saveUnsyncedDeltas(temp_buffer);
   }
 }
 

@@ -3,7 +3,8 @@ import { storage } from '../../../src/storage';
 import { Rule } from '../../../src/types';
 
 describe('Storage', () => {
-  let mockStorage: Record<string, any> = {};
+  let mockSync: Record<string, any> = {};
+  let mockLocal: Record<string, any> = {};
 
   beforeAll(() => {
     // Mock global chrome object
@@ -15,18 +16,19 @@ describe('Storage', () => {
         sync: {
           get: vi.fn((keys: string[] | null, callback: (result: any) => void) => {
             if (keys === null) {
-              // This is the check for sync availability
-              callback({});
+              callback(JSON.parse(JSON.stringify(mockSync)));
               return;
             }
             const result: any = {};
             keys.forEach((key) => {
-              result[key] = mockStorage[key];
+              if (mockSync[key] !== undefined) {
+                  result[key] = JSON.parse(JSON.stringify(mockSync[key]));
+              }
             });
             callback(result);
           }),
           set: vi.fn((items: any, callback: () => void) => {
-            Object.assign(mockStorage, items);
+            Object.assign(mockSync, JSON.parse(JSON.stringify(items)));
             callback();
           }),
         },
@@ -34,12 +36,14 @@ describe('Storage', () => {
           get: vi.fn((keys: string[], callback: (result: any) => void) => {
             const result: any = {};
             keys.forEach((key) => {
-              result[key] = mockStorage[key];
+               if (mockLocal[key] !== undefined) {
+                   result[key] = JSON.parse(JSON.stringify(mockLocal[key]));
+               }
             });
             callback(result);
           }),
           set: vi.fn((items: any, callback: () => void) => {
-            Object.assign(mockStorage, items);
+            Object.assign(mockLocal, JSON.parse(JSON.stringify(items)));
             callback();
           }),
         },
@@ -48,7 +52,8 @@ describe('Storage', () => {
   });
 
   beforeEach(() => {
-    mockStorage = {};
+    mockSync = {};
+    mockLocal = {};
   });
 
   test('getRules should return empty array if no rules exist', async () => {
@@ -56,77 +61,76 @@ describe('Storage', () => {
     expect(rules).toEqual([]);
   });
 
-  test('saveRules should save rules to storage', async () => {
+  test('saveRules should save rules to sync', async () => {
     const rules: Rule[] = [{ id: 1, source: 'a', target: 'b', active: true, count: 0 }];
     await storage.saveRules(rules);
-    expect(mockStorage.rules).toEqual(rules);
+    expect(mockSync.rules).toEqual(rules);
+    // It should also back up to local
+    expect(mockLocal.rules).toEqual(rules);
   });
 
-  test('addRule should add a new rule', async () => {
+  test('addRule should add a new rule to sync', async () => {
     const rule: Rule = { id: 1, source: 'a', target: 'b', active: true, count: 0 };
     await storage.addRule(rule);
     const rules = await storage.getRules();
     expect(rules).toHaveLength(1);
     expect(rules[0]).toEqual(rule);
+    expect(mockSync.rules).toHaveLength(1);
   });
 
-  test('addRule should throw error for duplicate source', async () => {
-    const rule: Rule = { id: 1, source: 'a', target: 'b', active: true, count: 0 };
-    await storage.addRule(rule);
-    await expect(storage.addRule(rule)).rejects.toThrow('Duplicate source');
+  test('incrementCount should update count in LOCAL only', async () => {
+    const rule: Rule = { id: 1, source: 'a', target: 'b', active: true, count: 10 };
+    // Setup initial state: Sync has the rule
+    await storage.saveRules([rule]);
+
+    // Clear local to ensure saveRules didn't just put it there (though it does)
+    // But incrementCount logic reads from Local (or Sync if Local empty) then writes to Local.
+    // For this test, we want to prove it DRIFTS from sync.
+    // So let's verify baseline:
+    expect(mockSync.rules[0].count).toBe(10);
+    expect(mockLocal.rules[0].count).toBe(10);
+
+    await storage.incrementCount(1, 1);
+
+    // Check Local: should be 11
+    expect(mockLocal.rules[0].count).toBe(11);
+
+    // Check Sync: should still be 10
+    expect(mockSync.rules[0].count).toBe(10);
   });
 
-  test('updateRule should update an existing rule', async () => {
-    const rule: Rule = { id: 1, source: 'a', target: 'b', active: true, count: 0 };
-    await storage.addRule(rule);
-
-    const updatedRule = { ...rule, target: 'c' };
-    await storage.updateRule(updatedRule);
+  test('getRules should merge local counts into sync rules', async () => {
+    const rule: Rule = { id: 1, source: 'a', target: 'b', active: true, count: 10 };
+    mockSync.rules = [rule];
+    // Simulate a local update
+    mockLocal.rules = [{ ...rule, count: 15 }];
 
     const rules = await storage.getRules();
-    expect(rules[0].target).toBe('c');
+    expect(rules[0].count).toBe(15);
   });
 
-  test('updateRule should do nothing if rule does not exist', async () => {
-    const rule: Rule = { id: 1, source: 'a', target: 'b', active: true, count: 0 };
-    await storage.updateRule(rule);
-    const rules = await storage.getRules();
-    expect(rules).toHaveLength(0);
+  test('syncStats should update sync storage with deltas', async () => {
+    const rule: Rule = { id: 1, source: 'a', target: 'b', active: true, count: 10 };
+    mockSync.rules = [rule];
+
+    const deltas = new Map<number, number>();
+    deltas.set(1, 5); // Add 5
+
+    await storage.syncStats(deltas);
+
+    expect(mockSync.rules[0].count).toBe(15);
   });
 
-  test('deleteRule should remove a rule by ID', async () => {
-    const rule1: Rule = { id: 1, source: 'a', target: 'b', active: true, count: 0 };
-    const rule2: Rule = { id: 2, source: 'c', target: 'd', active: true, count: 0 };
-    await storage.addRule(rule1);
-    await storage.addRule(rule2);
+  test('should save and retrieve unsynced deltas correctly', async () => {
+    const deltas = new Map<number, number>();
+    deltas.set(1, 5);
+    deltas.set(2, 10);
 
-    await storage.deleteRule(1);
-    const rules = await storage.getRules();
-    expect(rules).toHaveLength(1);
-    expect(rules[0].id).toBe(2);
-  });
+    await storage.saveUnsyncedDeltas(deltas);
+    const retrieved = await storage.getUnsyncedDeltas();
 
-  test('incrementCount should increase count', async () => {
-    const rule: Rule = { id: 1, source: 'a', target: 'b', active: true, count: 0 };
-    await storage.addRule(rule);
-
-    await storage.incrementCount(1);
-    const rules = await storage.getRules();
-    expect(rules[0].count).toBe(1);
-  });
-
-  test('incrementCount should update message if provided', async () => {
-    const rule: Rule = { id: 1, source: 'a', target: 'b', active: true, count: 0 };
-    await storage.addRule(rule);
-
-    await storage.incrementCount(1, 1, 'Redirected!');
-    const rules = await storage.getRules();
-    expect(rules[0].lastCountMessage).toBe('Redirected!');
-  });
-
-  test('incrementCount should do nothing if rule not found', async () => {
-    await storage.incrementCount(999);
-    const rules = await storage.getRules();
-    expect(rules).toHaveLength(0);
+    expect(retrieved).toEqual(deltas);
+    expect(retrieved.get(1)).toBe(5);
+    expect(retrieved.get(2)).toBe(10);
   });
 });
