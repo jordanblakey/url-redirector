@@ -1,0 +1,4 @@
+# Check types in case did not npm run build (which runs tsc)
+tsc --noEmit
+# Run all unit tests to ensure no regressions (fail fast)
+npm run test:unit

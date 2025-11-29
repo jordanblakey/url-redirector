@@ -9,32 +9,50 @@ permissions:
 jobs:
   url-redirector:
     runs-on: ubuntu-latest
-    
+
     # ------------------------------------------------------------------
     # ⚠️ MAINTAINER NOTE: SYNC REQUIRED
-    # The Docker image version below (v1.56.1) MUST match the
+    # The Docker image version below (v1.57.0) MUST match the
     # @playwright/test version in package.json.
     # If you upgrade Playwright in package.json, update this tag.
     # ------------------------------------------------------------------
     container:
       image: mcr.microsoft.com/playwright:v1.57.0-jammy
-    
+
     steps:
       - uses: actions/checkout@v6
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: '24'
           cache: 'npm'
           cache-dependency-path: package-lock.json
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
+      # -------------------------------------------------------
+      # 1. QUALITY GATES (Fail Fast)
+      # -------------------------------------------------------
+
+      # Checks types without building. Fails fast if you broke an interface.
+      - name: Type Check
+        run: npx tsc --noEmit
+
+      - name: Lint check
+        run: npx eslint .
+
+      - name: Format check
+        run: npx prettier --check .
+
+      # -------------------------------------------------------
+      # 2. BUILD & TEST
+      # -------------------------------------------------------
+
       - name: Build
         run: npm run build
-        
+
       - name: Bundle
         run: npm run bundle
 
@@ -48,10 +66,10 @@ jobs:
         run: xvfb-run --auto-servernum --server-args="-screen 0 1920x1080x24" npm run test:e2e
         env:
           HOME: /root
-      
+
       - name: Upload Playwright Report
         # 'always()' ensures this runs even if tests fail
-        if: always() 
+        if: always()
         uses: actions/upload-artifact@v5
         with:
           name: playwright-report

@@ -24,21 +24,24 @@ The release process is fully automated via **GitHub Actions**, triggered by crea
     3.  **Git Commit & Tag:** Commits the changelog and manifest, and creates a git tag (e.g., `v1.2.1`).
     4.  **GitHub Release:** The `postversion` hook pushes the tag and creates a GitHub Release, attaching the built artifact (`url-redirector-vX.Y.Z.zip`) and using the AI-generated changelog as the release notes.
     5.  **CWS Submission (CI):** The creation of the GitHub Release triggers the **Publish Web Extension** workflow in GitHub Actions.
-        *   This workflow bundles the extension (ensuring a hermetic build).
-        *   It uploads and publishes the extension to the Chrome Web Store.
-        *   It uses Gemini to intelligently merge the new changelog into the CWS Store Listing description (appending for patches, replacing for major/minor).
+        - This workflow bundles the extension (ensuring a hermetic build).
+        - It uploads and publishes the extension to the Chrome Web Store.
+        - It uses Gemini to intelligently merge the new changelog into the CWS Store Listing description (appending for patches, replacing for major/minor).
 
 ## Manual / Dry Run
 
 To test the submission process or generate changelogs without publishing:
 
 **Locally (Dry Run):**
+
 ```bash
 npm run cws:submit
 ```
+
 This runs a dry run, validating credentials (from GCP) and showing a preview of the AI-generated Store Description update in the console.
 
 **Via GitHub Actions:**
+
 1.  Go to the **Actions** tab on GitHub.
 2.  Select **Publish Web Extension**.
 3.  Click **Run workflow**.
@@ -52,10 +55,10 @@ This runs a dry run, validating credentials (from GCP) and showing a preview of 
 graph TD
     subgraph Local[Local Environment]
         Dev(Developer) -->|Runs| NPM["npm version patch/minor/major"]
-        
+
         %% FIX: Added quotes around the label to support parentheses
         NPM -->|Generates| Changelog["AI Changelog (Gemini)"]
-        
+
         Changelog -->|Triggers| Release[gh release create]
     end
 

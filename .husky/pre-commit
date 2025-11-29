@@ -1,1 +1,3 @@
-npm test
+# lint and format changed files.
+# See lint-staged block in package.json
+npx lint-staged

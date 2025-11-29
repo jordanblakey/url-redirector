@@ -1,21 +1,21 @@
-import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from "vitest";
-import * as fs from "fs";
-import * as path from "path";
-import { execSync } from "child_process";
+import { test, expect, describe, beforeEach, afterEach, beforeAll, afterAll, vi } from 'vitest';
+import * as fs from 'fs';
+import * as path from 'path';
+import { execSync } from 'child_process';
 
-const rootDir = path.resolve(__dirname, "../..");
+const rootDir = path.resolve(__dirname, '../..');
 // Create a unique temporary directory for this test run
 const distDir = path.join(rootDir, `dist-test-${Date.now()}`);
 
 // describe.configure({ mode: "serial" });
 
-describe("Build Process Validation", () => {
+describe('Build Process Validation', () => {
   beforeAll(() => {
     // Run the build command with the custom output directory
 
     execSync(`npm run build -- "${distDir}"`, {
       cwd: rootDir,
-      stdio: "pipe", // Suppress output for this test
+      stdio: 'pipe', // Suppress output for this test
     });
   });
 
@@ -27,26 +27,27 @@ describe("Build Process Validation", () => {
     }
   });
 
-  test("dist directory should exist", () => {
+  test('dist directory should exist', () => {
     expect(fs.existsSync(distDir)).toBe(true);
   });
 
-  describe("Required Files", () => {
-    test("manifest.json should exist in dist", () => {
-      const manifestPath = path.join(distDir, "manifest.json");
+  describe('Required Files', () => {
+    test('manifest.json should exist in dist', () => {
+      const manifestPath = path.join(distDir, 'manifest.json');
       expect(fs.existsSync(manifestPath)).toBe(true);
     });
 
-    test("manifest.json should be valid JSON", () => {
-      const manifestPath = path.join(distDir, "manifest.json");
-      const content = fs.readFileSync(manifestPath, "utf8");
+    test('manifest.json should be valid JSON', () => {
+      const manifestPath = path.join(distDir, 'manifest.json');
+      const content = fs.readFileSync(manifestPath, 'utf8');
 
       expect(() => JSON.parse(content)).not.toThrow();
     });
 
-    test("manifest.json should have required fields", () => {
-      const manifestPath = path.join(distDir, "manifest.json");
-      const manifest: { [key: string]: any } = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    test('manifest.json should have required fields', () => {
+      const manifestPath = path.join(distDir, 'manifest.json');
+
+      const manifest: { [key: string]: any } = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
       expect(manifest.manifest_version).toBe(3);
       expect(manifest.name).toBeTruthy();
@@ -57,74 +58,74 @@ describe("Build Process Validation", () => {
       expect(manifest.background.service_worker).toBeTruthy();
     });
 
-    test("options.html should exist in dist", () => {
-      const optionsHtmlPath = path.join(distDir, "html", "options.html");
+    test('options.html should exist in dist', () => {
+      const optionsHtmlPath = path.join(distDir, 'html', 'options.html');
       expect(fs.existsSync(optionsHtmlPath)).toBe(true);
     });
 
-    test("icons directory should exist in dist", () => {
-      const iconsDir = path.join(distDir, "icons");
+    test('icons directory should exist in dist', () => {
+      const iconsDir = path.join(distDir, 'icons');
       expect(fs.existsSync(iconsDir)).toBe(true);
       expect(fs.statSync(iconsDir).isDirectory()).toBe(true);
     });
   });
 
-  describe("Compiled JavaScript Files", () => {
-    test("background.js should exist in dist", () => {
-      const backgroundPath = path.join(distDir, "background.js");
+  describe('Compiled JavaScript Files', () => {
+    test('background.js should exist in dist', () => {
+      const backgroundPath = path.join(distDir, 'background.js');
       expect(fs.existsSync(backgroundPath)).toBe(true);
     });
 
-    test("background.js should be valid JavaScript", () => {
-      const backgroundPath = path.join(distDir, "background.js");
-      const content = fs.readFileSync(backgroundPath, "utf8");
+    test('background.js should be valid JavaScript', () => {
+      const backgroundPath = path.join(distDir, 'background.js');
+      const content = fs.readFileSync(backgroundPath, 'utf8');
 
       // Check it's not empty and contains expected content
       expect(content.length).toBeGreaterThan(0);
-      expect(content).toContain("chrome");
+      expect(content).toContain('chrome');
     });
 
-    test("options.js should exist in dist", () => {
-      const optionsPath = path.join(distDir, "options.js");
+    test('options.js should exist in dist', () => {
+      const optionsPath = path.join(distDir, 'options.js');
       expect(fs.existsSync(optionsPath)).toBe(true);
     });
 
-    test("utils.js should exist in dist", () => {
-      const utilsPath = path.join(distDir, "utils.js");
+    test('utils.js should exist in dist', () => {
+      const utilsPath = path.join(distDir, 'utils.js');
       expect(fs.existsSync(utilsPath)).toBe(true);
     });
   });
 
-  describe("Icon Files", () => {
-    test("icon-128.png should exist", () => {
-      const iconPath = path.join(distDir, "icons", "icon-128.png");
+  describe('Icon Files', () => {
+    test('icon-128.png should exist', () => {
+      const iconPath = path.join(distDir, 'icons', 'icon-128.png');
       expect(fs.existsSync(iconPath)).toBe(true);
     });
 
-    test("icon-128.png should be a valid file with content", () => {
-      const iconPath = path.join(distDir, "icons", "icon-128.png");
+    test('icon-128.png should be a valid file with content', () => {
+      const iconPath = path.join(distDir, 'icons', 'icon-128.png');
       const stats = fs.statSync(iconPath);
 
       expect(stats.size).toBeGreaterThan(0);
       expect(stats.isFile()).toBe(true);
     });
 
-    test("icon-256.png should exist", () => {
-      const iconPath = path.join(distDir, "icons", "icon-256.png");
+    test('icon-256.png should exist', () => {
+      const iconPath = path.join(distDir, 'icons', 'icon-256.png');
       expect(fs.existsSync(iconPath)).toBe(true);
     });
 
-    test("icon-256.png should be a valid file with content", () => {
-      const iconPath = path.join(distDir, "icons", "icon-256.png");
+    test('icon-256.png should be a valid file with content', () => {
+      const iconPath = path.join(distDir, 'icons', 'icon-256.png');
       const stats = fs.statSync(iconPath);
 
       expect(stats.size).toBeGreaterThan(0);
       expect(stats.isFile()).toBe(true);
     });
 
-    test("manifest icons should reference existing files", () => {
-      const manifestPath = path.join(distDir, "manifest.json");
-      const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    test('manifest icons should reference existing files', () => {
+      const manifestPath = path.join(distDir, 'manifest.json');
+      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
       // Check icons in manifest
       if (manifest.icons) {
@@ -137,20 +138,18 @@ describe("Build Process Validation", () => {
 
       // Check action icons
       if (manifest.action && manifest.action.default_icon) {
-        Object.values(manifest.action.default_icon).forEach(
-          (value: unknown) => {
-            const iconPath = value as string;
-            const fullPath = path.join(distDir, iconPath);
-            expect(fs.existsSync(fullPath)).toBe(true);
-          }
-        );
+        Object.values(manifest.action.default_icon).forEach((value: unknown) => {
+          const iconPath = value as string;
+          const fullPath = path.join(distDir, iconPath);
+          expect(fs.existsSync(fullPath)).toBe(true);
+        });
       }
     });
   });
 
-  describe("File Integrity", () => {
-    test("all JavaScript files should have non-zero size", () => {
-      const jsFiles = ["background.js", "options.js", "utils.js"];
+  describe('File Integrity', () => {
+    test('all JavaScript files should have non-zero size', () => {
+      const jsFiles = ['background.js', 'options.js', 'utils.js'];
 
       jsFiles.forEach((file) => {
         const filePath = path.join(distDir, file);
@@ -159,24 +158,24 @@ describe("Build Process Validation", () => {
       });
     });
 
-    test("options.html should reference the new CSS files", () => {
-      const htmlPath = path.join(distDir, "html", "options.html");
-      const content = fs.readFileSync(htmlPath, "utf8");
+    test('options.html should reference the new CSS files', () => {
+      const htmlPath = path.join(distDir, 'html', 'options.html');
+      const content = fs.readFileSync(htmlPath, 'utf8');
 
-      expect(content).toContain("styles/base.css");
-      expect(content).toContain("styles/options.css");
+      expect(content).toContain('styles/base.css');
+      expect(content).toContain('styles/options.css');
     });
 
-    test("options.html should reference options.js", () => {
-      const htmlPath = path.join(distDir, "html", "options.html");
-      const content = fs.readFileSync(htmlPath, "utf8");
+    test('options.html should reference options.js', () => {
+      const htmlPath = path.join(distDir, 'html', 'options.html');
+      const content = fs.readFileSync(htmlPath, 'utf8');
 
-      expect(content).toContain("options.js");
+      expect(content).toContain('options.js');
     });
 
-    test("manifest background service_worker should reference existing file", () => {
-      const manifestPath = path.join(distDir, "manifest.json");
-      const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    test('manifest background service_worker should reference existing file', () => {
+      const manifestPath = path.join(distDir, 'manifest.json');
+      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
       const serviceWorkerPath = manifest.background.service_worker;
       const fullPath = path.join(distDir, serviceWorkerPath);
@@ -185,20 +184,20 @@ describe("Build Process Validation", () => {
     });
   });
 
-  describe("Extension Completeness", () => {
-    test("dist should contain all files needed for a working extension", () => {
+  describe('Extension Completeness', () => {
+    test('dist should contain all files needed for a working extension', () => {
       const requiredFiles = [
-        "manifest.json",
-        "html/options.html",
-        "html/popup.html",
-        "styles/base.css",
-        "styles/options.css",
-        "styles/popup.css",
-        "background.js",
-        "options.js",
-        "utils.js",
-        "icons/icon-128.png",
-        "icons/icon-256.png",
+        'manifest.json',
+        'html/options.html',
+        'html/popup.html',
+        'styles/base.css',
+        'styles/options.css',
+        'styles/popup.css',
+        'background.js',
+        'options.js',
+        'utils.js',
+        'icons/icon-128.png',
+        'icons/icon-256.png',
       ];
 
       requiredFiles.forEach((file) => {
@@ -207,17 +206,17 @@ describe("Build Process Validation", () => {
       });
     });
 
-    test("no TypeScript source files should be in dist", () => {
+    test('no TypeScript source files should be in dist', () => {
       const files = fs.readdirSync(distDir);
-      const tsFiles = files.filter((file) => file.endsWith(".ts"));
+      const tsFiles = files.filter((file) => file.endsWith('.ts'));
 
       expect(tsFiles.length).toBe(0);
     });
 
-    test("dist should be loadable as Chrome extension", () => {
+    test('dist should be loadable as Chrome extension', () => {
       // Verify the basic structure Chrome expects
-      const manifestPath = path.join(distDir, "manifest.json");
-      const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+      const manifestPath = path.join(distDir, 'manifest.json');
+      const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 
       // Chrome extension requirements
       expect(manifest.manifest_version).toBe(3);
@@ -225,10 +224,7 @@ describe("Build Process Validation", () => {
       expect(manifest.version).toBeTruthy();
 
       // Service worker must exist
-      const serviceWorkerPath = path.join(
-        distDir,
-        manifest.background.service_worker
-      );
+      const serviceWorkerPath = path.join(distDir, manifest.background.service_worker);
       expect(fs.existsSync(serviceWorkerPath)).toBe(true);
 
       // Options page must exist
@@ -237,8 +233,8 @@ describe("Build Process Validation", () => {
     });
   });
 
-  describe("Build Reproducibility", () => {
-    test("running build twice should produce same files", () => {
+  describe('Build Reproducibility', () => {
+    test('running build twice should produce same files', () => {
       // Get current file list
       const getFileList = (dir: string): string[] => {
         const files: string[] = [];
@@ -263,7 +259,7 @@ describe("Build Process Validation", () => {
       // Run build again
       execSync(`npm run build -- "${distDir}"`, {
         cwd: rootDir,
-        stdio: "pipe", // Suppress output for this test
+        stdio: 'pipe', // Suppress output for this test
       });
 
       const filesAfter = getFileList(distDir);

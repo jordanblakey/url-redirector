@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*",
+    "test/**/*",
+    "scripts/**/*",
+    "demos/**/*",
+    "*.ts",
+    "*.mjs",
+    "eslint.config.mjs"
+  ],
+  "exclude": ["node_modules", "dist", "build"],
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false
+  }
+}

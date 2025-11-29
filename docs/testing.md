@@ -56,8 +56,3 @@ The test suite validates multiple aspects of the auild output:
 - **File Integrity**: Checks that files are properly linked.
 - **Extension Completeness**: Validates the extension can be loaded in Chrome.
 - **Build Reproducibility**: Ensures consistent build output.
-
-
-
-
-

@@ -3,31 +3,31 @@
  */
 
 export interface Rule {
-    id: number;
-    source: string;
-    target: string;
-    count: number;
-    active: boolean;
-    pausedUntil?: number;
-    lastCountMessage?: string;
+  id: number;
+  source: string;
+  target: string;
+  count: number;
+  active: boolean;
+  pausedUntil?: number;
+  lastCountMessage?: string;
 }
 
 export interface StorageSchema {
-    rules: Rule[];
+  rules: Rule[];
 }
 
 export interface StorageResult {
-    rules?: Rule[];
+  rules?: Rule[];
 }
 
 export interface RedirectMessage {
-    type: 'REDIRECT_DETECTED';
-    source: string;
+  type: 'REDIRECT_DETECTED';
+  source: string;
 }
 
 export interface CwsListing {
-    items: {
-        fullDescription: string;
-        promotionalText: string;
-    }[];
+  items: {
+    fullDescription: string;
+    promotionalText: string;
+  }[];
 }

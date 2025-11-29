@@ -13,7 +13,12 @@ export interface CheckStatusOptions {
 }
 
 // --- Helper Functions ---
-async function getAccessToken(clientId: string, clientSecret: string, refreshToken: string, fetchFn: typeof fetch) {
+async function getAccessToken(
+  clientId: string,
+  clientSecret: string,
+  refreshToken: string,
+  fetchFn: typeof fetch,
+) {
   const response = await fetchFn('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -32,10 +37,17 @@ async function getAccessToken(clientId: string, clientSecret: string, refreshTok
   return (await response.json()).access_token;
 }
 
-async function checkStatus(accessToken: string, publisherId: string, extensionId: string, fetchFn: typeof fetch, log: typeof console.log, dir: typeof console.dir) {
+async function checkStatus(
+  accessToken: string,
+  publisherId: string,
+  extensionId: string,
+  fetchFn: typeof fetch,
+  log: typeof console.log,
+  dir: typeof console.dir,
+) {
   const fetchStatusUrl = `https://chromewebstore.googleapis.com/v2/publishers/${publisherId}/items/${extensionId}:fetchStatus`;
   const response = await fetchFn(fetchStatusUrl, {
-    headers: { 'Authorization': `Bearer ${accessToken}` },
+    headers: { Authorization: `Bearer ${accessToken}` },
   });
 
   if (!response.ok) {
@@ -77,7 +89,6 @@ export async function runCheckStatus(options: CheckStatusOptions = {}) {
 
     log('Checking extension status...');
     await checkStatus(accessToken, PUBLISHER_ID, EXTENSION_ID, fetchFn, log, dir);
-
   } catch (err: unknown) {
     error(err);
     process.exit(1);
