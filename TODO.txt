@@ -2,15 +2,16 @@
 [] FEATURE: Users can edit the pool of shuffle urls in the options page.
 
 ## TODO
-[] BRAND: Update 1.2.0 release notes on CWS once it is approved
-[] BRAND: Create CWS assets
+[] BRAND: Update 1.2.0 release notes and assets on CWS once it is approved
 [] BUG: When the popup or options page is open, a redirect should immediately update the count as shown in the rule definition.
+[] FEATURE: Sync storage rules to other devices
 
 ## DELEGATED
 
 ## DOING
 
 ## DONE
+[x] BRAND: Create CWS assets
 [x] READ: https://developer.chrome.com/docs/webstore/discovery
 [x] READ: https://developer.chrome.com/docs/webstore/service-accounts
 [x] BUG: "Active Rules" is a bit misleading with new pause/resume feature. "Redirection Rules"? "Rules"?

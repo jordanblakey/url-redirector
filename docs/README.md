@@ -90,6 +90,21 @@ Instructions for versioning and submitting to the Chrome Web Store.
 
 ---
 
+### [Store Assets](cws-assets.md)
+
+Guide to generating high-fidelity assets for the Chrome Web Store.
+
+**Topics covered:**
+
+- High-DPI screenshots
+- Vector PDF extraction
+
+**When to read:**
+
+- When preparing marketing materials
+
+---
+
 ## Screenshots
 
 The `screenshots/` directory contains images used in documentation and for the Chrome Web Store listing.
