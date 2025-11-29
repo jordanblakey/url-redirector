@@ -28,6 +28,8 @@ test.describe('Loop Prevention', () => {
     await page.fill('#targetUrl', 'site-a.com');
     await page.click('#addRuleBtn');
 
-    await expect(page.locator('body')).toContainText('Redirect loop detected');
+    await expect(page.locator('body')).toContainText(
+      'Are you mad?! This rule would create an infinite loop!',
+    );
   });
 });
