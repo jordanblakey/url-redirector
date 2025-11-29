@@ -1,6 +1,11 @@
+#!/bin/sh
+set -e
+
 # Check types in case did not npm run build (which runs tsc)
-tsc --noEmit
+npm run type-check
+
 # Check formatting
-prettier --check .
+npx prettier --check .
+
 # Run all unit tests to ensure no regressions (fail fast)
 npm run test:unit
