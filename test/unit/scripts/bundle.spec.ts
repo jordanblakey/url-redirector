@@ -37,6 +37,8 @@ describe('Bundle Script', () => {
       readdirSync: (path: any) => ['file1', 'file2'] as any,
       statSync: (path: any) => ({ size: 1024 }) as any,
       readJsonSync: (path: any) => ({ version: '1.0.0' }),
+      copySync: (src: any, dest: any) => fsOperations.push({ op: 'copySync', src, dest }),
+      removeSync: (path: any) => fsOperations.push({ op: 'removeSync', path }),
     };
 
     mockAdmZip = class {
