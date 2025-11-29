@@ -1,17 +1,14 @@
 ## TODO
-[] BRAND: Update 1.2.0 release notes on CWS
-
-
-[] READ: https://developer.chrome.com/docs/webstore/discovery
-[] READ: https://developer.chrome.com/docs/webstore/service-accounts
+[] BRAND: Update 1.2.0 release notes on CWS once it is approved
 [] BRAND: Create CWS assets
-
 
 ## DELEGATED
 
 ## DOING
 
 ## DONE
+[x] READ: https://developer.chrome.com/docs/webstore/discovery
+[x] READ: https://developer.chrome.com/docs/webstore/service-accounts
 [x] BUG: "Active Rules" is a bit misleading with new pause/resume feature. "Redirection Rules"? "Rules"?
 [x] BUG: adding a rule to popup should immediately redirect tabs currently on the source url. Write test.
 [x] BUG: alt layout for coverage report? Hides the pass/fail status and you have to scroll up.

@@ -27,7 +27,7 @@ function createReporter() {
     ['html', { open: 'never', outputFolder: 'test/artifacts/playwright-report' }] as [string, any],
   );
   if (process.env.CI) {
-    reporters.push(['github']);
+    reporters.push(['list']);
   } else {
     if (process.env.COVERAGE) {
       reporters.push(['list']);
@@ -35,7 +35,7 @@ function createReporter() {
         'monocart-reporter',
         {
           name: 'URL Redirector E2E Coverage Report',
-          outputFile: 'test/artifacts/coverage/index.html',
+          outputFile: 'test/artifacts/monocart-report.html',
           open: true,
           logging: 'warn',
           clear: false,
