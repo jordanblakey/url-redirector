@@ -2,7 +2,10 @@ import { test, expect, getServiceWorker } from '../fixtures';
 
 test.describe('Utils Coverage - E2E', () => {
   test.describe('URL Matching and Redirection', () => {
-    test('should handle protocol normalization (http vs https)', async ({ context, extensionId }) => {
+    test('should handle protocol normalization (http vs https)', async ({
+      context,
+      extensionId,
+    }) => {
       // Go to popup and add a rule
       const popup = await context.newPage();
       await popup.goto(`chrome-extension://${extensionId}/html/popup.html`);
