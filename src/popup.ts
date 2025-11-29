@@ -18,6 +18,13 @@ const init = () => {
 
   loadRules();
 
+  // Listen for changes in storage and refresh the list
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === 'local' && changes.rules) {
+      loadRules();
+    }
+  });
+
   // Refresh UI every second to update pause countdowns
   setInterval(() => {
     updatePauseButtons(rulesList);
