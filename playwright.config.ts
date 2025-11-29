@@ -18,6 +18,7 @@ export default defineConfig({
     },
   },
   // workers: 1, // Use 1 worker to run tests serially and watch the test execution.
+  timeout: 10000,
 });
 
 function createReporter() {

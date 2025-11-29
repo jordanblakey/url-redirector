@@ -169,12 +169,9 @@ test.describe('URL Redirector Options Page', () => {
     });
 
     const ruleItem = page.locator('.rule-item').first();
-    await ruleItem.hover();
 
-    // Click Delete
-    await page.click('.delete-btn');
-
-    // No error should occur
+    // The UI should update automatically due to storage.onChanged
+    await expect(ruleItem).toHaveCount(0);
   });
 
   test('should handle rule not found during toggle', async ({ page }) => {
@@ -189,11 +186,9 @@ test.describe('URL Redirector Options Page', () => {
     });
 
     const ruleItem = page.locator('.rule-item').first();
-    await ruleItem.hover();
 
-    await page.click('.toggle-btn');
-
-    // No error should occur
+    // The UI should update automatically due to storage.onChanged
+    await expect(ruleItem).toHaveCount(0);
   });
 
   test('should sort rules alphabetically by source URL', async ({ page }) => {
