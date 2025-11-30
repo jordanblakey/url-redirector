@@ -2,14 +2,15 @@
 [] BRAND: Update 1.2.0 release notes and assets on CWS once it is approved
 
 ## DELEGATED
-[] BUG: Transitive redirects are not being counted. Fix and write tests.
-[] CLEANUP: Refactor shared logic from popup.ts and options.ts into ui.ts
-[] FEATURE: Limit calls to chrome.storage.sync so they do not exceed 120 requests per minute. Use chrome.storage.local as the primary storage, using a write through cache strategy.
-[] FEATURE: Storage space quota in chrome.storage.sync is 8kb per entry, 120kb total. 250 entries. Refactor our use of chrome.storage.sync so that we can easily accomodate 500 20char url rules. This could be a combination of using separate entries, serialization, and compression. The implementation details are up to you.
 
 ## DOING
 
 ## DONE
+[x] BUG: If the badge is active when showBadge is called, it should reset the badge timer (10 seconds).
+[x] CLEANUP: Refactor shared logic from popup.ts and options.ts into ui.ts
+[x] BUG: Transitive redirects are not being counted. Fix and write tests.
+[x] BUG: When pause expires, it should immediately redirect tabs currently on the source url. Write test.
+[x] BUG: Occasionally, a rule will stop counting. Implementing rapid badge increment tests for single and transitive redirects.
 [x] FEATURE: Sync storage rules to other devices. Convert from localStorage to chrome.storage.sync, with chrome.storage.local as fallback.
 [x] BUG: prevent the creation of rules that would complete a redirect loop. Write tests.
 [x] BUG: When the popup or options page is open, a redirect should immediately update the count as shown in the rule definition.

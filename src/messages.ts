@@ -99,7 +99,7 @@ export const MESSAGES = [
 
   // --- ODDLY SPECIFIC ---
   'Swapped junk food for brain food ({count})',
-  'Saved you ~{count} minutes of your life',
+  'Saved you ~{count} minute{s} of your life',
   'Return to sender: {count} request{s}',
   'Self-control outsourced {count} time{s}',
   'Automated willpower: {count} use{s}',

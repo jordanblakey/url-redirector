@@ -13,7 +13,7 @@ Reclaim your focus and master your digital habits with URL Redirector. This simp
 - **Universal Redirection**: Redirect any URL (and its subpages) to a target URL.
 - **Shuffle Mode**: Randomize redirection targets (great for A/B testing or auditing).
 - **Snooze**: Temporarily pause specific rules without deleting them.
-- **Rules Sync**: Rules sync automatically across all your Chrome instances using `chrome.storage.sync`.
+- **Rules Storage**: Rules are stored locally using `chrome.storage.local`.
 - **Privacy First**: Built on the `declarativeNetRequest` API. This extension does not read your browsing history and cannot see the content of your pages.
 
 ## Installation (Local Development)

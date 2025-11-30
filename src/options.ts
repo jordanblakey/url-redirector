@@ -3,9 +3,11 @@ import { isValidUrl } from './utils.js';
 import {
   renderRules,
   updatePauseButtons,
-  toggleRuleState,
   showFlashMessage,
   setupPlaceholderButtons,
+  handleAddRule,
+  handleDeleteRule,
+  handleToggleRule,
 } from './ui.js';
 import { getThematicPair } from './suggestions.js';
 import { storage } from './storage.js';
@@ -123,53 +125,24 @@ const init = () => {
   }
 
   async function addRule(source: string, target: string): Promise<void> {
-    try {
-      // Note: We don't need to manually check for duplicates or redirect tabs here.
-      // storage.addRule throws on duplicate source.
-      // background.ts handles the redirect for new active rules via storage.onChanged.
-
-      await storage.addRule({
-        source,
-        target,
-        id: Date.now(),
-        count: 0,
-        active: true,
-      });
-
-      chrome.runtime.sendMessage({ type: 'RULES_UPDATED' });
+    await handleAddRule(source, target, async () => {
       sourceInput.value = '';
       targetInput.value = '';
-      updateButtonText(); // Update button text after clearing inputs
+      updateButtonText();
       await loadRules();
-      showFlashMessage('Rule added successfully!', 'success');
-    } catch (e) {
-      const error = e as Error;
-      if (error.message === 'Duplicate source') {
-        showFlashMessage('Duplicate source. A rule for this source URL already exists.', 'error');
-      } else if (error.message === 'Redirect loop detected') {
-        showFlashMessage('Are you mad?! This would create an infinite loop!', 'error');
-      } else {
-        showFlashMessage('Error adding rule.', 'error');
-      }
-    }
+    });
   }
 
   async function deleteRule(id: number): Promise<void> {
-    const newRules = await storage.deleteRule(id);
-    chrome.runtime.sendMessage({ type: 'RULES_UPDATED' });
-    renderRulesList(newRules);
-    showFlashMessage('Rule deleted.', 'info');
+    await handleDeleteRule(id, (newRules) => {
+      renderRulesList(newRules);
+    });
   }
 
   async function toggleRule(id: number): Promise<void> {
-    const rules = await storage.getRules();
-    const rule = rules.find((r) => r.id === id);
-    if (rule) {
-      toggleRuleState(rule);
-      await storage.saveRules(rules);
-      chrome.runtime.sendMessage({ type: 'RULES_UPDATED' });
+    await handleToggleRule(id, (rules) => {
       renderRulesList(rules);
-    }
+    });
   }
 
   function renderRulesList(rules: Rule[]): void {
