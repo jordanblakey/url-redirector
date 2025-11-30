@@ -25,7 +25,7 @@
     "test:coverage-vitest": "COVERAGE=1 vitest run test/unit test/integration --coverage",
     "test:coverage-e2e": "COVERAGE=1 playwright test",
     "//------ Releasing ------": "",
-    "version": "npm run changelog && npm run update-manifest && git add manifest.json metadata/recent_updates.txt",
+    "version": "npm run bundle && npm run changelog && npm run update-manifest && git add manifest.json metadata/recent_updates.txt",
     "changelog": "ts-node scripts/generate-changelog.ts",
     "update-manifest": "jq --arg v $npm_package_version '.version = $v' manifest.json > tmp.json && mv tmp.json manifest.json",
     "postversion": "gh release create v$npm_package_version build/url-redirector-v$npm_package_version.zip --notes-file metadata/recent_updates.txt",
