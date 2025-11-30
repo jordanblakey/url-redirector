@@ -72,3 +72,23 @@ The pre-commit hook aborts your commit because tests are failing.
     ```bash
     git commit -m "docs: update README" --no-verify
     ```
+
+## 4. Redirects Ignored on PWA Sites (Pinterest, Twitter)
+
+### Problem
+
+Redirect rules fail to trigger on Progressive Web Apps (PWAs) like Pinterest, Twitter, or YouTube. You may also see console logs stating: https://chromewebstore.google.com/detail/redirector/lioaeidejmlpffbndjhaameocfldlhin?hl=en: 🗑️ Unregistering Service Worker for matching rule...
+
+### Cause
+
+These sites use Service Workers to serve content from a local cache ("App Shell"). This bypasses Chrome's network layer, causing the declarativeNetRequest API to be ignored because no network request is made.
+
+### Solution
+
+This behavior is expected. The extension employs a "Service Worker Suppression" system to handle this:
+
+**Automatic Fix**: In the content script, the extension detects the interfering Service Worker, unregisters it, and forces the site to reload via the network. This allows the redirect rule to fire on the next attempt.
+
+**Console Logs**: The "Unregistering" logs indicate the extension is successfully removing the cache layer to enforce your rules.
+
+**Manual Reset**: If a site is persistently refusing to redirect, open Developer Tools (F12) > Application > Storage and click "Clear site data".
