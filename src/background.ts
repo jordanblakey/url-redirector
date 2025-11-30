@@ -6,12 +6,11 @@ import { storage } from './storage.js';
 
 // Expose for testing
 self.storage = storage;
-self.setForceLocalStorage = (value: boolean) => {
-  self.FORCE_LOCAL_STORAGE = value;
-};
 
 let rulesMap: Map<number, Rule> | null = null;
 const processedRedirects: Map<number, Set<number>> = new Map();
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let badgeTimeout: any = null;
 
 async function ensureRulesMap(rules?: Rule[]) {
   if (rulesMap && !rules) return;
@@ -22,6 +21,18 @@ async function ensureRulesMap(rules?: Rule[]) {
     rulesMap.set(generateRuleId(rule.source), rule);
   }
 }
+
+// On install or refresh
+chrome.runtime.onInstalled.addListener(() => {
+  // Check if we are in "Unpacked / Dev" mode
+  const manifest = chrome.runtime.getManifest();
+  const isDevMode = !('update_url' in manifest);
+
+  if (isDevMode) {
+    console.log('DEV MODE EXT RELOAD DETECTED: Wiping storage for a clean slate.');
+    chrome.storage.local.clear();
+  }
+});
 
 // Initialize rules on load
 chrome.runtime.onInstalled.addListener(async () => {
@@ -36,8 +47,9 @@ chrome.runtime.onStartup.addListener(async () => {
 // Listen for redirect detected via URL param (works even if content script fails)
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   // 1. Detect Redirect (Early) - for Badge & Count
-  if (changeInfo.url && changeInfo.url.includes('url_redirector=')) {
-    const url = new URL(changeInfo.url);
+  const urlToCheck = changeInfo.url || tab.url;
+  if (urlToCheck && urlToCheck.includes('url_redirector=')) {
+    const url = new URL(urlToCheck);
     const source = url.searchParams.get('url_redirector');
 
     if (source) {
@@ -75,7 +87,9 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     if (tab.url && tab.url.includes('url_redirector=')) {
       const url = new URL(tab.url);
       url.searchParams.delete('url_redirector');
-      chrome.tabs.update(tabId, { url: url.toString() });
+      chrome.tabs.update(tabId, { url: url.toString() }).catch(() => {
+        // Ignore navigation errors (e.g. tab closed)
+      });
     }
     processedRedirects.delete(tabId);
   }
@@ -100,11 +114,7 @@ chrome.runtime.onMessage.addListener(async (message) => {
 
 // Listen for rule changes
 chrome.storage.onChanged.addListener(async (changes, areaName) => {
-  // Check if we should process this change based on storage mode
-  const useLocal = self.FORCE_LOCAL_STORAGE;
-  const isValidArea = (areaName === 'sync' && !useLocal) || (areaName === 'local' && useLocal);
-
-  if (isValidArea && changes.rules) {
+  if (areaName === 'local' && changes.rules) {
     const newRules = (changes.rules.newValue || []) as Rule[];
     const oldRules = (changes.rules.oldValue || []) as Rule[];
 
@@ -162,7 +172,9 @@ export async function scanAndRedirect(activeRules: Rule[]) {
   const ruleUpdates = new Map<number, number>();
 
   for (const redirect of redirects) {
-    chrome.tabs.update(redirect.tabId, { url: redirect.targetUrl });
+    chrome.tabs.update(redirect.tabId, { url: redirect.targetUrl }).catch(() => {
+      // Ignore navigation errors (e.g. tab closed)
+    });
 
     const currentCount = ruleUpdates.get(redirect.ruleId) || 0;
     ruleUpdates.set(redirect.ruleId, currentCount + 1);
@@ -187,12 +199,18 @@ export async function scanAndRedirect(activeRules: Rule[]) {
 export function showBadge(count?: number) {
   try {
     if (typeof chrome !== 'undefined' && chrome.action && chrome.action.setBadgeText) {
+      if (badgeTimeout) {
+        clearTimeout(badgeTimeout);
+        badgeTimeout = null;
+      }
+
       chrome.action.setBadgeText({
         text: count ? count.toString() : '✔',
       });
       chrome.action.setBadgeTextColor({ color: '#ffffff' });
       chrome.action.setBadgeBackgroundColor({ color: '#5f33ffff' });
-      setTimeout(() => {
+
+      badgeTimeout = setTimeout(() => {
         try {
           if (typeof chrome !== 'undefined' && chrome.action && chrome.action.setBadgeText) {
             chrome.action.setBadgeText({ text: '' });
@@ -200,9 +218,34 @@ export function showBadge(count?: number) {
         } catch (_e: unknown) {
           // Silently fail
         }
+        badgeTimeout = null;
       }, 10000);
     }
   } catch (_e: unknown) {
     // Silently fail
+  }
+}
+// Check for expired pauses every second
+setInterval(checkPausedRules, 1000);
+
+async function checkPausedRules() {
+  const rules = await storage.getRules();
+  const now = Date.now();
+  let hasChanges = false;
+
+  const updatedRules = rules.map((rule) => {
+    if (rule.pausedUntil && rule.pausedUntil <= now) {
+      hasChanges = true;
+      // Remove pausedUntil
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { pausedUntil, ...rest } = rule;
+      return { ...rest, active: true };
+    }
+    return rule;
+  });
+
+  if (hasChanges) {
+    console.debug('Pause expired for some rules, updating...');
+    await storage.saveRules(updatedRules);
   }
 }

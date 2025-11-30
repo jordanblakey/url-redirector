@@ -93,6 +93,14 @@ export function buildDNRRules(rules: Rule[]): chrome.declarativeNetRequest.Rule[
 export function findActivelyChangedRules(newRules: Rule[], oldRules: Rule[]): Rule[] {
   return newRules.filter((newRule) => {
     const oldRule = oldRules.find((r) => r.id === newRule.id);
+
+    // Special case: If pausedUntil was removed (expired or manually unpaused),
+    // we consider it a transition to active, regardless of what shouldRuleApply says about the old rule
+    // (because shouldRuleApply uses Date.now(), which might make the old rule appear active if it expired)
+    if (oldRule?.pausedUntil && !newRule.pausedUntil && newRule.active) {
+      return true;
+    }
+
     const isNowActive = shouldRuleApply(newRule);
     const wasActive = oldRule ? shouldRuleApply(oldRule) : false;
     return isNowActive && !wasActive;

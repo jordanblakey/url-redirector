@@ -8,7 +8,6 @@ test.describe('URL Redirector Pause Functionality', () => {
 
   test('should toggle rule pause state', async ({ page, httpServer, extensionId, context }) => {
     const worker = await getServiceWorker(context);
-    await worker.evaluate(() => (self as any).setForceLocalStorage(true));
     const source = httpServer; // Use the actual server URL as source
     const target = 'http://example.com';
 

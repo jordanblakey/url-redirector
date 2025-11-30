@@ -71,7 +71,7 @@ export const test = base.extend<
       ],
     });
     await context.addInitScript(() => {
-      (window as any).FORCE_LOCAL_STORAGE = true;
+      // No need to force local storage anymore
     });
     await use(context);
     await context.close();

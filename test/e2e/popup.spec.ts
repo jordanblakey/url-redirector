@@ -192,45 +192,53 @@ test.describe('URL Redirector Popup', () => {
     await expect(countSpan).toContainText('Used 0 times');
 
     // Case 1: Singular
-    await page.evaluate(() => {
-      return new Promise<void>((resolve) => {
+    await page.evaluate(async () => {
+      return new Promise<void>((resolve, reject) => {
         chrome.storage.local.get(['rules'], (result) => {
-          const rules = result.rules as Rule[];
-          if (rules && rules.length > 0) {
-            rules[0].count = 1;
-            // Clear lastCountMessage to force regeneration
-            delete rules[0].lastCountMessage;
-            chrome.storage.local.set({ rules }, resolve);
-          } else {
-            resolve();
+          const rules = result.rules as any;
+          if (!rules || rules.length === 0) {
+            reject(new Error(`No rules found. Result: ${JSON.stringify(result)}`));
+            return;
           }
+          rules[0].count = 1;
+          delete rules[0].lastCountMessage;
+          chrome.storage.local.set({ rules }, () => {
+            if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+            } else {
+              resolve();
+            }
+          });
         });
       });
     });
     // Reload to force re-render
     await page.reload();
-    await expect(countSpan).toContainText('1');
-    // We can't easily check for "time" vs "times" generically without knowing the message,
-    // but we can check that it's NOT "Used 0 times"
-    await expect(countSpan).not.toContainText('Used 0 times');
+    await expect(countSpan.locator('.count-value')).toHaveText('1');
 
     // Case 2: Plural
-    await page.evaluate(() => {
-      return new Promise<void>((resolve) => {
+    await page.evaluate(async () => {
+      return new Promise<void>((resolve, reject) => {
         chrome.storage.local.get(['rules'], (result) => {
-          const rules = result.rules as Rule[];
-          if (rules && rules.length > 0) {
-            rules[0].count = 5;
-            delete rules[0].lastCountMessage;
-            chrome.storage.local.set({ rules }, resolve);
-          } else {
-            resolve();
+          const rules = result.rules as any;
+          if (!rules || rules.length === 0) {
+            reject(new Error(`No rules found. Result: ${JSON.stringify(result)}`));
+            return;
           }
+          rules[0].count = 5;
+          delete rules[0].lastCountMessage;
+          chrome.storage.local.set({ rules }, () => {
+            if (chrome.runtime.lastError) {
+              reject(chrome.runtime.lastError);
+            } else {
+              resolve();
+            }
+          });
         });
       });
     });
     await page.reload();
-    await expect(countSpan).toContainText('5');
+    await expect(countSpan.locator('.count-value')).toHaveText('5');
   });
 
   test('should have tabindex="-1" on placeholder buttons to skip tab order', async ({ page }) => {

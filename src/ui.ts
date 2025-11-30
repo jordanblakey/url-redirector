@@ -12,6 +12,56 @@ import {
   extractPlaceholderValue,
   getNextRuleState,
 } from './ui-logic.js';
+import { storage } from './storage.js';
+
+export async function handleAddRule(
+  source: string,
+  target: string,
+  onSuccess: () => Promise<void>,
+): Promise<void> {
+  try {
+    await storage.addRule({
+      source,
+      target,
+      id: Date.now(),
+      count: 0,
+      active: true,
+    });
+    await onSuccess();
+    showFlashMessage('Rule added successfully!', 'success');
+  } catch (e) {
+    const error = e as Error;
+    if (error.message === 'Duplicate source') {
+      showFlashMessage('Duplicate source. A rule for this source URL already exists.', 'error');
+    } else if (error.message === 'Redirect loop detected') {
+      showFlashMessage('Are you mad?! This would create an infinite loop!', 'error');
+    } else {
+      showFlashMessage('Error adding rule.', 'error');
+    }
+  }
+}
+
+export async function handleDeleteRule(
+  id: number,
+  onSuccess: (rules: Rule[]) => void,
+): Promise<void> {
+  const newRules = await storage.deleteRule(id);
+  onSuccess(newRules);
+  showFlashMessage('Rule deleted.', 'info');
+}
+
+export async function handleToggleRule(
+  id: number,
+  onSuccess: (rules: Rule[]) => void,
+): Promise<void> {
+  const rules = await storage.getRules();
+  const rule = rules.find((r) => r.id === id);
+  if (rule) {
+    toggleRuleState(rule);
+    await storage.saveRules(rules);
+    onSuccess(rules);
+  }
+}
 
 export function showFlashMessage(
   message: string,
