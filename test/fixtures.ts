@@ -235,8 +235,15 @@ export const test = base.extend<
     async ({}, use) => {
       const testHtmlContent = `<!DOCTYPE html><html><head><title>Test Page</title></head><body><h1>Content Script Test</h1></body></html>`;
       const server = http.createServer((req, res) => {
-        res.writeHead(200, { 'Content-Type': 'text/html' });
-        res.end(testHtmlContent);
+        if (req.url === '/sw.js') {
+          res.writeHead(200, { 'Content-Type': 'application/javascript' });
+          res.end(
+            `self.addEventListener('install', () => self.skipWaiting()); self.addEventListener('activate', () => self.clients.claim());`,
+          );
+        } else {
+          res.writeHead(200, { 'Content-Type': 'text/html' });
+          res.end(testHtmlContent);
+        }
       });
 
       let port = 0;
