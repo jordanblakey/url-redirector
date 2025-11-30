@@ -1,11 +1,6 @@
 ## User Facing
-*   Fixed an issue where only the first rule in a redirect chain would be counted; now all transitive redirects are accurately tracked.
-*   Introduced robust prevention for redirect loops, ensuring rules cannot create direct or indirect infinite redirection chains.
-*   Enabled real-time updates for redirect counts in the UI, providing immediate feedback on rule activity.
-*   Added new features including Shuffle Mode, Snooze functionality, and automatic unpausing of rules, alongside general UI improvements and bug fixes for pausing and badge timers.
+*   Redirect rules now function correctly on PWA (Progressive Web App) sites.
 
 ## Technical Highlights
-*   **Major overhaul and optimization of the testing infrastructure:** Migrated to Vitest, significantly reduced E2E test bloat and flakiness, and improved test coverage.
-*   **Enhanced CI/CD pipelines and release automation:** Integrated linting, formatting, pre-commit/pre-push hooks, improved Chrome Web Store submission, added AI changelog generation, and addressed several security alerts in workflows.
-*   **Significant improvements to code quality and maintainability:** Added comprehensive TypeScript type annotations, refactored core logic for better testability, and removed dead code.
-*   **Updated and expanded project documentation:** Introduced new guides for CWS asset creation, detailed testing framework configurations, and added architectural diagrams for the build and release processes.
+*   Implemented service worker suppression in content scripts.
+*   Added corresponding documentation and E2E tests for service worker suppression.
