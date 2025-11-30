@@ -107,15 +107,18 @@ test.describe('Rule Count Updates', () => {
 
     // Verify both rule counts incremented
     await expect
-      .poll(async () => {
-        const rules = await worker.evaluate(async () => {
-          const { rules } = (await chrome.storage.sync.get('rules')) as { rules: Rule[] };
-          return rules.filter((r) => [1001, 1002].includes(r.id));
-        });
-        const rule1 = rules.find((r) => r.id === 1001);
-        const rule2 = rules.find((r) => r.id === 1002);
-        return rule1?.count === 1 && rule2?.count === 1;
-      }, { timeout: 5000 })
+      .poll(
+        async () => {
+          const rules = await worker.evaluate(async () => {
+            const { rules } = (await chrome.storage.sync.get('rules')) as { rules: Rule[] };
+            return rules.filter((r) => [1001, 1002].includes(r.id));
+          });
+          const rule1 = rules.find((r) => r.id === 1001);
+          const rule2 = rules.find((r) => r.id === 1002);
+          return rule1?.count === 1 && rule2?.count === 1;
+        },
+        { timeout: 5000 },
+      )
       .toBe(true);
   });
 });
