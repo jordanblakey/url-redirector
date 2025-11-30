@@ -4,6 +4,15 @@ import { generateRuleId } from './utils.js';
 import { getRandomMessage } from './messages.js';
 import { storage } from './storage.js';
 
+// Expose for testing
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(self as any).storage = storage;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+(self as any).setForceLocalStorage = (value: boolean) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (self as any).FORCE_LOCAL_STORAGE = value;
+};
+
 let rulesMap: Map<number, Rule> | null = null;
 const processedRedirects: Map<number, Set<number>> = new Map();
 
@@ -65,10 +74,12 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
   // 2. Detect Failed Cleanup (Late) - for URL Cleanup
   // If content script didn't run (e.g. error page), clean up here
-  if (changeInfo.status === 'complete' && tab.url && tab.url.includes('url_redirector=')) {
-    const url = new URL(tab.url);
-    url.searchParams.delete('url_redirector');
-    chrome.tabs.update(tabId, { url: url.toString() });
+  if (changeInfo.status === 'complete') {
+    if (tab.url && tab.url.includes('url_redirector=')) {
+      const url = new URL(tab.url);
+      url.searchParams.delete('url_redirector');
+      chrome.tabs.update(tabId, { url: url.toString() });
+    }
     processedRedirects.delete(tabId);
   }
 });
@@ -92,7 +103,12 @@ chrome.runtime.onMessage.addListener(async (message) => {
 
 // Listen for rule changes
 chrome.storage.onChanged.addListener(async (changes, areaName) => {
-  if (areaName === 'sync' && changes.rules) {
+  // Check if we should process this change based on storage mode
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const useLocal = (self as any).FORCE_LOCAL_STORAGE;
+  const isValidArea = (areaName === 'sync' && !useLocal) || (areaName === 'local' && useLocal);
+
+  if (isValidArea && changes.rules) {
     const newRules = (changes.rules.newValue || []) as Rule[];
     const oldRules = (changes.rules.oldValue || []) as Rule[];
 

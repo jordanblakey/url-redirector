@@ -4,6 +4,7 @@ import { Rule } from '../../src/types';
 test.describe('Rule Count Updates', () => {
   test('should increment rule count after redirect', async ({ context }) => {
     const worker = await getServiceWorker(context);
+    await worker.evaluate(() => (self as any).setForceLocalStorage(true));
 
     // Add rule
     await worker.evaluate(async () => {
@@ -16,7 +17,7 @@ test.describe('Rule Count Updates', () => {
           id: 999,
         },
       ];
-      await chrome.storage.sync.set({ rules });
+      await (self as any).storage.saveRules(rules);
     });
 
     // Open a tab to the source URL
@@ -30,7 +31,7 @@ test.describe('Rule Count Updates', () => {
     await expect
       .poll(async () => {
         return await worker.evaluate(async () => {
-          const { rules } = (await chrome.storage.sync.get('rules')) as { rules: any[] };
+          const rules = await (self as any).storage.getRules();
           return rules.find((r: any) => r.id === 999)?.count;
         });
       })
@@ -39,6 +40,7 @@ test.describe('Rule Count Updates', () => {
 
   test('should increment count for normalized matches', async ({ context }) => {
     const worker = await getServiceWorker(context);
+    await worker.evaluate(() => (self as any).setForceLocalStorage(true));
 
     // Add rule with specific casing/protocol
     await worker.evaluate(async () => {
@@ -51,7 +53,7 @@ test.describe('Rule Count Updates', () => {
           id: 1000,
         },
       ];
-      await chrome.storage.sync.set({ rules });
+      await (self as any).storage.saveRules(rules);
     });
 
     // Open a tab to the source URL with different casing/protocol
@@ -65,7 +67,7 @@ test.describe('Rule Count Updates', () => {
     await expect
       .poll(async () => {
         return await worker.evaluate(async () => {
-          const { rules } = (await chrome.storage.sync.get('rules')) as { rules: any[] };
+          const rules = await (self as any).storage.getRules();
           return rules.find((r: any) => r.id === 1000)?.count;
         });
       })
@@ -74,6 +76,7 @@ test.describe('Rule Count Updates', () => {
 
   test('should increment counts for transitive redirects', async ({ context }) => {
     const worker = await getServiceWorker(context);
+    await worker.evaluate(() => (self as any).setForceLocalStorage(true));
 
     // Add rules: a.com -> b.com -> c.com
     await worker.evaluate(async () => {
@@ -81,7 +84,7 @@ test.describe('Rule Count Updates', () => {
         { id: 1001, source: 'a.com', target: 'b.com', active: true, count: 0 },
         { id: 1002, source: 'b.com', target: 'c.com', active: true, count: 0 },
       ];
-      await chrome.storage.sync.set({ rules });
+      await (self as any).storage.saveRules(rules);
     });
 
     // Open a tab to the source URL
@@ -110,11 +113,10 @@ test.describe('Rule Count Updates', () => {
       .poll(
         async () => {
           const rules = await worker.evaluate(async () => {
-            const { rules } = (await chrome.storage.sync.get('rules')) as { rules: Rule[] };
-            return rules.filter((r) => [1001, 1002].includes(r.id));
+            return await (self as any).storage.getRules();
           });
-          const rule1 = rules.find((r) => r.id === 1001);
-          const rule2 = rules.find((r) => r.id === 1002);
+          const rule1 = rules.find((r: any) => r.id === 1001);
+          const rule2 = rules.find((r: any) => r.id === 1002);
           return rule1?.count === 1 && rule2?.count === 1;
         },
         { timeout: 5000 },

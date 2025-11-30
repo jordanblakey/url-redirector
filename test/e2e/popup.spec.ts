@@ -194,13 +194,13 @@ test.describe('URL Redirector Popup', () => {
     // Case 1: Singular
     await page.evaluate(() => {
       return new Promise<void>((resolve) => {
-        chrome.storage.sync.get(['rules'], (result) => {
+        chrome.storage.local.get(['rules'], (result) => {
           const rules = result.rules as Rule[];
           if (rules && rules.length > 0) {
             rules[0].count = 1;
             // Clear lastCountMessage to force regeneration
             delete rules[0].lastCountMessage;
-            chrome.storage.sync.set({ rules }, resolve);
+            chrome.storage.local.set({ rules }, resolve);
           } else {
             resolve();
           }
@@ -217,12 +217,12 @@ test.describe('URL Redirector Popup', () => {
     // Case 2: Plural
     await page.evaluate(() => {
       return new Promise<void>((resolve) => {
-        chrome.storage.sync.get(['rules'], (result) => {
+        chrome.storage.local.get(['rules'], (result) => {
           const rules = result.rules as Rule[];
           if (rules && rules.length > 0) {
             rules[0].count = 5;
             delete rules[0].lastCountMessage;
-            chrome.storage.sync.set({ rules }, resolve);
+            chrome.storage.local.set({ rules }, resolve);
           } else {
             resolve();
           }
