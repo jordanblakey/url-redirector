@@ -10,6 +10,7 @@ describe('Storage', () => {
     global.chrome = {
       runtime: {
         lastError: null,
+        sendMessage: vi.fn(),
       },
       storage: {
         sync: {

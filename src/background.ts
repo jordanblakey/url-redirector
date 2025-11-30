@@ -1,10 +1,11 @@
-import { Rule } from './types';
+import { Rule, CompressedStorageResult } from './types';
 import { buildDNRRules, findActivelyChangedRules, findMatchingTabs } from './background-logic.js';
 import { generateRuleId } from './utils.js';
 import { getRandomMessage } from './messages.js';
-import { storage } from './storage.js';
+import { storage, syncToCloud, syncFromCloud, decompressRules } from './storage.js';
 
 let rulesMap: Map<number, Rule> | null = null;
+let syncTimeout: NodeJS.Timeout | null = null;
 
 async function ensureRulesMap(rules?: Rule[]) {
   if (rulesMap && !rules) return;
@@ -18,10 +19,12 @@ async function ensureRulesMap(rules?: Rule[]) {
 
 // Initialize rules on load
 chrome.runtime.onInstalled.addListener(async () => {
+  await syncFromCloud();
   await updateDynamicRules();
 });
 
 chrome.runtime.onStartup.addListener(async () => {
+  await syncFromCloud();
   await updateDynamicRules();
 });
 
@@ -67,6 +70,22 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   }
 });
 
+function scheduleSync() {
+  if (syncTimeout) {
+    clearTimeout(syncTimeout);
+  }
+  syncTimeout = setTimeout(async () => {
+    console.debug('Syncing rules to cloud...');
+    const rules = await storage.getRules();
+    try {
+      await syncToCloud(rules);
+      console.debug('Sync successful.');
+    } catch (e) {
+      console.error('Sync failed:', e);
+    }
+  }, 5000); // 5 second debounce
+}
+
 // Listen for messages from popup or options page
 chrome.runtime.onMessage.addListener(async (message) => {
   if (message.type === 'RULES_UPDATED') {
@@ -77,43 +96,66 @@ chrome.runtime.onMessage.addListener(async (message) => {
     if (activeRules.length > 0) {
       await scanAndRedirect(activeRules);
     }
+    scheduleSync();
   }
 });
 
-// Listen for rule changes
+// Listen for rule changes from the cloud
 chrome.storage.onChanged.addListener(async (changes, areaName) => {
-  if (areaName === 'sync' && changes.rules) {
-    const newRules = (changes.rules.newValue || []) as Rule[];
-    const oldRules = (changes.rules.oldValue || []) as Rule[];
+  if (areaName === 'sync') {
+    console.debug('Cloud rules changed, syncing from cloud...');
 
-    // Update cache
-    await ensureRulesMap(newRules);
+    // De-chunk and de-compress the rules from the sync change event
+    const chunks = Object.keys(changes)
+      .filter(key => key.startsWith('rules_chunk_'))
+      .sort()
+      .map(key => changes[key].newValue as string);
 
-    // Check if we need to update DNR rules
-    // We only update if source, target, or active status changed, or if rules were added/removed
-    const hasLogicChanged =
-      JSON.stringify(
-        newRules.map((r) => ({ s: r.source, t: r.target, a: r.active, p: r.pausedUntil })),
-      ) !==
-      JSON.stringify(
-        oldRules.map((r) => ({ s: r.source, t: r.target, a: r.active, p: r.pausedUntil })),
-      );
-
-    if (hasLogicChanged) {
-      console.debug('Rules logic changed, updating DNR rules...');
-      await updateDynamicRules(newRules);
-    } else {
-      console.debug('Only counts changed, skipping DNR update.');
+    const jsonStr = chunks.join('');
+    if (!jsonStr) {
+      console.warn('No rules found in sync change event, possibly a deletion.');
+      await storage.saveRules([]); // Clear local rules if cloud is empty
+      await updateDynamicRules([]);
+      return;
     }
 
-    // Find rules that are new or have become active
-    const activeRules = findActivelyChangedRules(newRules, oldRules);
+    try {
+      const compressedRules = JSON.parse(jsonStr);
+      const newRules = decompressRules(compressedRules);
+      const oldRules = await storage.getRules();
 
-    if (activeRules.length > 0) {
-      await scanAndRedirect(activeRules);
+      // Update local storage and cache
+      await storage.saveRules(newRules);
+      await ensureRulesMap(newRules);
+
+      // Check if we need to update DNR rules
+      const hasLogicChanged =
+        JSON.stringify(
+          newRules.map((r) => ({ s: r.source, t: r.target, a: r.active, p: r.pausedUntil })),
+        ) !==
+        JSON.stringify(
+          oldRules.map((r) => ({ s: r.source, t: r.target, a: r.active, p: r.pausedUntil })),
+        );
+
+      if (hasLogicChanged) {
+        console.debug('Rules logic changed, updating DNR rules...');
+        await updateDynamicRules(newRules);
+      } else {
+        console.debug('Only counts changed, skipping DNR update.');
+      }
+
+      // Find rules that are new or have become active
+      const activeRules = findActivelyChangedRules(newRules, oldRules);
+
+      if (activeRules.length > 0) {
+        await scanAndRedirect(activeRules);
+      }
+    } catch (e) {
+      console.error('Error processing cloud sync change:', e);
     }
   }
 });
+
 
 export async function updateDynamicRules(rules?: Rule[]) {
   await ensureRulesMap(rules);

@@ -20,6 +20,20 @@ export interface StorageResult {
   rules?: Rule[];
 }
 
+export type CompressedRule = [
+  number, // id
+  string, // source
+  string, // target
+  number, // count
+  boolean, // active
+  number | undefined, // pausedUntil
+  string | undefined // lastCountMessage
+];
+
+export interface CompressedStorageResult {
+  [key: string]: string;
+}
+
 export interface RedirectMessage {
   type: 'REDIRECT_DETECTED';
   source: string;
