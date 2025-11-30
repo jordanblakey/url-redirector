@@ -107,11 +107,16 @@ test.describe('Badge Functionality', () => {
     // Mock network for both source and target
     await page.route('**/*', (route) => {
       const url = route.request().url();
-      if (url.includes('a.com')) {
-        return route.fulfill({ status: 200, body: 'Source Page' });
-      }
-      if (url.includes('b.com')) {
-        return route.fulfill({ status: 200, body: 'Target Page' });
+      try {
+        const hostname = new URL(url).hostname;
+        if (hostname === 'a.com') {
+          return route.fulfill({ status: 200, body: 'Source Page' });
+        }
+        if (hostname === 'b.com') {
+          return route.fulfill({ status: 200, body: 'Target Page' });
+        }
+      } catch (e) {
+        // Ignore invalid URLs
       }
       return route.continue();
     });
@@ -152,8 +157,13 @@ test.describe('Badge Functionality', () => {
     // Mock network
     await page.route('**/*', (route) => {
       const url = route.request().url();
-      if (['a.com', 'b.com', 'c.com', 'd.com'].some((d) => url.includes(d))) {
-        return route.fulfill({ status: 200, body: 'Page' });
+      try {
+        const hostname = new URL(url).hostname;
+        if (['a.com', 'b.com', 'c.com', 'd.com'].includes(hostname)) {
+          return route.fulfill({ status: 200, body: 'Page' });
+        }
+      } catch (e) {
+        // Ignore invalid URLs
       }
       return route.continue();
     });
