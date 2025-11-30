@@ -43,10 +43,10 @@ jobs:
           CWS_REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          if [[ "${{ github.event_name }}" == "release" || "${{ inputs.dry_run }}" == "false" ]]; then
-            echo "🚀 Submitting to Chrome Web Store..."
-            npm run cws:submit -- --submit
-          else
+          #if [[ "${{ github.event_name }}" == "release" || "${{ inputs.dry_run }}" == "false" ]]; then
+          #  echo "🚀 Submitting to Chrome Web Store..."
+          #  npm run cws:submit -- --submit
+          #else
             echo "🧪 Performing Dry Run..."
             npm run cws:submit
-          fi
+          #fi
