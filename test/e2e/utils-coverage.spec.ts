@@ -6,6 +6,8 @@ test.describe('Utils Coverage - E2E', () => {
       context,
       extensionId,
     }) => {
+      const worker = await getServiceWorker(context);
+      await worker.evaluate(() => (self as any).setForceLocalStorage(true));
       // Go to popup and add a rule
       const popup = await context.newPage();
       await popup.goto(`chrome-extension://${extensionId}/html/popup.html`);
@@ -25,6 +27,8 @@ test.describe('Utils Coverage - E2E', () => {
     });
 
     test('should handle www normalization', async ({ context, extensionId }) => {
+      const worker = await getServiceWorker(context);
+      await worker.evaluate(() => (self as any).setForceLocalStorage(true));
       // Go to popup and add a rule
       const popup = await context.newPage();
       await popup.goto(`chrome-extension://${extensionId}/html/popup.html`);
@@ -44,6 +48,8 @@ test.describe('Utils Coverage - E2E', () => {
     });
 
     test('should add https protocol to target if missing', async ({ context, extensionId }) => {
+      const worker = await getServiceWorker(context);
+      await worker.evaluate(() => (self as any).setForceLocalStorage(true));
       // Go to popup and add a rule
       const popup = await context.newPage();
       await popup.goto(`chrome-extension://${extensionId}/html/popup.html`);
@@ -68,6 +74,8 @@ test.describe('Utils Coverage - E2E', () => {
     });
 
     test('should match URL with path', async ({ context, extensionId }) => {
+      const worker = await getServiceWorker(context);
+      await worker.evaluate(() => (self as any).setForceLocalStorage(true));
       // Go to popup and add a rule
       const popup = await context.newPage();
       await popup.goto(`chrome-extension://${extensionId}/html/popup.html`);

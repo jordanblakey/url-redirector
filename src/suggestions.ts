@@ -64,7 +64,6 @@ const rawProductiveSites: SiteData[] = [
   { url: 'ted.com', category: 'learning' },
   { url: 'investopedia.com', category: 'learning' },
   { url: 'wtamu.edu/~cbaird/sq/', category: 'learning' },
-  { url: 'human-anatomy.com', category: 'learning' },
   { url: 'freecodecamp.org', category: 'learning' },
   { url: 'edx.org', category: 'learning' },
   { url: 'futurelearn.com', category: 'learning' },
@@ -83,7 +82,7 @@ const rawProductiveSites: SiteData[] = [
   { url: 'longreads.com', category: 'reading' },
   { url: 'farnamstreetblog.com', category: 'reading' },
   { url: 'waitbutwhy.com', category: 'reading' },
-  { url: 'jstor.org/open', category: 'reading' },
+  { url: 'jstor.org', category: 'reading' },
 
   // --- CULTURE & CURIOSITY ---
   { url: 'atlasobscura.com/random', category: 'culture' },

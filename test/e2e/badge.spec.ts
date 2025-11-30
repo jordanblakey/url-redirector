@@ -3,9 +3,10 @@ import { test, expect, getServiceWorker } from '../fixtures';
 test.describe('Badge Functionality', () => {
   test('should not show badge if rule is inactive', async ({ context, page }) => {
     const worker = await getServiceWorker(context);
+    await worker.evaluate(() => (self as any).setForceLocalStorage(true));
     await worker.evaluate(async () => {
       const rules = [{ source: 'example.org', target: 'google.com', active: false, count: 0 }];
-      await chrome.storage.sync.set({ rules });
+      await (self as any).storage.saveRules(rules);
     });
 
     // Navigate to the source URL
@@ -25,11 +26,12 @@ test.describe('Badge Functionality', () => {
 
   test('should show badge count after redirect', async ({ context, page }) => {
     const worker = await getServiceWorker(context);
+    await worker.evaluate(() => (self as any).setForceLocalStorage(true));
     await worker.evaluate(async () => {
       const rules = [
         { source: 'badge-test.com', target: 'google.com', active: true, count: 0, id: 300 },
       ];
-      await chrome.storage.sync.set({ rules });
+      await (self as any).storage.saveRules(rules);
     });
 
     // Mock network to avoid external dependencies
@@ -57,11 +59,12 @@ test.describe('Badge Functionality', () => {
 
   test('should increment badge count on subsequent redirects', async ({ context, page }) => {
     const worker = await getServiceWorker(context);
+    await worker.evaluate(() => (self as any).setForceLocalStorage(true));
     await worker.evaluate(async () => {
       const rules = [
         { source: 'badge-increment.com', target: 'google.com', active: true, count: 0, id: 301 },
       ];
-      await chrome.storage.sync.set({ rules });
+      await (self as any).storage.saveRules(rules);
     });
 
     // Mock network

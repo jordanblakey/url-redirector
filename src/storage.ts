@@ -3,6 +3,10 @@ import { detectLoop } from './utils.js';
 
 const getStorage = (): Promise<chrome.storage.StorageArea> => {
   return new Promise((resolve) => {
+    if (globalThis.FORCE_LOCAL_STORAGE) {
+      resolve(chrome.storage.local);
+      return;
+    }
     chrome.storage.sync.get(null, () => {
       if (chrome.runtime.lastError) {
         resolve(chrome.storage.local);
