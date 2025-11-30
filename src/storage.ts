@@ -68,6 +68,7 @@ export const storage = {
     }
 
     // Fallback: Try to load from compressed sync format (cold start on new device)
+    // We don't know how many chunks, so we get all
     const syncData = await chrome.storage.sync.get(null);
     const compressedRules: CompressedRule[] = [];
     Object.keys(syncData).forEach((key) => {
@@ -96,11 +97,23 @@ export const storage = {
     if (globalThis.FORCE_LOCAL_STORAGE) return;
 
     // 2. Notify background to schedule a sync
+    // We catch errors because this might be called from background itself or context where runtime is not available (?)
+    // But runtime.sendMessage should be available.
     try {
       chrome.runtime.sendMessage({ type: 'SCHEDULE_SYNC' });
+      // We also send RULES_UPDATED so background can update DNR rules immediately
+      // (Wait, background handles RULES_UPDATED separately. We should probably keep using it)
+      // Actually, let's piggyback or send both.
+      // background.ts listens for RULES_UPDATED to update DNR.
+      // background.ts listens for SCHEDULE_SYNC to update Sync Storage.
       chrome.runtime.sendMessage({ type: 'RULES_UPDATED' });
     } catch (e) {
-      // Ignore errors if context invalid
+      // If we are in background, sendMessage might fail if no listeners? No, background can listen to itself?
+      // Actually, chrome.runtime.sendMessage sends to other parts.
+      // If we are IN background, we should handle it directly.
+      // We can detect if we are in background SW?
+      // Checking for window object? ServiceWorkerGlobalScope?
+      // Let's safe guard.
     }
   },
 
@@ -159,15 +172,21 @@ export const storage = {
 
   // Internal: Called by background script when sync storage changes
   syncFromCloud: async (changes: { [key: string]: chrome.storage.StorageChange }): Promise<void> => {
+    // If any rules_chunk_ changed, we need to rebuild
     const hasRuleChanges = Object.keys(changes).some(
       (key) => key.startsWith('rules_chunk_') || key === 'rules'
     );
 
     if (!hasRuleChanges) return;
 
+    // Fetch all chunks
     const syncData = await chrome.storage.sync.get(null);
     const compressedRules: CompressedRule[] = [];
 
+    // Sort keys to ensure order?
+    // rules_chunk_0, rules_chunk_1... default sort might be lexicographical which works for 0-9 but 10 vs 2?
+    // keys are rules_chunk_0, rules_chunk_1.
+    // We should parse index.
     const keys = Object.keys(syncData).filter(k => k.startsWith('rules_chunk_'));
     keys.sort((a, b) => {
       const idxA = parseInt(a.replace('rules_chunk_', ''), 10);
@@ -180,9 +199,12 @@ export const storage = {
       compressedRules.push(...chunk);
     });
 
-    // Also handle legacy 'rules' key if it appeared
+    // Also handle legacy 'rules' key if it appeared (though we try to delete it)
     if (syncData.rules) {
+       // Merge or prefer compressed?
+       // If compressed exists, it's newer format.
        if (compressedRules.length === 0) {
+         // Maybe just legacy
          const legacyRules = syncData.rules as Rule[];
          await chrome.storage.local.set({ rules: legacyRules });
          return;
@@ -192,10 +214,12 @@ export const storage = {
     if (compressedRules.length > 0) {
       const rules = compressedRules.map(decompressRule);
       await chrome.storage.local.set({ rules });
+      // Notify so background can update DNR
       try {
           chrome.runtime.sendMessage({ type: 'RULES_UPDATED' });
       } catch (e) {
-          // Ignore
+          // If called from background, this message might not be needed if we call updateDynamicRules directly
+          // But sending message is safe pattern
       }
     }
   },
