@@ -5,6 +5,7 @@ import { getRandomMessage } from './messages.js';
 import { storage } from './storage.js';
 
 let rulesMap: Map<number, Rule> | null = null;
+let syncTimer: ReturnType<typeof setTimeout> | null = null;
 
 async function ensureRulesMap(rules?: Rule[]) {
   if (rulesMap && !rules) return;
@@ -77,12 +78,30 @@ chrome.runtime.onMessage.addListener(async (message) => {
     if (activeRules.length > 0) {
       await scanAndRedirect(activeRules);
     }
+  } else if (message.type === 'SCHEDULE_SYNC') {
+    console.debug('Scheduling sync to cloud...');
+    if (syncTimer) {
+      clearTimeout(syncTimer);
+    }
+    syncTimer = setTimeout(async () => {
+      try {
+        await storage.syncToCloud();
+        syncTimer = null;
+      } catch (e) {
+        console.error('Sync failed:', e);
+      }
+    }, 5000);
   }
 });
 
 // Listen for rule changes
 chrome.storage.onChanged.addListener(async (changes, areaName) => {
-  if (areaName === 'sync' && changes.rules) {
+  if (areaName === 'sync') {
+    // Cloud changed, update local
+    await storage.syncFromCloud(changes);
+  } else if (areaName === 'local' && changes.rules) {
+    // Local cache changed (either from UI or from Sync)
+    // We update DNR and redirects
     const newRules = (changes.rules.newValue || []) as Rule[];
     const oldRules = (changes.rules.oldValue || []) as Rule[];
 
@@ -90,7 +109,6 @@ chrome.storage.onChanged.addListener(async (changes, areaName) => {
     await ensureRulesMap(newRules);
 
     // Check if we need to update DNR rules
-    // We only update if source, target, or active status changed, or if rules were added/removed
     const hasLogicChanged =
       JSON.stringify(
         newRules.map((r) => ({ s: r.source, t: r.target, a: r.active, p: r.pausedUntil })),
