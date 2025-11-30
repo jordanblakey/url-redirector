@@ -5,6 +5,7 @@ import { getRandomMessage } from './messages.js';
 import { storage } from './storage.js';
 
 let rulesMap: Map<number, Rule> | null = null;
+const processedRedirects: Map<number, Set<number>> = new Map();
 
 async function ensureRulesMap(rules?: Rule[]) {
   if (rulesMap && !rules) return;
@@ -35,10 +36,14 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
     if (source) {
       await ensureRulesMap();
+      if (!processedRedirects.has(tabId)) {
+        processedRedirects.set(tabId, new Set());
+      }
+      const processed = processedRedirects.get(tabId)!;
       const ids = source.split(',').map((s) => parseInt(s, 10));
 
       for (const id of ids) {
-        if (isNaN(id)) continue;
+        if (isNaN(id) || processed.has(id)) continue;
 
         const rule = rulesMap?.get(id);
         if (rule) {
@@ -52,7 +57,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
           const countMessage = getRandomMessage(rule.count + 1);
           await storage.incrementCount(rule.id, 1, countMessage);
           showBadge(rule.count + 1);
-          break;
+          processed.add(id);
         }
       }
     }
@@ -64,7 +69,12 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
     const url = new URL(tab.url);
     url.searchParams.delete('url_redirector');
     chrome.tabs.update(tabId, { url: url.toString() });
+    processedRedirects.delete(tabId);
   }
+});
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  processedRedirects.delete(tabId);
 });
 
 // Listen for messages from popup or options page

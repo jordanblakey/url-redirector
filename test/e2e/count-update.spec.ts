@@ -71,4 +71,51 @@ test.describe('Rule Count Updates', () => {
       })
       .toBe(1);
   });
+
+  test('should increment counts for transitive redirects', async ({ context }) => {
+    const worker = await getServiceWorker(context);
+
+    // Add rules: a.com -> b.com -> c.com
+    await worker.evaluate(async () => {
+      const rules: Rule[] = [
+        { id: 1001, source: 'a.com', target: 'b.com', active: true, count: 0 },
+        { id: 1002, source: 'b.com', target: 'c.com', active: true, count: 0 },
+      ];
+      await chrome.storage.sync.set({ rules });
+    });
+
+    // Open a tab to the source URL
+    const page = await context.newPage();
+
+    // Mock network requests to avoid DNS errors
+    await page.route('**/*', (route) => {
+      const url = route.request().url();
+      if (['a.com', 'b.com', 'c.com'].some((d) => url.includes(d))) {
+        return route.fulfill({
+          status: 200,
+          contentType: 'text/html',
+          body: `<html><body>Mock for ${url}</body></html>`,
+        });
+      }
+      return route.continue();
+    });
+
+    await page.goto('https://a.com');
+
+    // Verify redirect
+    await expect(page).toHaveURL(/c\.com/);
+
+    // Verify both rule counts incremented
+    await expect
+      .poll(async () => {
+        const rules = await worker.evaluate(async () => {
+          const { rules } = (await chrome.storage.sync.get('rules')) as { rules: Rule[] };
+          return rules.filter((r) => [1001, 1002].includes(r.id));
+        });
+        const rule1 = rules.find((r) => r.id === 1001);
+        const rule2 = rules.find((r) => r.id === 1002);
+        return rule1?.count === 1 && rule2?.count === 1;
+      }, { timeout: 5000 })
+      .toBe(true);
+  });
 });
