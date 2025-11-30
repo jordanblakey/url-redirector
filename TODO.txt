@@ -1,6 +1,8 @@
 ## TODO
 [] BRAND: Update 1.2.0 release notes and assets on CWS once it is approved
-[] BUG: Count messages should persist until the count is updated. Fix and write tests.
+[] BUG: Count templated messages should persist until the count is updated. Count templated messages should be the same across devices. Fix and write tests.
+[] FEATURE: In storage, count templated messages can be an enum, and interpolated in the UI. This would save storage space. Fix and write tests.
+[] BUG: When pauses expire, rules should resume immediately. They do not. Manual resume works. Fix and write tests.
 
 ## DELEGATED
 [] CLEANUP: Refactor shared logic from popup.ts and options.ts into ui.ts
