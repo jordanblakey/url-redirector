@@ -22,7 +22,7 @@ describe('Storage', () => {
             const result: any = {};
             keys.forEach((key) => {
               if (mockSync[key] !== undefined) {
-                  result[key] = JSON.parse(JSON.stringify(mockSync[key]));
+                result[key] = JSON.parse(JSON.stringify(mockSync[key]));
               }
             });
             callback(result);
@@ -36,9 +36,9 @@ describe('Storage', () => {
           get: vi.fn((keys: string[], callback: (result: any) => void) => {
             const result: any = {};
             keys.forEach((key) => {
-               if (mockLocal[key] !== undefined) {
-                   result[key] = JSON.parse(JSON.stringify(mockLocal[key]));
-               }
+              if (mockLocal[key] !== undefined) {
+                result[key] = JSON.parse(JSON.stringify(mockLocal[key]));
+              }
             });
             callback(result);
           }),
