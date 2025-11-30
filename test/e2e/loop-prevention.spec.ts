@@ -29,7 +29,7 @@ test.describe('Loop Prevention', () => {
     await page.click('#addRuleBtn');
 
     await expect(page.locator('body')).toContainText(
-      'Are you mad?! This rule would create an infinite loop!',
+      'Are you mad?! This would create an infinite loop!',
     );
   });
 });

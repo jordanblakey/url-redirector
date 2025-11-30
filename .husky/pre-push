@@ -4,6 +4,9 @@ set -e
 # Check types in case did not npm run build (which runs tsc)
 npm run type-check
 
+# Lint check
+npx eslint .
+
 # Check formatting
 npx prettier --check .
 
