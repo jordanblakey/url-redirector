@@ -49,8 +49,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
               console.error('Failed to update shuffle rule:', e),
             );
           }
-          const countMessage = getRandomMessage(rule.count + 1);
-          await storage.incrementCount(rule.id, 1, countMessage);
+          await storage.incrementCount(rule.id, 1);
           showBadge(rule.count + 1);
           break;
         }
@@ -155,8 +154,7 @@ export async function scanAndRedirect(activeRules: Rule[]) {
 
     if (rule) {
       const newCount = (rule.count || 0) + incrementBy;
-      const message = getRandomMessage(newCount);
-      await storage.incrementCount(ruleId, incrementBy, message);
+      await storage.incrementCount(ruleId, incrementBy);
       showBadge(newCount);
     }
   }

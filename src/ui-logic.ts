@@ -78,9 +78,6 @@ export function getTargetDisplayText(target: string): string {
  * Pure function to get the count message for a rule
  */
 export function getCountMessage(rule: Rule): string {
-  if (rule.lastCountMessage) {
-    return rule.lastCountMessage;
-  }
   return getRandomMessage(rule.count || 0);
 }
 

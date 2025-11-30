@@ -9,15 +9,33 @@ export interface Rule {
   count: number;
   active: boolean;
   pausedUntil?: number;
-  lastCountMessage?: string;
 }
 
 export interface StorageSchema {
   rules: Rule[];
 }
 
+export type CompressedRule = [
+  id: number,
+  source: string,
+  target: string,
+  count: number,
+  active: 0 | 1,
+  pausedUntil?: number,
+];
+
 export interface StorageResult {
   rules?: Rule[];
+}
+
+export interface CompressedStorageResult {
+  rules?: CompressedRule[];
+  rules_0?: string;
+  rules_1?: string;
+  rules_2?: string;
+  rules_3?: string;
+  rules_4?: string;
+  rules_chunk_count?: number;
 }
 
 export interface RedirectMessage {

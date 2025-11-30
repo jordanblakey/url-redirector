@@ -1,5 +1,8 @@
-import { Rule, StorageResult } from './types';
+import { Rule, CompressedStorageResult, StorageResult } from './types.js';
 import { detectLoop } from './utils.js';
+import { compressRules, decompressRules } from './storage-format.js';
+
+const CHUNK_SIZE = 8000; // Chrome's QUOTA_BYTES_PER_ITEM is 8192
 
 const getStorage = (): Promise<chrome.storage.StorageArea> => {
   return new Promise((resolve) => {
@@ -17,16 +20,58 @@ export const storage = {
   getRules: async (): Promise<Rule[]> => {
     const storageArea = await getStorage();
     return new Promise((resolve) => {
-      storageArea.get(['rules'], (result: StorageResult) => {
-        resolve(result.rules || []);
+      // Check for both old and new storage formats
+      storageArea.get(null, (result: CompressedStorageResult & StorageResult) => {
+        if (result.rules_chunk_count) {
+          // New chunked format
+          const chunkKeys = Array.from({ length: result.rules_chunk_count }, (_, i) => `rules_${i}`);
+          storageArea.get(chunkKeys, (chunks) => {
+            const jsonString = chunkKeys.map((key) => chunks[key]).join('');
+            const compressedRules = JSON.parse(jsonString);
+            resolve(decompressRules(compressedRules));
+          });
+        } else if (result.rules) {
+          // Old format - migrate to new format
+          const rules = result.rules || [];
+          storage.saveRules(rules).then(() => {
+            resolve(rules);
+          });
+        } else {
+          resolve([]);
+        }
       });
     });
   },
 
   saveRules: async (rules: Rule[]): Promise<void> => {
     const storageArea = await getStorage();
-    return new Promise((resolve) => {
-      storageArea.set({ rules }, () => {
+    const compressedRules = compressRules(rules);
+    const jsonString = JSON.stringify(compressedRules);
+
+    const chunks: { [key: string]: string } = {};
+    const numChunks = Math.ceil(jsonString.length / CHUNK_SIZE);
+
+    for (let i = 0; i < numChunks; i++) {
+      chunks[`rules_${i}`] = jsonString.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
+    }
+
+    // First, clear out all old rule data to prevent orphans
+    const oldKeysToRemove = await new Promise<string[]>((resolve) => {
+      storageArea.get(null, (items) => {
+        resolve(Object.keys(items).filter((key) => key.startsWith('rules')));
+      });
+    });
+
+    await new Promise<void>((resolve) => {
+      storageArea.remove(oldKeysToRemove, () => resolve());
+    });
+
+    // Now, save the new chunks
+    await new Promise<void>((resolve) => {
+      storageArea.set({
+        ...chunks,
+        rules_chunk_count: numChunks,
+      }, () => {
         resolve();
       });
     });
@@ -68,14 +113,11 @@ export const storage = {
     return newRules;
   },
 
-  incrementCount: async (id: number, incrementBy: number = 1, message?: string): Promise<void> => {
+  incrementCount: async (id: number, incrementBy: number = 1): Promise<void> => {
     const rules = await storage.getRules();
     const rule = rules.find((r) => r.id === id);
     if (rule) {
       rule.count = (rule.count || 0) + incrementBy;
-      if (message) {
-        rule.lastCountMessage = message;
-      }
       await storage.saveRules(rules);
     }
   },
