@@ -198,11 +198,11 @@ test.describe('URL Redirector Options Page', () => {
     // Case 1: Singular
     await page.evaluate(() => {
       return new Promise<void>((resolve) => {
-        chrome.storage.sync.get(['rules'], (result) => {
+        chrome.storage.local.get(['rules'], (result) => {
           const rules = result.rules as any;
           rules[0].count = 1;
           delete rules[0].lastCountMessage;
-          chrome.storage.sync.set({ rules }, resolve);
+          chrome.storage.local.set({ rules }, resolve);
         });
       });
     });
@@ -213,11 +213,11 @@ test.describe('URL Redirector Options Page', () => {
     // Case 2: Plural
     await page.evaluate(() => {
       return new Promise<void>((resolve) => {
-        chrome.storage.sync.get(['rules'], (result) => {
+        chrome.storage.local.get(['rules'], (result) => {
           const rules = result.rules as any;
           rules[0].count = 5;
           delete rules[0].lastCountMessage;
-          chrome.storage.sync.set({ rules }, resolve);
+          chrome.storage.local.set({ rules }, resolve);
         });
       });
     });
