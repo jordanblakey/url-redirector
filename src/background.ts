@@ -4,12 +4,19 @@ import { generateRuleId } from './utils.js';
 import { getRandomMessage } from './messages.js';
 import { storage } from './storage.js';
 
+// Expose for testing
+self.storage = storage;
+self.setForceLocalStorage = (value: boolean) => {
+  self.FORCE_LOCAL_STORAGE = value;
+};
+
 let rulesMap: Map<number, Rule> | null = null;
 const ALARM_NAME = 'flush_stats';
 const FLUSH_INTERVAL_MIN = 1 / 12; // 5 seconds (1/12 of a minute)
 
 // In-memory buffer for stats (Requirement: "increment a temp_buffer variable in memory")
 const temp_buffer = new Map<number, number>();
+const processedRedirects: Map<number, Set<number>> = new Map();
 
 async function ensureRulesMap(rules?: Rule[]) {
   if (rulesMap && !rules) return;
@@ -34,31 +41,31 @@ chrome.runtime.onStartup.addListener(async () => {
   // Crash Recovery: Check for unsynced stats
   const unsynced = await storage.getUnsyncedDeltas();
   if (unsynced.size > 0) {
-      console.log('Restoring unsynced stats from previous session', unsynced);
-      for (const [id, count] of unsynced) {
-          temp_buffer.set(id, (temp_buffer.get(id) || 0) + count);
-      }
+    console.log('Restoring unsynced stats from previous session', unsynced);
+    for (const [id, count] of unsynced) {
+      temp_buffer.set(id, (temp_buffer.get(id) || 0) + count);
+    }
   }
 });
 
 // Alarm Listener: Flush Buffer
 chrome.alarms.onAlarm.addListener(async (alarm) => {
-    if (alarm.name === ALARM_NAME) {
-        if (temp_buffer.size > 0) {
-            console.debug('Flushing stats buffer to sync...', temp_buffer);
-            try {
-                // "Critical: Perform a safe transaction... Only clear temp_buffer if... successful"
-                await storage.syncStats(temp_buffer);
+  if (alarm.name === ALARM_NAME) {
+    if (temp_buffer.size > 0) {
+      console.debug('Flushing stats buffer to sync...', temp_buffer);
+      try {
+        // "Critical: Perform a safe transaction... Only clear temp_buffer if... successful"
+        await storage.syncStats(temp_buffer);
 
-                // Success: Clear buffer and local backup
-                temp_buffer.clear();
-                await storage.saveUnsyncedDeltas(temp_buffer); // Clears local storage too
-            } catch (e) {
-                console.error('Failed to flush stats to sync:', e);
-                // Buffer remains for next attempt
-            }
-        }
+        // Success: Clear buffer and local backup
+        temp_buffer.clear();
+        await storage.saveUnsyncedDeltas(temp_buffer); // Clears local storage too
+      } catch (e) {
+        console.error('Failed to flush stats to sync:', e);
+        // Buffer remains for next attempt
+      }
     }
+  }
 });
 
 // Listen for redirect messages / detections
@@ -70,10 +77,14 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
     if (source) {
       await ensureRulesMap();
+      if (!processedRedirects.has(tabId)) {
+        processedRedirects.set(tabId, new Set());
+      }
+      const processed = processedRedirects.get(tabId)!;
       const ids = source.split(',').map((s) => parseInt(s, 10));
 
       for (const id of ids) {
-        if (isNaN(id)) continue;
+        if (isNaN(id) || processed.has(id)) continue;
 
         const rule = rulesMap?.get(id);
         if (rule) {
@@ -95,29 +106,27 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
           const countMessage = getRandomMessage(rule.count + 1); // Note: rule.count might be slightly stale if temp_buffer matches
           // We pass 1 as increment. The UI will see the local update.
           await storage.incrementCount(rule.id, 1, countMessage);
-
-          // Update local cache to reflect the new count immediately
-          rule.count = (rule.count || 0) + 1;
-
-          // 3. Persist Buffer (Crash Recovery)
-          // We save the specific delta so we know what hasn't been synced
-          await storage.saveUnsyncedDeltas(temp_buffer);
-
-          // --- BUFFERED SYNC LOGIC END ---
-
-          showBadge(rule.count);
-          break;
+          showBadge(rule.count + 1);
+          processed.add(id);
         }
       }
     }
   }
 
-  // 2. Detect Failed Cleanup (Late)
-  if (changeInfo.status === 'complete' && tab.url && tab.url.includes('url_redirector=')) {
-    const url = new URL(tab.url);
-    url.searchParams.delete('url_redirector');
-    chrome.tabs.update(tabId, { url: url.toString() });
+  // 2. Detect Failed Cleanup (Late) - for URL Cleanup
+  // If content script didn't run (e.g. error page), clean up here
+  if (changeInfo.status === 'complete') {
+    if (tab.url && tab.url.includes('url_redirector=')) {
+      const url = new URL(tab.url);
+      url.searchParams.delete('url_redirector');
+      chrome.tabs.update(tabId, { url: url.toString() });
+    }
+    processedRedirects.delete(tabId);
   }
+});
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  processedRedirects.delete(tabId);
 });
 
 // Listen for messages from popup or options page
@@ -133,7 +142,11 @@ chrome.runtime.onMessage.addListener(async (message) => {
 
 // Listen for rule changes
 chrome.storage.onChanged.addListener(async (changes, areaName) => {
-  if (areaName === 'sync' && changes.rules) {
+  // Check if we should process this change based on storage mode
+  const useLocal = self.FORCE_LOCAL_STORAGE;
+  const isValidArea = (areaName === 'sync' && !useLocal) || (areaName === 'local' && useLocal);
+
+  if (isValidArea && changes.rules) {
     const newRules = (changes.rules.newValue || []) as Rule[];
     const oldRules = (changes.rules.oldValue || []) as Rule[];
 
@@ -199,9 +212,9 @@ export async function scanAndRedirect(activeRules: Rule[]) {
     const rules = await storage.getRules();
     const rule = rules.find((r) => r.id === ruleId);
     if (rule) {
-        const message = getRandomMessage((rule.count || 0) + incrementBy);
-        await storage.incrementCount(ruleId, incrementBy, message);
-        showBadge((rule.count || 0) + incrementBy);
+      const message = getRandomMessage((rule.count || 0) + incrementBy);
+      await storage.incrementCount(ruleId, incrementBy, message);
+      showBadge((rule.count || 0) + incrementBy);
     }
 
     // 3. Persist Buffer

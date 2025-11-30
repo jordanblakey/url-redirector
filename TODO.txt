@@ -1,15 +1,17 @@
-## IDEAS I DON'T LIKE, YET
-[] FEATURE: Users can edit the pool of shuffle urls in the options page.
-
 ## TODO
 [] BRAND: Update 1.2.0 release notes and assets on CWS once it is approved
+[] BUG: Count messages should persist until the count is updated. Fix and write tests.
 
 ## DELEGATED
-[] FEATURE: Sync storage rules to other devices. Convert from localStorage to chrome.storage.sync, with chrome.storage.local as fallback.
+[] CLEANUP: Refactor shared logic from popup.ts and options.ts into ui.ts
+[] FEATURE: Limit calls to chrome.storage.sync so they do not exceed 120 requests per minute. Use chrome.storage.local as the primary storage, using a write through cache strategy.
+[] FEATURE: Storage space quota in chrome.storage.sync is 8kb per entry, 120kb total. 250 entries. Refactor our use of chrome.storage.sync so that we can easily accomodate 500 20char url rules. This could be a combination of using separate entries, serialization, and compression. The implementation details are up to you.
 
 ## DOING
 
 ## DONE
+[x] BUG: Transitive redirects are not being counted. Fix and write tests.
+[x] FEATURE: Sync storage rules to other devices. Convert from localStorage to chrome.storage.sync, with chrome.storage.local as fallback.
 [x] BUG: prevent the creation of rules that would complete a redirect loop. Write tests.
 [x] BUG: When the popup or options page is open, a redirect should immediately update the count as shown in the rule definition.
 [x] BRAND: Create CWS assets
@@ -31,18 +33,18 @@
 [x] BUG: Use flash messages instead of alerts.
 [x] BUG: when new rules are added, reloads should redirect tabs currently on the source url.
 [x] BUG: why are CSS files in the coverage report?
-[x] CHORE: Add architecture diagrams to build and release processes.
-[x] CHORE: bundles should go in a gitignored build/ top level directory.
-[x] CHORE: combine CSS for popup and options pages if feasible.
-[x] CHORE: evaluate the use of 'any' in the codebase. Replace with appropriate types where desirable.
-[x] CHORE: look at all comments in the codebase to make sure they make sense, and are needed.
-[x] CHORE: Refactor duplicated logic in the src folder. Clean old comments, dead code. Particularly in ui.ts. popup.ts. background.ts and options.ts
-[x] CHORE: Remove any css that isn't referenced anywhere. Remove redundant rules. Add section comments grouping related rules. Nest where possible.
-[x] CHORE: reorg to assets/ folder
-[x] CHORE: there are too many top level test directories. playwright-report, test-results, test.
-[x] CHORE: understand the purpose of sourcemaps in dist/ and remove them if not needed. What's the value?
-[x] CHORE: unify tsconfig
-[x] CHORE: Update readme based on recent changes
+[x] CLEANUP: Add architecture diagrams to build and release processes.
+[x] CLEANUP: bundles should go in a gitignored build/ top level directory.
+[x] CLEANUP: combine CSS for popup and options pages if feasible.
+[x] CLEANUP: evaluate the use of 'any' in the codebase. Replace with appropriate types where desirable.
+[x] CLEANUP: look at all comments in the codebase to make sure they make sense, and are needed.
+[x] CLEANUP: Refactor duplicated logic in the src folder. Clean old comments, dead code. Particularly in ui.ts. popup.ts. background.ts and options.ts
+[x] CLEANUP: Remove any css that isn't referenced anywhere. Remove redundant rules. Add section comments grouping related rules. Nest where possible.
+[x] CLEANUP: reorg to assets/ folder
+[x] CLEANUP: there are too many top level test directories. playwright-report, test-results, test.
+[x] CLEANUP: understand the purpose of sourcemaps in dist/ and remove them if not needed. What's the value?
+[x] CLEANUP: unify tsconfig
+[x] CLEANUP: Update readme based on recent changes
 [x] CI: add github action to publish new version to chrome web store
 [x] CI: add github actions to run tests on PR
 [x] CI: add script to run tests suites (Playwright)

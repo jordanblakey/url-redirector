@@ -70,6 +70,9 @@ export const test = base.extend<
         `--load-extension=${path.resolve(__dirname, '../dist')}`,
       ],
     });
+    await context.addInitScript(() => {
+      (window as any).FORCE_LOCAL_STORAGE = true;
+    });
     await use(context);
     await context.close();
     fs.rmSync(userDataDir, { recursive: true, force: true });

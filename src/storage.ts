@@ -3,6 +3,10 @@ import { detectLoop } from './utils.js';
 
 const getStorage = (): Promise<chrome.storage.StorageArea> => {
   return new Promise((resolve) => {
+    if (globalThis.FORCE_LOCAL_STORAGE) {
+      resolve(chrome.storage.local);
+      return;
+    }
     chrome.storage.sync.get(null, () => {
       if (chrome.runtime.lastError) {
         resolve(chrome.storage.local);
@@ -115,7 +119,7 @@ export const storage = {
 
     // If local is empty, populate from sync first to have a base
     if (rules.length === 0) {
-        rules = await storage.getRules();
+      rules = await storage.getRules();
     }
 
     const rule = rules.find((r) => r.id === id);
@@ -137,62 +141,62 @@ export const storage = {
     if (deltas.size === 0) return;
 
     return new Promise((resolve, reject) => {
-        // 1. Fetch current Sync Rules
-        chrome.storage.sync.get(['rules'], (result: StorageResult) => {
-            if (chrome.runtime.lastError) {
-                // If sync is down, we can't flush.
-                // We leave the buffer (handled by caller) and try later.
-                return reject(chrome.runtime.lastError);
-            }
+      // 1. Fetch current Sync Rules
+      chrome.storage.sync.get(['rules'], (result: StorageResult) => {
+        if (chrome.runtime.lastError) {
+          // If sync is down, we can't flush.
+          // We leave the buffer (handled by caller) and try later.
+          return reject(chrome.runtime.lastError);
+        }
 
-            const rules = result.rules || [];
-            let updated = false;
+        const rules = result.rules || [];
+        let updated = false;
 
-            // 2. Apply Deltas
-            for (const [id, delta] of deltas.entries()) {
-                const rule = rules.find(r => r.id === id);
-                if (rule) {
-                    rule.count = (rule.count || 0) + delta;
-                    updated = true;
-                }
-            }
+        // 2. Apply Deltas
+        for (const [id, delta] of deltas.entries()) {
+          const rule = rules.find((r) => r.id === id);
+          if (rule) {
+            rule.count = (rule.count || 0) + delta;
+            updated = true;
+          }
+        }
 
-            if (!updated) {
-                resolve();
-                return;
-            }
+        if (!updated) {
+          resolve();
+          return;
+        }
 
-            // 3. Save back to Sync
-            chrome.storage.sync.set({ rules }, () => {
-                if (chrome.runtime.lastError) {
-                    reject(chrome.runtime.lastError);
-                } else {
-                    resolve();
-                }
-            });
+        // 3. Save back to Sync
+        chrome.storage.sync.set({ rules }, () => {
+          if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError);
+          } else {
+            resolve();
+          }
         });
+      });
     });
   },
 
   // Helper for Crash Recovery
   getUnsyncedDeltas: async (): Promise<Map<number, number>> => {
-      return new Promise((resolve) => {
-          chrome.storage.local.get(['unsynced_deltas'], (result) => {
-               const raw = result.unsynced_deltas || {};
-               // Convert object back to Map (keys are strings in JSON, need Number)
-               const map = new Map<number, number>();
-               for(const k of Object.keys(raw)) {
-                   map.set(Number(k), raw[k]);
-               }
-               resolve(map);
-          });
+    return new Promise((resolve) => {
+      chrome.storage.local.get(['unsynced_deltas'], (result) => {
+        const raw = (result.unsynced_deltas || {}) as Record<string, number>;
+        // Convert object back to Map (keys are strings in JSON, need Number)
+        const map = new Map<number, number>();
+        for (const k of Object.keys(raw)) {
+          map.set(Number(k), raw[k]);
+        }
+        resolve(map);
       });
+    });
   },
 
   saveUnsyncedDeltas: async (deltas: Map<number, number>): Promise<void> => {
-      const obj = Object.fromEntries(deltas);
-      return new Promise((resolve) => {
-          chrome.storage.local.set({ unsynced_deltas: obj }, () => resolve());
-      });
-  }
+    const obj = Object.fromEntries(deltas);
+    return new Promise((resolve) => {
+      chrome.storage.local.set({ unsynced_deltas: obj }, () => resolve());
+    });
+  },
 };
