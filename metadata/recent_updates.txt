@@ -1,11 +1,11 @@
 ## User Facing
-*   Introduced "Shuffle Mode" for redirect rules.
-*   Added "Snooze" functionality to temporarily disable rules.
-*   Improved handling to prevent redirect loops.
-*   Resolved various UI and general bug fixes.
+*   Fixed an issue where transitive redirects were not correctly counted, ensuring all steps in a redirect chain are now accurately recorded.
+*   Introduced logic to prevent the creation of both direct and indirect redirect loops, enhancing rule stability.
+*   Implemented real-time updates for redirect counts in the UI, providing immediate feedback on rule activity.
+*   Resolved issues with the badge timer display, improving the accuracy of status indicators.
 
 ## Technical Highlights
-*   **Major Test Infrastructure Overhaul:** Migrated to Vitest, significantly expanded unit and Playwright E2E test coverage, and optimized slow tests to prevent flakiness.
-*   **CI/CD Enhancements:** Improved workflow files, added GitHub annotations, refined test reporting, and implemented dynamic zip naming for build artifacts.
-*   **Core Logic Refactoring:** Abstracted background and UI logic for improved testability and removed legacy server mocks.
-*   **Deployment and Tooling:** Added a CWS (Chrome Web Store) submission script and updated development dependencies.
+*   Underwent a significant overhaul of the testing infrastructure, including migration to Vitest, CI optimization, and removal of redundant E2E tests.
+*   Enhanced the CI/CD pipeline with improved pre-push hooks, linting, formatting, and automated release process improvements like AI changelog generation.
+*   Reverted the primary storage mechanism from `chrome.storage.sync` back to `chrome.storage.local` to resolve identified bugs and flaky test behavior.
+*   Improved codebase quality and security by adding missing type annotations, removing dead code, and addressing several CodeQL security alerts.
