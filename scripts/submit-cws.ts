@@ -168,6 +168,7 @@ export async function submitCws(options: SubmitCwsOptions) {
                 Instructions:
                 - Use the Template as the base structure.
                 - Replace {{RECENT_UPDATES}} with the "What's New" section.
+                - Include only the user facing changes in the What's New section.
                 - "What's New" Section Logic:
                     - IF Update Type is "patch": Retain the existing "What's New" entries from the Current Description (if any) and APPEND/PREPEND the New Updates. Keep them reverse chronological (newest first).
                     - IF Update Type is "major" or "minor": REPLACE the "What's New" section entirely with the New Updates.

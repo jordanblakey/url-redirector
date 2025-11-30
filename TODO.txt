@@ -1,50 +1,32 @@
 ## TODO
-[] BRAND: Update 1.2.0 release notes and assets on CWS once it is approved
-
-## DELEGATED
 
 ## DOING
 
 ## DONE
-[x] BUG: If the badge is active when showBadge is called, it should reset the badge timer (10 seconds).
-[x] CLEANUP: Refactor shared logic from popup.ts and options.ts into ui.ts
-[x] BUG: Transitive redirects are not being counted. Fix and write tests.
-[x] BUG: When pause expires, it should immediately redirect tabs currently on the source url. Write test.
-[x] BUG: Occasionally, a rule will stop counting. Implementing rapid badge increment tests for single and transitive redirects.
-[x] FEATURE: Sync storage rules to other devices. Convert from localStorage to chrome.storage.sync, with chrome.storage.local as fallback.
-[x] BUG: prevent the creation of rules that would complete a redirect loop. Write tests.
-[x] BUG: When the popup or options page is open, a redirect should immediately update the count as shown in the rule definition.
 [x] BRAND: Create CWS assets
-[x] READ: https://developer.chrome.com/docs/webstore/discovery
-[x] READ: https://developer.chrome.com/docs/webstore/service-accounts
+[x] BRAND: Update 1.2.0 release notes and assets on CWS once it is approved
 [x] BUG: "Active Rules" is a bit misleading with new pause/resume feature. "Redirection Rules"? "Rules"?
 [x] BUG: adding a rule to popup should immediately redirect tabs currently on the source url. Write test.
 [x] BUG: alt layout for coverage report? Hides the pass/fail status and you have to scroll up.
 [x] BUG: Find an unidentified bug, and fix it. Found localStorage race condition.
+[x] BUG: If the badge is active when showBadge is called, it should reset the badge timer (10 seconds).
 [x] BUG: long urls are truncated. Especially in the popup.
+[x] BUG: Occasionally, a rule will stop counting. Implementing rapid badge increment tests for single and transitive redirects.
 [x] BUG: persist badge for 10 seconds
+[x] BUG: prevent the creation of rules that would complete a redirect loop. Write tests.
 [x] BUG: Prevent the entry of rules where a rule with the same source url exists
 [x] BUG: release.yml does not appear to be working. analyze if it is conflicting with the release script. Prepare a summary of the problem. (Summary: It was conflicting/redundant with the local postversion script. Deleted.)
 [x] BUG: resuming should immediately redirect tabs currently on the source url. Write test.
 [x] BUG: Rule validation: must be url, not empty, not duplicate, urls not the same. Write tests.
 [x] BUG: Tab order should skip the copy buttons altogether, in the source and target url fields
+[x] BUG: Transitive redirects are not being counted. Fix and write tests.
 [x] BUG: types.js should not be in dist
 [x] BUG: Unpausing a rule on the popup page no longer immediately redirects.
 [x] BUG: Use flash messages instead of alerts.
 [x] BUG: when new rules are added, reloads should redirect tabs currently on the source url.
+[x] BUG: When pause expires, it should immediately redirect tabs currently on the source url. Write test.
+[x] BUG: When the popup or options page is open, a redirect should immediately update the count as shown in the rule definition.
 [x] BUG: why are CSS files in the coverage report?
-[x] CLEANUP: Add architecture diagrams to build and release processes.
-[x] CLEANUP: bundles should go in a gitignored build/ top level directory.
-[x] CLEANUP: combine CSS for popup and options pages if feasible.
-[x] CLEANUP: evaluate the use of 'any' in the codebase. Replace with appropriate types where desirable.
-[x] CLEANUP: look at all comments in the codebase to make sure they make sense, and are needed.
-[x] CLEANUP: Refactor duplicated logic in the src folder. Clean old comments, dead code. Particularly in ui.ts. popup.ts. background.ts and options.ts
-[x] CLEANUP: Remove any css that isn't referenced anywhere. Remove redundant rules. Add section comments grouping related rules. Nest where possible.
-[x] CLEANUP: reorg to assets/ folder
-[x] CLEANUP: there are too many top level test directories. playwright-report, test-results, test.
-[x] CLEANUP: understand the purpose of sourcemaps in dist/ and remove them if not needed. What's the value?
-[x] CLEANUP: unify tsconfig
-[x] CLEANUP: Update readme based on recent changes
 [x] CI: add github action to publish new version to chrome web store
 [x] CI: add github actions to run tests on PR
 [x] CI: add script to run tests suites (Playwright)
@@ -66,36 +48,50 @@
 [x] CI: Write instructions for Chrome Web Store reviewer to test the extension.
 [x] CI: write tests for generate-changelog.ts
 [x] CI: Write tests for untested scripts in /scripts and put them in /test/scripts
+[x] CLEANUP: Add architecture diagrams to build and release processes.
+[x] CLEANUP: bundles should go in a gitignored build/ top level directory.
+[x] CLEANUP: combine CSS for popup and options pages if feasible.
+[x] CLEANUP: evaluate the use of 'any' in the codebase. Replace with appropriate types where desirable.
+[x] CLEANUP: look at all comments in the codebase to make sure they make sense, and are needed.
+[x] CLEANUP: Refactor duplicated logic in the src folder. Clean old comments, dead code. Particularly in ui.ts. popup.ts. background.ts and options.ts
+[x] CLEANUP: Refactor shared logic from popup.ts and options.ts into ui.ts
+[x] CLEANUP: Remove any css that isn't referenced anywhere. Remove redundant rules. Add section comments grouping related rules. Nest where possible.
+[x] CLEANUP: reorg to assets/ folder
+[x] CLEANUP: there are too many top level test directories. playwright-report, test-results, test.
+[x] CLEANUP: understand the purpose of sourcemaps in dist/ and remove them if not needed. What's the value?
+[x] CLEANUP: unify tsconfig
+[x] CLEANUP: Update readme based on recent changes
 [x] DOCS: Check all the documentation in the project is accurate and well written.
 [x] DOCS: Create extension docs homepage on github pages: https://jordanblakey.github.io/url-redirector/. Enable github issues, link as contact. Need privacy policy. Need verification meta tag.
 [x] DOCS: Update documentation for new versioning and release process
 [x] DOCS: Update documentation to describe the testing system of unit, integration, and e2e tests, using playwright and vitest.
-[x] FEAT: Add a "demo" recording of the extension for the Chrome Web Store.
-[x] FEAT: Add a "use" button on hover to inputs that makes the placeholder the value.
-[x] FEAT: Add a test coverage report.
-[x] FEAT: add script to bundle extension (crx)
-[x] FEAT: add TS type annotations throughout the codebase. Create type defs and interfaces if needed.
-[x] FEAT: also expose the options page as a popup.
-[x] FEAT: Automated demo recording utility.
-[x] FEAT: Automated demo recording. Named recording. Migrate demos/ to top. Visible mouse actions.
-[x] FEAT: badge indicating a redirection event
-[x] FEAT: Convert the "Pause" button into a Temporary Snooze (e.g., 5-10 minutes)UI: Visual indicator that the rule is "Snoozed" (maybe a countdown or a different icon color) so the user knows it will come back.
-[x] FEAT: create a utility script to read dotenv from Secret Manager. Refactor check-cws-status to use it.
-[x] FEAT: Expand messages.ts to include more microcopy options.
-[x] FEAT: explore using TS for scripts/ and anywhere .js files are still used. Validate that it works.
-[x] FEAT: Favicon caching mechanism (why? Browser caching...)
-[x] FEAT: generate an appropriate icon for the extension.
-[x] FEAT: Implement "Thematic Matching" logic for placeholders (map specific source categories to relevant target categories, e.g., Video → Education vs. Social Scroll → Deep Reading) to replace pure randomization.
-[x] FEAT: Implement a new FEAT of your own imagining
-[x] FEAT: Include preset templates for common distracting sites paired with healthier alternatives. Hook into the psychology of why people use these sites and satisfy it in a different way. Bad habit? Replace with a good one.
-[x] FEAT: Microcopy ideas for rule counts. Randomized.
-[x] FEAT: migrate from a listener-based approach to declarativeNetRequest (DNR) to improve performance and remove the tabs permission (to avoid the "Read History" warning).
-[x] FEAT: Playwright tests to stop using mocked Chrome APIs and instead test the actual loaded extension
-[x] FEAT: Randomly select a top distracting site to populate source and wholesome site populate target placeholder text
-[x] FEAT: redirection count per rule
-[x] FEAT: Shuffle Mode after a source url is provided, if target input is empty, change the button text to "Add Shuffle Rule". Change it back to "Add Rule" when Target URL is provided. In the rule display, it should say :shuffle: shuffle. When the target URL is visited, a random URL is selected from list of recommended URLS.
-[x] FEAT: submit a rule on enter keypress
-[x] FEAT:convert to typescript
+[x] FEATURE: Add a "demo" recording of the extension for the Chrome Web Store.
+[x] FEATURE: Add a "use" button on hover to inputs that makes the placeholder the value.
+[x] FEATURE: Add a test coverage report.
+[x] FEATURE: add script to bundle extension (crx)
+[x] FEATURE: add TS type annotations throughout the codebase. Create type defs and interfaces if needed.
+[x] FEATURE: also expose the options page as a popup.
+[x] FEATURE: Automated demo recording utility.
+[x] FEATURE: Automated demo recording. Named recording. Migrate demos/ to top. Visible mouse actions.
+[x] FEATURE: badge indicating a redirection event
+[x] FEATURE: Convert the "Pause" button into a Temporary Snooze (e.g., 5-10 minutes)UI: Visual indicator that the rule is "Snoozed" (maybe a countdown or a different icon color) so the user knows it will come back.
+[x] FEATURE: create a utility script to read dotenv from Secret Manager. Refactor check-cws-status to use it.
+[x] FEATURE: Expand messages.ts to include more microcopy options.
+[x] FEATURE: explore using TS for scripts/ and anywhere .js files are still used. Validate that it works.
+[x] FEATURE: Favicon caching mechanism (why? Browser caching...)
+[x] FEATURE: generate an appropriate icon for the extension.
+[x] FEATURE: Implement "Thematic Matching" logic for placeholders (map specific source categories to relevant target categories, e.g., Video → Education vs. Social Scroll → Deep Reading) to replace pure randomization.
+[x] FEATURE: Implement a new FEATURE of your own imagining
+[x] FEATURE: Include preset templates for common distracting sites paired with healthier alternatives. Hook into the psychology of why people use these sites and satisfy it in a different way. Bad habit? Replace with a good one.
+[x] FEATURE: Microcopy ideas for rule counts. Randomized.
+[x] FEATURE: migrate from a listener-based approach to declarativeNetRequest (DNR) to improve performance and remove the tabs permission (to avoid the "Read History" warning).
+[x] FEATURE: Playwright tests to stop using mocked Chrome APIs and instead test the actual loaded extension
+[x] FEATURE: Randomly select a top distracting site to populate source and wholesome site populate target placeholder text
+[x] FEATURE: redirection count per rule
+[x] FEATURE: Shuffle Mode after a source url is provided, if target input is empty, change the button text to "Add Shuffle Rule". Change it back to "Add Rule" when Target URL is provided. In the rule display, it should say :shuffle: shuffle. When the target URL is visited, a random URL is selected from list of recommended URLS.
+[x] FEATURE: submit a rule on enter keypress
+[x] FEATURE:convert to typescript
+[x] FEATURE: Sync storage rules to other devices. Convert from localStorage to chrome.storage.sync, with chrome.storage.local as fallback.
 [x] UX: Alpha sort rules by source url.
 [x] UX: Buttons a bit small on Popup. Fitts' Law.
 [x] UX: make the rule display one line like source -> target

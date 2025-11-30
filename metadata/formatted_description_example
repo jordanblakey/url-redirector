@@ -17,7 +17,10 @@ MINIMALIST BY DESIGN
 
 RECENT UPDATES
 
-{{RECENT_UPDATES}}
+• Introduced "Shuffle Mode" for redirect rules.
+• Added "Snooze" functionality to temporarily disable rules.
+• Improved handling to prevent redirect loops.
+• Resolved various UI and general bug fixes.
 
 CONTACT & SUPPORT
 
