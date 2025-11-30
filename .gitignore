@@ -13,13 +13,15 @@ demos/screenshots/*
 
 # Test reports and results
 test/artifacts
+.monocart_report
 
 # Build artifacts and caches
 .cache
 dist
 build
-.monocart_report
 
 # Environment configuration
 .env
 
+# Chrome workspaces
+chrome_workspace
