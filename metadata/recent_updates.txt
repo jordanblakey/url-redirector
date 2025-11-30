@@ -1,11 +1,11 @@
 ## User Facing
-*   Fixed an issue where transitive redirects were not correctly counted, ensuring all steps in a redirect chain are now accurately recorded.
-*   Introduced logic to prevent the creation of both direct and indirect redirect loops, enhancing rule stability.
-*   Implemented real-time updates for redirect counts in the UI, providing immediate feedback on rule activity.
-*   Resolved issues with the badge timer display, improving the accuracy of status indicators.
+*   Fixed an issue where only the first rule in a redirect chain would be counted; now all transitive redirects are accurately tracked.
+*   Introduced robust prevention for redirect loops, ensuring rules cannot create direct or indirect infinite redirection chains.
+*   Enabled real-time updates for redirect counts in the UI, providing immediate feedback on rule activity.
+*   Added new features including Shuffle Mode, Snooze functionality, and automatic unpausing of rules, alongside general UI improvements and bug fixes for pausing and badge timers.
 
 ## Technical Highlights
-*   Underwent a significant overhaul of the testing infrastructure, including migration to Vitest, CI optimization, and removal of redundant E2E tests.
-*   Enhanced the CI/CD pipeline with improved pre-push hooks, linting, formatting, and automated release process improvements like AI changelog generation.
-*   Reverted the primary storage mechanism from `chrome.storage.sync` back to `chrome.storage.local` to resolve identified bugs and flaky test behavior.
-*   Improved codebase quality and security by adding missing type annotations, removing dead code, and addressing several CodeQL security alerts.
+*   **Major overhaul and optimization of the testing infrastructure:** Migrated to Vitest, significantly reduced E2E test bloat and flakiness, and improved test coverage.
+*   **Enhanced CI/CD pipelines and release automation:** Integrated linting, formatting, pre-commit/pre-push hooks, improved Chrome Web Store submission, added AI changelog generation, and addressed several security alerts in workflows.
+*   **Significant improvements to code quality and maintainability:** Added comprehensive TypeScript type annotations, refactored core logic for better testability, and removed dead code.
+*   **Updated and expanded project documentation:** Introduced new guides for CWS asset creation, detailed testing framework configurations, and added architectural diagrams for the build and release processes.
