@@ -35,10 +35,11 @@ test.describe('Unpause Bug', () => {
     // Mock network
     await page.route('**/*', (route) => {
       const url = route.request().url();
-      if (url.includes('rule-a.com') || url.includes('rule-b.com')) {
+      const hostname = new URL(url).hostname;
+      if (hostname === 'rule-a.com' || hostname === 'rule-b.com') {
         return route.fulfill({ status: 200, body: 'Source Page' });
       }
-      if (url.includes('target.com')) {
+      if (hostname === 'target.com') {
         return route.fulfill({ status: 200, body: 'Target Page' });
       }
       return route.continue();
