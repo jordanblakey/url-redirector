@@ -96,13 +96,16 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
           // We pass 1 as increment. The UI will see the local update.
           await storage.incrementCount(rule.id, 1, countMessage);
 
+          // Update local cache to reflect the new count immediately
+          rule.count = (rule.count || 0) + 1;
+
           // 3. Persist Buffer (Crash Recovery)
           // We save the specific delta so we know what hasn't been synced
           await storage.saveUnsyncedDeltas(temp_buffer);
 
           // --- BUFFERED SYNC LOGIC END ---
 
-          showBadge(rule.count + 1);
+          showBadge(rule.count);
           break;
         }
       }
@@ -123,10 +126,8 @@ chrome.runtime.onMessage.addListener(async (message) => {
     console.debug('Rules updated, re-evaluating DNR rules...');
     const rules = await storage.getRules();
     await updateDynamicRules(rules);
-    const activeRules = rules.filter((r) => r.active);
-    if (activeRules.length > 0) {
-      await scanAndRedirect(activeRules);
-    }
+    // Note: We do NOT call scanAndRedirect here to avoid double-counting.
+    // The storage.onChanged event (triggered by saveRules) will handle scanning/redirecting.
   }
 });
 
