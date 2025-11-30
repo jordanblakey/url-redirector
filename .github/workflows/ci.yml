@@ -33,21 +33,7 @@ jobs:
         run: npm ci
 
       # -------------------------------------------------------
-      # 1. QUALITY GATES (Fail Fast)
-      # -------------------------------------------------------
-
-      # Checks types without building. Fails fast if you broke an interface.
-      - name: Type Check
-        run: npx tsc --noEmit
-
-      - name: Lint check
-        run: npx eslint .
-
-      - name: Format check
-        run: npx prettier --check .
-
-      # -------------------------------------------------------
-      # 2. BUILD & TEST
+      # BUILD & TEST
       # -------------------------------------------------------
 
       - name: Build

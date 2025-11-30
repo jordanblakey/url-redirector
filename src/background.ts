@@ -4,8 +4,15 @@ import { generateRuleId } from './utils.js';
 import { getRandomMessage } from './messages.js';
 import { storage } from './storage.js';
 
+// Expose for testing
+self.storage = storage;
+self.setForceLocalStorage = (value: boolean) => {
+  self.FORCE_LOCAL_STORAGE = value;
+};
+
 let rulesMap: Map<number, Rule> | null = null;
 let syncTimer: ReturnType<typeof setTimeout> | null = null;
+const processedRedirects: Map<number, Set<number>> = new Map();
 
 async function ensureRulesMap(rules?: Rule[]) {
   if (rulesMap && !rules) return;
@@ -36,10 +43,14 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
     if (source) {
       await ensureRulesMap();
+      if (!processedRedirects.has(tabId)) {
+        processedRedirects.set(tabId, new Set());
+      }
+      const processed = processedRedirects.get(tabId)!;
       const ids = source.split(',').map((s) => parseInt(s, 10));
 
       for (const id of ids) {
-        if (isNaN(id)) continue;
+        if (isNaN(id) || processed.has(id)) continue;
 
         const rule = rulesMap?.get(id);
         if (rule) {
@@ -53,7 +64,7 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
           const countMessage = getRandomMessage(rule.count + 1);
           await storage.incrementCount(rule.id, 1, countMessage);
           showBadge(rule.count + 1);
-          break;
+          processed.add(id);
         }
       }
     }
@@ -61,11 +72,18 @@ chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 
   // 2. Detect Failed Cleanup (Late) - for URL Cleanup
   // If content script didn't run (e.g. error page), clean up here
-  if (changeInfo.status === 'complete' && tab.url && tab.url.includes('url_redirector=')) {
-    const url = new URL(tab.url);
-    url.searchParams.delete('url_redirector');
-    chrome.tabs.update(tabId, { url: url.toString() });
+  if (changeInfo.status === 'complete') {
+    if (tab.url && tab.url.includes('url_redirector=')) {
+      const url = new URL(tab.url);
+      url.searchParams.delete('url_redirector');
+      chrome.tabs.update(tabId, { url: url.toString() });
+    }
+    processedRedirects.delete(tabId);
   }
+});
+
+chrome.tabs.onRemoved.addListener((tabId) => {
+  processedRedirects.delete(tabId);
 });
 
 // Listen for messages from popup or options page
@@ -96,7 +114,10 @@ chrome.runtime.onMessage.addListener(async (message) => {
 
 // Listen for rule changes
 chrome.storage.onChanged.addListener(async (changes, areaName) => {
-  if (areaName === 'sync') {
+  // Check if we should process this change based on storage mode
+  const useLocal = self.FORCE_LOCAL_STORAGE;
+
+  if (areaName === 'sync' && !useLocal) {
     // Cloud changed, update local
     await storage.syncFromCloud(changes);
   } else if (areaName === 'local' && changes.rules) {
