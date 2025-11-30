@@ -5,12 +5,9 @@ import { getRandomMessage } from './messages.js';
 import { storage } from './storage.js';
 
 // Expose for testing
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(self as any).storage = storage;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-(self as any).setForceLocalStorage = (value: boolean) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (self as any).FORCE_LOCAL_STORAGE = value;
+self.storage = storage;
+self.setForceLocalStorage = (value: boolean) => {
+  self.FORCE_LOCAL_STORAGE = value;
 };
 
 let rulesMap: Map<number, Rule> | null = null;
@@ -104,8 +101,7 @@ chrome.runtime.onMessage.addListener(async (message) => {
 // Listen for rule changes
 chrome.storage.onChanged.addListener(async (changes, areaName) => {
   // Check if we should process this change based on storage mode
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const useLocal = (self as any).FORCE_LOCAL_STORAGE;
+  const useLocal = self.FORCE_LOCAL_STORAGE;
   const isValidArea = (areaName === 'sync' && !useLocal) || (areaName === 'local' && useLocal);
 
   if (isValidArea && changes.rules) {
