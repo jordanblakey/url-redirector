@@ -1,0 +1,28 @@
+
+Running 1 test using 1 worker
+PAGE LOG: [URL Redirector]: ✅ Content script loaded!
+PAGE LOG: Navigation API is available
+PAGE LOG: [URL Redirector]: ✅ navigator.serviceWorker exists!
+PAGE LOG: [URL Redirector]: ✅ No Service Worker controls this page (Pure Network/HTTP Cache).
+PAGE LOG: [URL Redirector]: Checking window.navigation: Navigation
+PAGE LOG: [URL Redirector]: Navigation API found, attaching listener
+PAGE LOG: [URL Redirector]: Navigate event fired for https://example.com/spa-target
+PAGE LOG: [URL Redirector]: 🧭 Navigation detected to: https://example.com/spa-target
+PAGE LOG: [URL Redirector]: 🎯 Matching rule found for SPA navigation!
+PAGE LOG: [URL Redirector]: 🔀 Redirecting to: google.com
+PAGE LOG: [URL Redirector]: Navigate event fired for https://google.com/
+PAGE LOG: [URL Redirector]: 🧭 Navigation detected to: https://google.com/
+PAGE LOG: [URL Redirector]: ✅ Content script loaded!
+PAGE LOG: [URL Redirector]: ✅ navigator.serviceWorker exists!
+PAGE LOG: [URL Redirector]: ✅ No Service Worker controls this page (Pure Network/HTTP Cache).
+PAGE LOG: [URL Redirector]: Checking window.navigation: Navigation
+PAGE LOG: [URL Redirector]: Navigation API found, attaching listener
+PAGE LOG: [URL Redirector]: Navigate event fired for https://www.google.com/
+PAGE LOG: [URL Redirector]: 🧭 Navigation detected to: https://www.google.com/
+·
+  1 passed (2.2s)
+
+To open last HTML report run:
+[36m[39m
+[36m  npx playwright show-report test/artifacts/playwright-report[39m
+[36m[39m

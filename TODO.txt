@@ -1,4 +1,9 @@
 ## TODO
+[] BUG: Navigation changes within a Single Page Application (SPA) are not being redirected. We should use window.navigation.addEventListener('navigate', (event) => { ... })
+[] BUG: PausedUntil should be cleared on unpause for rules.
+[] BUG: Protocol should be stripped from urls when the rule is saved. This is a waste of space.
+[] BUG: Hovering over a rule should show the full url. This is a usability issue.
+[] FEATURE: Possibly source and target should have their own line so they have more space. Pause and delete could be icons, especially delete and esp in the popup.
 
 ## DOING
 

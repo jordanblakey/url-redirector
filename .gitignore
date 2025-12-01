@@ -23,5 +23,3 @@ build
 # Environment configuration
 .env
 
-# Chrome workspaces
-chrome_workspace
