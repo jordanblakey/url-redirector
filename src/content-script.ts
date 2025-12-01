@@ -49,23 +49,98 @@ chrome.storage.local.get(['rules'], (result) => {
       }
     });
 
-    setInterval(() => {
-      console.debug('[URL Redirector]: ♻️ Polling for service new worker registration...');
-      navigator.serviceWorker.getRegistrations().then((registrations) => {
-        if (registrations.length > 0) {
-          console.debug(
-            '[URL Redirector]: ⚠️ Found',
-            registrations.length,
-            'new service worker registrations!',
-          );
-          if (hasMatchingRule) {
+    if (hasMatchingRule) {
+      setInterval(() => {
+        console.debug('[URL Redirector]: ♻️ Polling for service new worker registration...');
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          if (registrations.length > 0) {
+            console.debug(
+              '[URL Redirector]: ⚠️ Found',
+              registrations.length,
+              'new service worker registrations!',
+            );
             unregisterServiceWorkers();
           }
-        }
-      });
-    }, 5000);
+        });
+      }, 5000);
+    }
   }
 });
+
+// Track URLs currently being processed to prevent double counting/redirects
+const processingUrls = new Set<string>();
+
+// Handle SPA navigations (history.pushState, etc.)
+// The Navigation API is available in Chrome 102+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+if ((window as any).navigation) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (window as any).navigation.addEventListener('navigate', (event: any) => {
+    const destinationUrl = event.destination.url;
+
+    // Deduplicate: If we are already checking/redirecting this URL, ignore
+    if (processingUrls.has(destinationUrl)) {
+      console.debug('[URL Redirector]: 🛑 Already processing navigation to:', destinationUrl);
+      return;
+    }
+
+    console.debug('[URL Redirector]: 🧭 Navigation detected to:', destinationUrl);
+    processingUrls.add(destinationUrl);
+
+    // Safety cleanup: Remove from set after a few seconds in case redirect fails or page doesn't unload
+    setTimeout(() => {
+      processingUrls.delete(destinationUrl);
+    }, 2000);
+
+    checkMatchingRuleAndRedirect(destinationUrl);
+  });
+}
+
+function checkMatchingRuleAndRedirect(destinationUrl: string): void {
+  chrome.storage.local.get(['rules'], (result) => {
+    const rules: Rule[] = Array.isArray(result.rules) ? result.rules : [];
+    if (rules.length === 0) {
+      processingUrls.delete(destinationUrl);
+      return;
+    }
+    // Check if the new URL matches any rules
+
+    // Find the matching rule to get the target
+    const matchingRule = rules.find((r) => {
+      const currentUrlNormalized = normalizeUrl(destinationUrl);
+      const sourceNormalized = normalizeUrl(r.source);
+      return currentUrlNormalized.startsWith(sourceNormalized);
+    });
+
+    if (matchingRule) {
+      // Check if rule is paused
+      if (matchingRule.pausedUntil && matchingRule.pausedUntil > Date.now()) {
+        console.log('[URL Redirector]: ⏸️ Rule is paused, skipping SPA redirect');
+        processingUrls.delete(destinationUrl);
+        return;
+      }
+
+      console.log('[URL Redirector]: 🔀 Redirecting to:', matchingRule.target);
+
+      // Manually redirect using window.location.
+      // This ensures the redirect happens even if DNR doesn't catch the client-side request.
+      let target = matchingRule.target;
+      if (!target.startsWith('http')) {
+        target = `https://${target}`;
+      }
+
+      // Increment count
+      chrome.runtime.sendMessage({ type: 'INCREMENT_COUNT', ruleId: matchingRule.id });
+
+      // Prevent the SPA navigation from completing if possible, or just override it.
+      // If we just set window.location.href, it should work.
+      window.location.href = target;
+    } else {
+      // No match found
+      processingUrls.delete(destinationUrl);
+    }
+  });
+}
 
 function unregisterServiceWorkers(): void {
   navigator.serviceWorker.getRegistrations().then((registrations) => {
