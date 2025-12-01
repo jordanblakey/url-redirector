@@ -1,7 +1,7 @@
 import { test, expect, getServiceWorker } from '../fixtures';
 import { Rule } from '../../src/types';
 
-test.describe('Rule Count Updates', () => {
+test.describe.serial('Rule Count Updates', () => {
   test('should increment rule count after redirect', async ({ context }) => {
     const worker = await getServiceWorker(context);
 

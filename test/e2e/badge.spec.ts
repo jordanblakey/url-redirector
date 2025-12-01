@@ -1,6 +1,6 @@
 import { test, expect, getServiceWorker } from '../fixtures';
 
-test.describe('Badge Functionality', () => {
+test.describe.serial('Badge Functionality', () => {
   test('should not show badge if rule is inactive', async ({ context, page }) => {
     const worker = await getServiceWorker(context);
     await worker.evaluate(async () => {
