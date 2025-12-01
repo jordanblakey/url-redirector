@@ -1,9 +1,0 @@
-
-Running 2 tests using 2 workers
-··
-  2 passed (2.1s)
-
-To open last HTML report run:
-[36m[39m
-[36m  npx playwright show-report test/artifacts/playwright-report[39m
-[36m[39m
