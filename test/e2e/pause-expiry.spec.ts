@@ -3,6 +3,7 @@ import { test, expect, getServiceWorker } from '../fixtures';
 test.describe('Pause Expiry', () => {
   test('should immediately redirect when pause expires', async ({ context }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
     const now = Date.now();
     const pauseDuration = 3000; // 3 seconds
 

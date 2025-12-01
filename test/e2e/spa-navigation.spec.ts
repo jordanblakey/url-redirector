@@ -3,6 +3,7 @@ import { test, expect, getServiceWorker } from '../fixtures';
 test.describe('SPA Navigation Redirects', () => {
   test('should redirect when navigating via history.pushState', async ({ context }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // 1. Add a rule: example.com/spa-target -> google.com
     await worker.evaluate(async () => {
@@ -66,6 +67,7 @@ test.describe('SPA Navigation Redirects', () => {
     context,
   }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // 1. Add a paused rule
     await worker.evaluate(async () => {
@@ -116,6 +118,7 @@ test.describe('SPA Navigation Redirects', () => {
     context,
   }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // 1. Add a rule
     await worker.evaluate(async () => {

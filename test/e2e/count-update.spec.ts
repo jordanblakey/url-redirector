@@ -4,6 +4,7 @@ import { Rule } from '../../src/types';
 test.describe('Rule Count Updates', () => {
   test('should increment rule count after redirect', async ({ context }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Add rule
     await worker.evaluate(async () => {
@@ -42,6 +43,7 @@ test.describe('Rule Count Updates', () => {
 
   test('should increment count for normalized matches', async ({ context }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Add rule with specific casing/protocol
     await worker.evaluate(async () => {
@@ -80,6 +82,7 @@ test.describe('Rule Count Updates', () => {
 
   test('should increment counts for transitive redirects', async ({ context }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Add rules: a.com -> b.com -> c.com
     await worker.evaluate(async () => {

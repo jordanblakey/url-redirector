@@ -3,6 +3,7 @@ import { test, expect, getServiceWorker } from '../fixtures';
 test.describe('Unpause Bug', () => {
   test('should not unpause other rules when one rule is unpaused', async ({ context, page }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
     const now = Date.now();
     const pauseDuration = 60000; // 1 minute
 

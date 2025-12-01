@@ -3,6 +3,7 @@ import { test, expect, getServiceWorker } from '../fixtures';
 test.describe('Badge Functionality', () => {
   test('should not show badge if rule is inactive', async ({ context, page }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
     await worker.evaluate(async () => {
       const rules = [{ source: 'example.org', target: 'google.com', active: false, count: 0 }];
       await (self as any).storage.saveRules(rules);
@@ -28,6 +29,7 @@ test.describe('Badge Functionality', () => {
 
   test('should show badge count after redirect', async ({ context, page }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
     await worker.evaluate(async () => {
       const rules = [
         { source: 'badge-test.com', target: 'google.com', active: true, count: 0, id: 300 },
@@ -63,6 +65,7 @@ test.describe('Badge Functionality', () => {
 
   test('should increment badge count on subsequent redirects', async ({ context, page }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
     await worker.evaluate(async () => {
       const rules = [
         { source: 'badge-increment.com', target: 'google.com', active: true, count: 0, id: 301 },
@@ -112,6 +115,7 @@ test.describe('Badge Functionality', () => {
 
   test('should increment badge count up to 20', async ({ context, page }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
     await worker.evaluate(async () => {
       const rules = [{ source: 'a.com', target: 'b.com', active: true, count: 0, id: 302 }];
       await (self as any).storage.saveRules(rules);
@@ -161,6 +165,7 @@ test.describe('Badge Functionality', () => {
     page,
   }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
     await worker.evaluate(async () => {
       const rules = [
         { source: 'a.com', target: 'b.com', active: true, count: 0, id: 401 },
