@@ -61,6 +61,24 @@ test.describe('Unpause Bug', () => {
       }
     });
 
+    // Wait for the update to propagate to DNR rules
+    await expect
+      .poll(
+        async () => {
+          return await worker.evaluate(async () => {
+            const rules = await chrome.declarativeNetRequest.getDynamicRules();
+
+            // Check by regexFilter since IDs are hashed
+            // Note: dots are escaped in regex (rule-a\.com), so we check for the name part
+            const hasRuleA = rules.some((r) => r.condition.regexFilter?.includes('rule-a'));
+            const hasRuleB = rules.some((r) => r.condition.regexFilter?.includes('rule-b'));
+            return hasRuleA && !hasRuleB;
+          });
+        },
+        { timeout: 10000 },
+      )
+      .toBe(true);
+
     // Immediately check Rule B. It should STILL be paused.
     // We check this by trying to navigate to it.
     // If the bug exists, this might redirect to target.com

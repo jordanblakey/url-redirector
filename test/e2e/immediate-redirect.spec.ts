@@ -20,7 +20,16 @@ test.describe('Immediate Redirect on Rule Change', () => {
     await popup.fill('#sourceUrl', 'example.com');
     await popup.fill('#targetUrl', 'google.com');
     await popup.click('#addRuleBtn');
-    await popup.waitForTimeout(100); // Allow time for message to be processed
+
+    // Wait for rule to be saved and active
+    await expect
+      .poll(async () => {
+        return await worker.evaluate(async () => {
+          const rules = await (self as any).storage.getRules();
+          return rules.some((r: any) => r.source === 'example.com' && r.active);
+        });
+      })
+      .toBe(true);
 
     // Verify redirect
     await expect(page).toHaveURL(/google\.com/);
@@ -66,7 +75,17 @@ test.describe('Immediate Redirect on Rule Change', () => {
     const ruleItem = popup.locator('.rule-item').first();
     await ruleItem.hover();
     await ruleItem.locator('.toggle-btn').click();
-    await popup.waitForTimeout(100);
+
+    // Wait for rule to be unpaused
+    await expect
+      .poll(async () => {
+        return await worker.evaluate(async () => {
+          const rules = await (self as any).storage.getRules();
+          const rule = rules.find((r: any) => r.id === 124);
+          return rule && !rule.pausedUntil;
+        });
+      })
+      .toBe(true);
 
     // Verify redirect
     await expect(page).toHaveURL(/google\.com/);
@@ -108,7 +127,17 @@ test.describe('Immediate Redirect on Rule Change', () => {
     const ruleItem = popup.locator('.rule-item').first();
     await ruleItem.hover();
     await ruleItem.locator('.toggle-btn').click();
-    await popup.waitForTimeout(100);
+
+    // Wait for rule to be active
+    await expect
+      .poll(async () => {
+        return await worker.evaluate(async () => {
+          const rules = await (self as any).storage.getRules();
+          const rule = rules.find((r: any) => r.id === 125);
+          return rule && rule.active;
+        });
+      })
+      .toBe(true);
 
     // Verify redirect
     await expect(page).toHaveURL(/google\.com/);
@@ -123,7 +152,16 @@ test.describe('Immediate Redirect on Rule Change', () => {
     await popup.fill('#sourceUrl', 'example.edu');
     await popup.fill('#targetUrl', 'google.com');
     await popup.click('#addRuleBtn');
-    await popup.waitForTimeout(100); // Allow time for message to be processed
+
+    // Wait for rule to be saved
+    await expect
+      .poll(async () => {
+        return await worker.evaluate(async () => {
+          const rules = await (self as any).storage.getRules();
+          return rules.some((r: any) => r.source === 'example.edu');
+        });
+      })
+      .toBe(true);
 
     // Open a NEW tab to the source URL
     const page = await context.newPage();

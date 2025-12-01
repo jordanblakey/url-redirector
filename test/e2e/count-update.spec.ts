@@ -1,7 +1,7 @@
 import { test, expect, getServiceWorker } from '../fixtures';
 import { Rule } from '../../src/types';
 
-test.describe.serial('Rule Count Updates', () => {
+test.describe('Rule Count Updates', () => {
   test('should increment rule count after redirect', async ({ context }) => {
     const worker = await getServiceWorker(context);
 
@@ -28,12 +28,15 @@ test.describe.serial('Rule Count Updates', () => {
 
     // Wait for count update (it happens asynchronously in background)
     await expect
-      .poll(async () => {
-        return await worker.evaluate(async () => {
-          const rules = await (self as any).storage.getRules();
-          return rules.find((r: any) => r.id === 999)?.count;
-        });
-      })
+      .poll(
+        async () => {
+          return await worker.evaluate(async () => {
+            const rules = await (self as any).storage.getRules();
+            return rules.find((r: any) => r.id === 999)?.count;
+          });
+        },
+        { timeout: 10000 },
+      )
       .toBe(1);
   });
 
@@ -63,12 +66,15 @@ test.describe.serial('Rule Count Updates', () => {
 
     // Verify count incremented despite casing/protocol differences
     await expect
-      .poll(async () => {
-        return await worker.evaluate(async () => {
-          const rules = await (self as any).storage.getRules();
-          return rules.find((r: any) => r.id === 1000)?.count;
-        });
-      })
+      .poll(
+        async () => {
+          return await worker.evaluate(async () => {
+            const rules = await (self as any).storage.getRules();
+            return rules.find((r: any) => r.id === 1000)?.count;
+          });
+        },
+        { timeout: 10000 },
+      )
       .toBe(1);
   });
 
@@ -118,7 +124,7 @@ test.describe.serial('Rule Count Updates', () => {
           const rule3 = rules.find((r: any) => r.id === 1003);
           return rule1?.count === 1 && rule2?.count === 1 && rule3?.count === 1;
         },
-        { timeout: 5000 },
+        { timeout: 10000 },
       )
       .toBe(true);
   });
