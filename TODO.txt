@@ -1,4 +1,5 @@
 ## TODO
+[] FEATURE: Possibly source and target should have their own line so they have more space. Pause and delete could be icons, especially delete and esp in the popup.
 
 ## DOING
 
@@ -8,6 +9,7 @@
 
 ## DONE
 [x] UX: Hovering over a rule should show the full url. This is a usability issue.
+[x] BUG: Navigation changes within a Single Page Application (SPA) are not being redirected. We should use window.navigation.addEventListener('navigate', (event) => { ... })
 [x] BRAND: Create CWS assets
 [x] BRAND: Update 1.2.0 release notes and assets on CWS once it is approved
 [x] BUG: "Active Rules" is a bit misleading with new pause/resume feature. "Redirection Rules"? "Rules"?

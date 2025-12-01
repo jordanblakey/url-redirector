@@ -109,6 +109,19 @@ chrome.runtime.onMessage.addListener(async (message) => {
     if (activeRules.length > 0) {
       await scanAndRedirect(activeRules);
     }
+  } else if (message.type === 'INCREMENT_COUNT') {
+    const ruleId = message.ruleId;
+    if (ruleId) {
+      console.debug('Incrementing count for rule:', ruleId);
+      const rules = await storage.getRules();
+      const rule = rules.find((r) => r.id === ruleId);
+      if (rule) {
+        const newCount = (rule.count || 0) + 1;
+        const message = getRandomMessage(newCount);
+        await storage.incrementCount(ruleId, 1, message);
+        showBadge(newCount);
+      }
+    }
   }
 });
 
