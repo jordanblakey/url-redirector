@@ -3,6 +3,7 @@ import { test, expect, getServiceWorker } from '../fixtures';
 test.describe('Pause Expiry', () => {
   test('should immediately redirect when pause expires', async ({ context }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
     const now = Date.now();
     const pauseDuration = 3000; // 3 seconds
 
@@ -37,10 +38,12 @@ test.describe('Pause Expiry', () => {
     // Should not redirect initially (paused)
     await expect(page).toHaveURL(/example\.com/);
 
-    // Wait for pause to expire + buffer
-    await page.waitForTimeout(pauseDuration + 1000);
-
-    // Should redirect automatically
-    await expect(page).toHaveURL(/google\.com/, { timeout: 5000 });
+    // Wait for pause to expire and redirect to happen
+    await expect
+      .poll(async () => page.url(), {
+        timeout: pauseDuration + 5000, // Wait for pause duration + buffer
+        intervals: [500],
+      })
+      .toMatch(/google\.com/);
   });
 });

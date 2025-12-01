@@ -3,6 +3,7 @@ import { test, expect, getServiceWorker } from '../fixtures';
 test.describe('Immediate Redirect on Rule Change', () => {
   test('should immediately redirect tabs when a matching rule is added', async ({ context }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Open a tab to the source URL
     const page = await context.newPage();
@@ -20,7 +21,16 @@ test.describe('Immediate Redirect on Rule Change', () => {
     await popup.fill('#sourceUrl', 'example.com');
     await popup.fill('#targetUrl', 'google.com');
     await popup.click('#addRuleBtn');
-    await popup.waitForTimeout(100); // Allow time for message to be processed
+
+    // Wait for rule to be saved and active
+    await expect
+      .poll(async () => {
+        return await worker.evaluate(async () => {
+          const rules = await (self as any).storage.getRules();
+          return rules.some((r: any) => r.source === 'example.com' && r.active);
+        });
+      })
+      .toBe(true);
 
     // Verify redirect
     await expect(page).toHaveURL(/google\.com/);
@@ -30,6 +40,7 @@ test.describe('Immediate Redirect on Rule Change', () => {
     context,
   }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
     const now = Date.now();
 
     // Start with a paused rule
@@ -66,7 +77,17 @@ test.describe('Immediate Redirect on Rule Change', () => {
     const ruleItem = popup.locator('.rule-item').first();
     await ruleItem.hover();
     await ruleItem.locator('.toggle-btn').click();
-    await popup.waitForTimeout(100);
+
+    // Wait for rule to be unpaused
+    await expect
+      .poll(async () => {
+        return await worker.evaluate(async () => {
+          const rules = await (self as any).storage.getRules();
+          const rule = rules.find((r: any) => r.id === 124);
+          return rule && !rule.pausedUntil;
+        });
+      })
+      .toBe(true);
 
     // Verify redirect
     await expect(page).toHaveURL(/google\.com/);
@@ -74,6 +95,7 @@ test.describe('Immediate Redirect on Rule Change', () => {
 
   test('should immediately redirect tabs when a matching rule is resumed', async ({ context }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Start with an inactive rule
     await worker.evaluate(async () => {
@@ -108,7 +130,17 @@ test.describe('Immediate Redirect on Rule Change', () => {
     const ruleItem = popup.locator('.rule-item').first();
     await ruleItem.hover();
     await ruleItem.locator('.toggle-btn').click();
-    await popup.waitForTimeout(100);
+
+    // Wait for rule to be active
+    await expect
+      .poll(async () => {
+        return await worker.evaluate(async () => {
+          const rules = await (self as any).storage.getRules();
+          const rule = rules.find((r: any) => r.id === 125);
+          return rule && rule.active;
+        });
+      })
+      .toBe(true);
 
     // Verify redirect
     await expect(page).toHaveURL(/google\.com/);
@@ -116,6 +148,7 @@ test.describe('Immediate Redirect on Rule Change', () => {
 
   test('should redirect new tabs using DNR rules', async ({ context }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Go to popup and add a rule to trigger redirect
     const popup = await context.newPage();
@@ -123,7 +156,16 @@ test.describe('Immediate Redirect on Rule Change', () => {
     await popup.fill('#sourceUrl', 'example.edu');
     await popup.fill('#targetUrl', 'google.com');
     await popup.click('#addRuleBtn');
-    await popup.waitForTimeout(100); // Allow time for message to be processed
+
+    // Wait for rule to be saved
+    await expect
+      .poll(async () => {
+        return await worker.evaluate(async () => {
+          const rules = await (self as any).storage.getRules();
+          return rules.some((r: any) => r.source === 'example.edu');
+        });
+      })
+      .toBe(true);
 
     // Open a NEW tab to the source URL
     const page = await context.newPage();

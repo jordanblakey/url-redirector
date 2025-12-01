@@ -3,6 +3,7 @@ import { test, expect, getServiceWorker } from '../fixtures';
 test.describe('Badge Functionality', () => {
   test('should not show badge if rule is inactive', async ({ context, page }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
     await worker.evaluate(async () => {
       const rules = [{ source: 'example.org', target: 'google.com', active: false, count: 0 }];
       await (self as any).storage.saveRules(rules);
@@ -13,18 +14,22 @@ test.describe('Badge Functionality', () => {
 
     // Verify badge text is empty
     await expect
-      .poll(async () => {
-        return await worker.evaluate(async () => {
-          const tabs = await chrome.tabs.query({ active: true });
-          if (tabs.length === 0) return null;
-          return await chrome.action.getBadgeText({ tabId: tabs[0].id! });
-        });
-      })
+      .poll(
+        async () => {
+          return await worker.evaluate(async () => {
+            const tabs = await chrome.tabs.query({ active: true });
+            if (tabs.length === 0) return null;
+            return await chrome.action.getBadgeText({ tabId: tabs[0].id! });
+          });
+        },
+        { timeout: 10000 },
+      )
       .toBe('');
   });
 
   test('should show badge count after redirect', async ({ context, page }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
     await worker.evaluate(async () => {
       const rules = [
         { source: 'badge-test.com', target: 'google.com', active: true, count: 0, id: 300 },
@@ -45,18 +50,22 @@ test.describe('Badge Functionality', () => {
 
     // Verify badge text shows "1"
     await expect
-      .poll(async () => {
-        return await worker.evaluate(async () => {
-          const tabs = await chrome.tabs.query({ active: true });
-          if (tabs.length === 0) return null;
-          return await chrome.action.getBadgeText({ tabId: tabs[0].id! });
-        });
-      })
+      .poll(
+        async () => {
+          return await worker.evaluate(async () => {
+            const tabs = await chrome.tabs.query({ active: true });
+            if (tabs.length === 0) return null;
+            return await chrome.action.getBadgeText({ tabId: tabs[0].id! });
+          });
+        },
+        { timeout: 10000 },
+      )
       .toBe('1');
   });
 
   test('should increment badge count on subsequent redirects', async ({ context, page }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
     await worker.evaluate(async () => {
       const rules = [
         { source: 'badge-increment.com', target: 'google.com', active: true, count: 0, id: 301 },
@@ -75,12 +84,15 @@ test.describe('Badge Functionality', () => {
 
     // Verify "1"
     await expect
-      .poll(async () => {
-        return await worker.evaluate(async () => {
-          const tabs = await chrome.tabs.query({ active: true });
-          return await chrome.action.getBadgeText({ tabId: tabs[0].id! });
-        });
-      })
+      .poll(
+        async () => {
+          return await worker.evaluate(async () => {
+            const tabs = await chrome.tabs.query({ active: true });
+            return await chrome.action.getBadgeText({ tabId: tabs[0].id! });
+          });
+        },
+        { timeout: 10000 },
+      )
       .toBe('1');
 
     // Second visit
@@ -89,16 +101,21 @@ test.describe('Badge Functionality', () => {
 
     // Verify "2"
     await expect
-      .poll(async () => {
-        return await worker.evaluate(async () => {
-          const tabs = await chrome.tabs.query({ active: true });
-          return await chrome.action.getBadgeText({ tabId: tabs[0].id! });
-        });
-      })
+      .poll(
+        async () => {
+          return await worker.evaluate(async () => {
+            const tabs = await chrome.tabs.query({ active: true });
+            return await chrome.action.getBadgeText({ tabId: tabs[0].id! });
+          });
+        },
+        { timeout: 10000 },
+      )
       .toBe('2');
   });
+
   test('should increment badge count up to 20', async ({ context, page }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
     await worker.evaluate(async () => {
       const rules = [{ source: 'a.com', target: 'b.com', active: true, count: 0, id: 302 }];
       await (self as any).storage.saveRules(rules);
@@ -129,13 +146,16 @@ test.describe('Badge Functionality', () => {
 
       // Verify badge count matches iteration
       await expect
-        .poll(async () => {
-          return await worker.evaluate(async () => {
-            const tabs = await chrome.tabs.query({ active: true });
-            if (tabs.length === 0) return null;
-            return await chrome.action.getBadgeText({ tabId: tabs[0].id! });
-          });
-        })
+        .poll(
+          async () => {
+            return await worker.evaluate(async () => {
+              const tabs = await chrome.tabs.query({ active: true });
+              if (tabs.length === 0) return null;
+              return await chrome.action.getBadgeText({ tabId: tabs[0].id! });
+            });
+          },
+          { timeout: 10000 },
+        )
         .toBe(i.toString());
     }
   });
@@ -145,6 +165,7 @@ test.describe('Badge Functionality', () => {
     page,
   }) => {
     const worker = await getServiceWorker(context);
+    await new Promise((resolve) => setTimeout(resolve, 500));
     await worker.evaluate(async () => {
       const rules = [
         { source: 'a.com', target: 'b.com', active: true, count: 0, id: 401 },
@@ -176,31 +197,37 @@ test.describe('Badge Functionality', () => {
 
       // Verify badge count matches iteration
       await expect
-        .poll(async () => {
-          return await worker.evaluate(async () => {
-            const tabs = await chrome.tabs.query({ active: true });
-            if (tabs.length === 0) return null;
-            return await chrome.action.getBadgeText({ tabId: tabs[0].id! });
-          });
-        })
+        .poll(
+          async () => {
+            return await worker.evaluate(async () => {
+              const tabs = await chrome.tabs.query({ active: true });
+              if (tabs.length === 0) return null;
+              return await chrome.action.getBadgeText({ tabId: tabs[0].id! });
+            });
+          },
+          { timeout: 10000 },
+        )
         .toBe(i.toString());
     }
 
     // Verify all rule counts are 20
     await expect
-      .poll(async () => {
-        return await worker.evaluate(async () => {
-          const rules = await (self as any).storage.getRules();
-          const r1 = rules.find((r: any) => r.id === 401);
-          const r2 = rules.find((r: any) => r.id === 402);
-          const r3 = rules.find((r: any) => r.id === 403);
-          return {
-            c1: r1?.count,
-            c2: r2?.count,
-            c3: r3?.count,
-          };
-        });
-      })
+      .poll(
+        async () => {
+          return await worker.evaluate(async () => {
+            const rules = await (self as any).storage.getRules();
+            const r1 = rules.find((r: any) => r.id === 401);
+            const r2 = rules.find((r: any) => r.id === 402);
+            const r3 = rules.find((r: any) => r.id === 403);
+            return {
+              c1: r1?.count,
+              c2: r2?.count,
+              c3: r3?.count,
+            };
+          });
+        },
+        { timeout: 10000 },
+      )
       .toEqual({
         c1: 20,
         c2: 20,
