@@ -120,6 +120,7 @@ export function renderRules(
     const li = document.createElement('li');
     li.className = `rule-item ${shouldDisplayAsPaused(rule) ? 'paused' : ''}`;
     li.style.cursor = 'pointer';
+    li.title = `${rule.source} ➜ ${getTargetDisplayText(rule.target)}`;
 
     // Toggle on row click
     li.onclick = (e) => {
