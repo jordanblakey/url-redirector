@@ -3,7 +3,12 @@
 
 ## DOING
 
+[] UX: Protocol should be stripped from urls when the rule is saved. This is a waste of space.
+[] BUG: Fix flaky e2e tests.
+[] UX: Truncation of imbalanced length urls can result in empty space. It should use the full space.
+
 ## DONE
+[x] UX: Hovering over a rule should show the full url. This is a usability issue.
 [x] BUG: Navigation changes within a Single Page Application (SPA) are not being redirected. We should use window.navigation.addEventListener('navigate', (event) => { ... })
 [x] BRAND: Create CWS assets
 [x] BRAND: Update 1.2.0 release notes and assets on CWS once it is approved
