@@ -29,6 +29,7 @@ test.describe('Immediate Redirect on Rule Change', () => {
   test('should immediately redirect tabs when a rule is unpaused (pausedUntil removed)', async ({
     context,
   }) => {
+    test.setTimeout(30000); // UI interactions can be slow
     const worker = await getServiceWorker(context);
     const now = Date.now();
 
@@ -64,6 +65,7 @@ test.describe('Immediate Redirect on Rule Change', () => {
     const popup = await context.newPage();
     await popup.goto(`chrome-extension://${worker.url().split('/')[2]}/html/popup.html`);
     const ruleItem = popup.locator('.rule-item').first();
+    await ruleItem.waitFor({ state: 'visible' }); // Ensure item is ready
     await ruleItem.hover();
     await ruleItem.locator('.toggle-btn').click();
     await popup.waitForTimeout(100);

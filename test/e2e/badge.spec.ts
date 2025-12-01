@@ -30,6 +30,15 @@ test.describe('Badge Functionality', () => {
         { source: 'badge-test.com', target: 'google.com', active: true, count: 0, id: 300 },
       ];
       await (self as any).storage.saveRules(rules);
+      await new Promise<void>((resolve) => {
+        const check = () => {
+          chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+            if (rules.length > 0) resolve();
+            else setTimeout(check, 50);
+          });
+        };
+        check();
+      });
     });
 
     // Mock network to avoid external dependencies
@@ -62,6 +71,15 @@ test.describe('Badge Functionality', () => {
         { source: 'badge-increment.com', target: 'google.com', active: true, count: 0, id: 301 },
       ];
       await (self as any).storage.saveRules(rules);
+      await new Promise<void>((resolve) => {
+        const check = () => {
+          chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+            if (rules.length > 0) resolve();
+            else setTimeout(check, 50);
+          });
+        };
+        check();
+      });
     });
 
     // Mock network
@@ -98,10 +116,20 @@ test.describe('Badge Functionality', () => {
       .toBe('2');
   });
   test('should increment badge count up to 20', async ({ context, page }) => {
+    test.setTimeout(60000); // Increase timeout for setup and loop
     const worker = await getServiceWorker(context);
     await worker.evaluate(async () => {
       const rules = [{ source: 'a.com', target: 'b.com', active: true, count: 0, id: 302 }];
       await (self as any).storage.saveRules(rules);
+      await new Promise<void>((resolve) => {
+        const check = () => {
+          chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+            if (rules.length > 0) resolve();
+            else setTimeout(check, 100);
+          });
+        };
+        check();
+      });
     });
 
     // Mock network for both source and target
@@ -120,8 +148,6 @@ test.describe('Badge Functionality', () => {
       }
       return route.continue();
     });
-
-    test.setTimeout(60000); // Increase timeout for loop
 
     for (let i = 1; i <= 20; i++) {
       await page.goto('https://a.com/');
@@ -144,6 +170,7 @@ test.describe('Badge Functionality', () => {
     context,
     page,
   }) => {
+    test.setTimeout(60000);
     const worker = await getServiceWorker(context);
     await worker.evaluate(async () => {
       const rules = [
@@ -152,6 +179,15 @@ test.describe('Badge Functionality', () => {
         { source: 'c.com', target: 'd.com', active: true, count: 0, id: 403 },
       ];
       await (self as any).storage.saveRules(rules);
+      await new Promise<void>((resolve) => {
+        const check = () => {
+          chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+            if (rules.length > 0) resolve();
+            else setTimeout(check, 100);
+          });
+        };
+        check();
+      });
     });
 
     // Mock network
@@ -167,8 +203,6 @@ test.describe('Badge Functionality', () => {
       }
       return route.continue();
     });
-
-    test.setTimeout(60000);
 
     for (let i = 1; i <= 20; i++) {
       await page.goto('https://a.com/');

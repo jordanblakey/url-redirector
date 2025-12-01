@@ -38,9 +38,17 @@ test.describe('Pause Expiry', () => {
     await expect(page).toHaveURL(/example\.com/);
 
     // Wait for pause to expire + buffer
-    await page.waitForTimeout(pauseDuration + 1000);
-
-    // Should redirect automatically
-    await expect(page).toHaveURL(/google\.com/, { timeout: 5000 });
+    // Should redirect automatically (use polling to handle timing variations)
+    await expect
+      .poll(
+        async () => {
+          return page.url();
+        },
+        {
+          timeout: pauseDuration + 10000,
+          intervals: [500],
+        },
+      )
+      .toMatch(/google\.com/);
   });
 });
