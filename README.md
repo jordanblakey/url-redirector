@@ -89,7 +89,7 @@ For more details on the build validation tests, see [docs/build-tests.md](docs/b
 - **[Source Maps](docs/source-maps.md)**: How to use the bundled sourcemaps for production debugging.
 - **[Store Assets](docs/cws-assets.md)**: How to generate high-fidelity assets for the Chrome Web Store.
 - **[Troubleshooting](docs/troubleshooting.md)**: Solutions for common issues.
-- **[Known Issues](docs/known-issues.md)**: Steps to reproduce known issues.
+- **[SPA Redirection](docs/spa-redirection.md)**: How the extension handles Single Page Application redirects.
 
 ## Contributing
 
