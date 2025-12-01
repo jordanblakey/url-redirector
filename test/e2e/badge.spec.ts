@@ -30,6 +30,15 @@ test.describe('Badge Functionality', () => {
         { source: 'badge-test.com', target: 'google.com', active: true, count: 0, id: 300 },
       ];
       await (self as any).storage.saveRules(rules);
+      await new Promise<void>((resolve) => {
+        const check = () => {
+          chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+            if (rules.length > 0) resolve();
+            else setTimeout(check, 50);
+          });
+        };
+        check();
+      });
     });
 
     // Mock network to avoid external dependencies
@@ -62,6 +71,15 @@ test.describe('Badge Functionality', () => {
         { source: 'badge-increment.com', target: 'google.com', active: true, count: 0, id: 301 },
       ];
       await (self as any).storage.saveRules(rules);
+      await new Promise<void>((resolve) => {
+        const check = () => {
+          chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+            if (rules.length > 0) resolve();
+            else setTimeout(check, 50);
+          });
+        };
+        check();
+      });
     });
 
     // Mock network
@@ -102,6 +120,15 @@ test.describe('Badge Functionality', () => {
     await worker.evaluate(async () => {
       const rules = [{ source: 'a.com', target: 'b.com', active: true, count: 0, id: 302 }];
       await (self as any).storage.saveRules(rules);
+      await new Promise<void>((resolve) => {
+        const check = () => {
+          chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+            if (rules.length > 0) resolve();
+            else setTimeout(check, 50);
+          });
+        };
+        check();
+      });
     });
 
     // Mock network for both source and target
@@ -152,6 +179,15 @@ test.describe('Badge Functionality', () => {
         { source: 'c.com', target: 'd.com', active: true, count: 0, id: 403 },
       ];
       await (self as any).storage.saveRules(rules);
+      await new Promise<void>((resolve) => {
+        const check = () => {
+          chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+            if (rules.length > 0) resolve();
+            else setTimeout(check, 50);
+          });
+        };
+        check();
+      });
     });
 
     // Mock network

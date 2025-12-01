@@ -17,6 +17,15 @@ test.describe('Rule Count Updates', () => {
         },
       ];
       await (self as any).storage.saveRules(rules);
+      await new Promise<void>((resolve) => {
+        const check = () => {
+          chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+            if (rules.length > 0) resolve();
+            else setTimeout(check, 50);
+          });
+        };
+        check();
+      });
     });
 
     // Open a tab to the source URL
@@ -52,6 +61,15 @@ test.describe('Rule Count Updates', () => {
         },
       ];
       await (self as any).storage.saveRules(rules);
+      await new Promise<void>((resolve) => {
+        const check = () => {
+          chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+            if (rules.length > 0) resolve();
+            else setTimeout(check, 50);
+          });
+        };
+        check();
+      });
     });
 
     // Open a tab to the source URL with different casing/protocol
@@ -83,6 +101,15 @@ test.describe('Rule Count Updates', () => {
         { id: 1003, source: 'c.com', target: 'd.com', active: true, count: 0 },
       ];
       await (self as any).storage.saveRules(rules);
+      await new Promise<void>((resolve) => {
+        const check = () => {
+          chrome.declarativeNetRequest.getDynamicRules().then((rules) => {
+            if (rules.length > 0) resolve();
+            else setTimeout(check, 50);
+          });
+        };
+        check();
+      });
     });
 
     // Open a tab to the source URL
