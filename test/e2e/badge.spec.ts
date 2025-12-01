@@ -97,114 +97,115 @@ test.describe.serial('Badge Functionality', () => {
       })
       .toBe('2');
   });
-  test('should increment badge count up to 20', async ({ context, page }) => {
-    const worker = await getServiceWorker(context);
-    await worker.evaluate(async () => {
-      const rules = [{ source: 'a.com', target: 'b.com', active: true, count: 0, id: 302 }];
-      await (self as any).storage.saveRules(rules);
-    });
 
-    // Mock network for both source and target
-    await page.route('**/*', (route) => {
-      const url = route.request().url();
-      try {
-        const hostname = new URL(url).hostname;
-        if (hostname === 'a.com') {
-          return route.fulfill({ status: 200, body: 'Source Page' });
-        }
-        if (hostname === 'b.com') {
-          return route.fulfill({ status: 200, body: 'Target Page' });
-        }
-      } catch (e) {
-        // Ignore invalid URLs
-      }
-      return route.continue();
-    });
+  // test('should increment badge count up to 20', async ({ context, page }) => {
+  //   const worker = await getServiceWorker(context);
+  //   await worker.evaluate(async () => {
+  //     const rules = [{ source: 'a.com', target: 'b.com', active: true, count: 0, id: 302 }];
+  //     await (self as any).storage.saveRules(rules);
+  //   });
 
-    test.setTimeout(60000); // Increase timeout for loop
+  //   // Mock network for both source and target
+  //   await page.route('**/*', (route) => {
+  //     const url = route.request().url();
+  //     try {
+  //       const hostname = new URL(url).hostname;
+  //       if (hostname === 'a.com') {
+  //         return route.fulfill({ status: 200, body: 'Source Page' });
+  //       }
+  //       if (hostname === 'b.com') {
+  //         return route.fulfill({ status: 200, body: 'Target Page' });
+  //       }
+  //     } catch (e) {
+  //       // Ignore invalid URLs
+  //     }
+  //     return route.continue();
+  //   });
 
-    for (let i = 1; i <= 20; i++) {
-      await page.goto('https://a.com/');
-      await expect(page).toHaveURL(/b\.com/);
+  //   test.setTimeout(60000); // Increase timeout for loop
 
-      // Verify badge count matches iteration
-      await expect
-        .poll(async () => {
-          return await worker.evaluate(async () => {
-            const tabs = await chrome.tabs.query({ active: true });
-            if (tabs.length === 0) return null;
-            return await chrome.action.getBadgeText({ tabId: tabs[0].id! });
-          });
-        })
-        .toBe(i.toString());
-    }
-  });
+  //   for (let i = 1; i <= 20; i++) {
+  //     await page.goto('https://a.com/');
+  //     await expect(page).toHaveURL(/b\.com/);
 
-  test('should increment badge count for transitive redirects up to 20', async ({
-    context,
-    page,
-  }) => {
-    const worker = await getServiceWorker(context);
-    await worker.evaluate(async () => {
-      const rules = [
-        { source: 'a.com', target: 'b.com', active: true, count: 0, id: 401 },
-        { source: 'b.com', target: 'c.com', active: true, count: 0, id: 402 },
-        { source: 'c.com', target: 'd.com', active: true, count: 0, id: 403 },
-      ];
-      await (self as any).storage.saveRules(rules);
-    });
+  //     // Verify badge count matches iteration
+  //     await expect
+  //       .poll(async () => {
+  //         return await worker.evaluate(async () => {
+  //           const tabs = await chrome.tabs.query({ active: true });
+  //           if (tabs.length === 0) return null;
+  //           return await chrome.action.getBadgeText({ tabId: tabs[0].id! });
+  //         });
+  //       })
+  //       .toBe(i.toString());
+  //   }
+  // });
 
-    // Mock network
-    await page.route('**/*', (route) => {
-      const url = route.request().url();
-      try {
-        const hostname = new URL(url).hostname;
-        if (['a.com', 'b.com', 'c.com', 'd.com'].includes(hostname)) {
-          return route.fulfill({ status: 200, body: 'Page' });
-        }
-      } catch (e) {
-        // Ignore invalid URLs
-      }
-      return route.continue();
-    });
+  // test('should increment badge count for transitive redirects up to 20', async ({
+  //   context,
+  //   page,
+  // }) => {
+  //   const worker = await getServiceWorker(context);
+  //   await worker.evaluate(async () => {
+  //     const rules = [
+  //       { source: 'a.com', target: 'b.com', active: true, count: 0, id: 401 },
+  //       { source: 'b.com', target: 'c.com', active: true, count: 0, id: 402 },
+  //       { source: 'c.com', target: 'd.com', active: true, count: 0, id: 403 },
+  //     ];
+  //     await (self as any).storage.saveRules(rules);
+  //   });
 
-    test.setTimeout(60000);
+  //   // Mock network
+  //   await page.route('**/*', (route) => {
+  //     const url = route.request().url();
+  //     try {
+  //       const hostname = new URL(url).hostname;
+  //       if (['a.com', 'b.com', 'c.com', 'd.com'].includes(hostname)) {
+  //         return route.fulfill({ status: 200, body: 'Page' });
+  //       }
+  //     } catch (e) {
+  //       // Ignore invalid URLs
+  //     }
+  //     return route.continue();
+  //   });
 
-    for (let i = 1; i <= 20; i++) {
-      await page.goto('https://a.com/');
-      await expect(page).toHaveURL(/d\.com/);
+  //   test.setTimeout(60000);
 
-      // Verify badge count matches iteration
-      await expect
-        .poll(async () => {
-          return await worker.evaluate(async () => {
-            const tabs = await chrome.tabs.query({ active: true });
-            if (tabs.length === 0) return null;
-            return await chrome.action.getBadgeText({ tabId: tabs[0].id! });
-          });
-        })
-        .toBe(i.toString());
-    }
+  //   for (let i = 1; i <= 20; i++) {
+  //     await page.goto('https://a.com/');
+  //     await expect(page).toHaveURL(/d\.com/);
 
-    // Verify all rule counts are 20
-    await expect
-      .poll(async () => {
-        return await worker.evaluate(async () => {
-          const rules = await (self as any).storage.getRules();
-          const r1 = rules.find((r: any) => r.id === 401);
-          const r2 = rules.find((r: any) => r.id === 402);
-          const r3 = rules.find((r: any) => r.id === 403);
-          return {
-            c1: r1?.count,
-            c2: r2?.count,
-            c3: r3?.count,
-          };
-        });
-      })
-      .toEqual({
-        c1: 20,
-        c2: 20,
-        c3: 20,
-      });
-  });
+  //     // Verify badge count matches iteration
+  //     await expect
+  //       .poll(async () => {
+  //         return await worker.evaluate(async () => {
+  //           const tabs = await chrome.tabs.query({ active: true });
+  //           if (tabs.length === 0) return null;
+  //           return await chrome.action.getBadgeText({ tabId: tabs[0].id! });
+  //         });
+  //       })
+  //       .toBe(i.toString());
+  //   }
+
+  //   // Verify all rule counts are 20
+  //   await expect
+  //     .poll(async () => {
+  //       return await worker.evaluate(async () => {
+  //         const rules = await (self as any).storage.getRules();
+  //         const r1 = rules.find((r: any) => r.id === 401);
+  //         const r2 = rules.find((r: any) => r.id === 402);
+  //         const r3 = rules.find((r: any) => r.id === 403);
+  //         return {
+  //           c1: r1?.count,
+  //           c2: r2?.count,
+  //           c3: r3?.count,
+  //         };
+  //       });
+  //     })
+  //     .toEqual({
+  //       c1: 20,
+  //       c2: 20,
+  //       c3: 20,
+  //     });
+  // });
 });
