@@ -17,7 +17,7 @@ jobs:
     # If you upgrade Playwright in package.json, update this tag.
     # ------------------------------------------------------------------
     container:
-      image: mcr.microsoft.com/playwright:v1.57.0-jammy
+      image: mcr.microsoft.com/playwright:v1.58.1-jammy
 
     steps:
       - uses: actions/checkout@v6
